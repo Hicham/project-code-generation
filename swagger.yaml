@@ -286,43 +286,7 @@ paths:
           description: Account not found.
         '500':
           description: Internal server error.
-  /transaction:
-    post:
-      summary: Transfer money between accounts
-      description: This endpoint facilitates the transfer of money from one account to another.
-      operationId: transferMoney
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - sourceIBAN
-                - destinationIBAN
-                - amount
-              properties:
-                sourceIBAN:
-                  type: integer
-                  description: The ID of the account from which money will be transferred.
-                destinationIBAN:
-                  type: integer
-                  description: The ID of the account to which money will be transferred.
-                amount:
-                  type: number
-                  format: double
-                  description: The amount of money to transfer.
-                  example: 250.00
-      responses:
-        '200':
-          description: Money transferred successfully.
-        '400':
-          description: Bad request, such as invalid account IDs or amount.
-        '404':
-          description: Account not found.
-        '500':
-          description: Internal server error.
-          
+
   /accounts/{IBAN}:
     get:
       summary: Get account details
@@ -452,6 +416,7 @@ paths:
         '500':
           description: Internal server error.
 
+
           
   /transactions:
     get:
@@ -467,6 +432,41 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Transaction'
+        '500':
+          description: Internal server error.
+    post:
+      summary: Transfer money between accounts
+      description: This endpoint facilitates the transfer of money from one account to another.
+      operationId: transferMoney
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - sourceIBAN
+                - destinationIBAN
+                - amount
+              properties:
+                sourceIBAN:
+                  type: integer
+                  description: The ID of the account from which money will be transferred.
+                destinationIBAN:
+                  type: integer
+                  description: The ID of the account to which money will be transferred.
+                amount:
+                  type: number
+                  format: double
+                  description: The amount of money to transfer.
+                  example: 250.00
+      responses:
+        '200':
+          description: Money transferred successfully.
+        '400':
+          description: Bad request, such as invalid account IDs or amount.
+        '404':
+          description: Account not found.
         '500':
           description: Internal server error.
   
