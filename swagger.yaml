@@ -1,0 +1,559 @@
+openapi: 3.0.0
+info:
+  title: Bank API
+  description: This API allows clients to create new user accounts and perform banking operations like depositing, withdrawing, and transferring money.
+  version: 2.0.0
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/698917_1/Bank/2.0.0
+  - url: 'https://api.idk.nl'
+    description: Bank dev server
+paths:
+  /login:
+    post:
+      summary: Login to user account
+      description: This endpoint allows users to log in to their account.
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: The user's email address.
+                  example: 'name@example.nl'
+                password:
+                  type: string
+                  format: password
+                  description: The user's password.
+                  example: 'password'
+      responses:
+        '200':
+          description: User logged in successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Login successful.'
+        '401':
+          description: Unauthorized. Incorrect email or password.
+        '500':
+          description: Internal server error.
+  /users:
+    post:
+      summary: Create a new user account
+      description: This endpoint creates a new user account with the provided details.
+      operationId: createAccount
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - firstname
+                - lastname
+                - bsnNumber
+                - phoneNumber
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: The user's email address.
+                  example: 'name@example.nl'
+                password:
+                  type: string
+                  format: password
+                  description: The user's desired password.
+                  example: 'password'
+                firstname:
+                  type: string
+                  description: The user's first name.
+                  example: 'name'
+                lastname:
+                  type: string
+                  description: The user's last name.
+                  example: 'lastname'
+                bsnNumber:
+                  type: string
+                  description: The user's BSN (Burger Service Nummer).
+                  example: '123456789'
+                phoneNumber:
+                  type: string
+                  description: The user's phone number.
+                  example: '+31123456789'
+      responses:
+        '201':
+          description: User created successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'User created successfully.'
+        '400':
+          description: Bad request. Could be due to missing or invalid fields.
+        '500':
+          description: Internal server error.
+    get:
+      summary: Retrieve a list of all users
+      description: This endpoint retrieves a list of all users.
+      operationId: getAllUsers
+      responses:
+        '200':
+          description: A list of users.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '500':
+          description: Internal server error.
+  
+  /users/{userId}:
+    get:
+      summary: Get user by ID
+      description: Retrieve user details by their ID.
+      operationId: getUserById
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The ID of the user to retrieve.
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: User details retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found.
+        '500':
+          description: Internal server error.
+    put:
+      summary: Update user details
+      description: This endpoint allows updating user details.
+      operationId: updateUser
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The ID of the user to update.
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: The user's email address.
+                  example: 'new_email@example.com'
+                password:
+                  type: string
+                  format: password
+                  description: The user's password.
+                  example: 'new_password'
+                firstname:
+                  type: string
+                  description: The user's first name.
+                  example: 'new_name'
+                lastname:
+                  type: string
+                  description: The user's last name.
+                  example: 'new_lastname'
+                bsnNumber:
+                  type: string
+                  description: The user's BSN (Burger Service Nummer).
+                  example: '987654321'
+                phoneNumber:
+                  type: string
+                  description: The user's phone number.
+                  example: '+31987654321'
+                isApproved:
+                  type: boolean
+                  description: If the user has rights to open an account.
+                  example: 1
+      responses:
+        '200':
+          description: User details updated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'User details updated successfully.'
+        '400':
+          description: Bad request. Could be due to missing or invalid fields.
+        '404':
+          description: User not found.
+        '500':
+          description: Internal server error.
+
+  /accounts/{IBAN}/deposit:
+    post:
+      summary: Deposit money into an account
+      description: This endpoint allows users to deposit money into their specified account.
+      operationId: depositMoney
+      parameters:
+        - name: IBAN
+          in: path
+          required: true
+          description: The ID of the account to deposit money into.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - amount
+              properties:
+                amount:
+                  type: number
+                  format: double
+                  description: The amount of money to deposit.
+                  example: 1000.00
+      responses:
+        '200':
+          description: Money deposited successfully.
+        '400':
+          description: Bad request, such as invalid account ID or amount.
+        '404':
+          description: Account not found.
+        '500':
+          description: Internal server error.
+  /accounts/{IBAN}/withdraw:
+    post:
+      summary: Withdraw money from an account
+      description: This endpoint allows users to withdraw money from their specified account.
+      operationId: withdrawMoney
+      parameters:
+        - name: IBAN
+          in: path
+          required: true
+          description: The ID of the account to withdraw money from.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - amount
+              properties:
+                amount:
+                  type: number
+                  format: double
+                  description: The amount of money to withdraw.
+                  example: 500.00
+      responses:
+        '200':
+          description: Money withdrawn successfully.
+        '400':
+          description: Bad request, such as invalid account ID or amount.
+        '404':
+          description: Account not found.
+        '500':
+          description: Internal server error.
+  /transaction:
+    post:
+      summary: Transfer money between accounts
+      description: This endpoint facilitates the transfer of money from one account to another.
+      operationId: transferMoney
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - sourceIBAN
+                - destinationIBAN
+                - amount
+              properties:
+                sourceIBAN:
+                  type: integer
+                  description: The ID of the account from which money will be transferred.
+                destinationIBAN:
+                  type: integer
+                  description: The ID of the account to which money will be transferred.
+                amount:
+                  type: number
+                  format: double
+                  description: The amount of money to transfer.
+                  example: 250.00
+      responses:
+        '200':
+          description: Money transferred successfully.
+        '400':
+          description: Bad request, such as invalid account IDs or amount.
+        '404':
+          description: Account not found.
+        '500':
+          description: Internal server error.
+          
+  /accounts/{IBAN}:
+    get:
+      summary: Get account details
+      description: This endpoint retrieves the details of the specified account.
+      operationId: getAccountDetails
+      parameters:
+        - name: IBAN
+          in: path
+          required: true
+          description: The account's IBAN.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Account details retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '404':
+          description: Account not found.
+        '500':
+          description: Internal server error.
+    put:
+      summary: Update account details
+      description: This endpoint allows updating account details.
+      operationId: updateAccount
+      parameters:
+        - name: IBAN
+          in: path
+          required: true
+          description: The IBAN of the account to update.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                balance:
+                  type: number
+                  format: double
+                  description: The updated balance of the account.
+                  example: 1500.00
+                currency:
+                  type: string
+                  description: The updated currency of the account.
+                  example: EUR
+                isActive:
+                  type: boolean
+                  description: If the account is closed or not.
+                  example: 1
+      responses:
+        '200':
+          description: Account details updated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Account details updated successfully.'
+        '400':
+          description: Bad request. Could be due to missing or invalid fields.
+        '404':
+          description: Account not found.
+        '500':
+          description: Internal server error.
+  
+  /accounts:
+    get:
+      summary: View all customer accounts
+      description: This endpoint allows employees to view all customer accounts, or their own.
+      operationId: viewAllCustomerAccounts
+      parameters:
+      - name: userId
+        in: query
+        description: The ID of the user whose accounts are to be retrieved. If not provided, returns all customer accounts (for employees).
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: List of all customer accounts retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserAccount'
+        '500':
+          description: Internal server error.
+          
+  /ibans:
+    get:
+      summary: Find IBANs by customer first and last names
+      description: This endpoint allows customers to find the IBANs of customers by their first and last names.
+      operationId: findIbansByNames
+      parameters:
+        - name: name
+          in: query
+          required: true
+          description: The name of the customer to search for.
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: IBANs found successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  customerName:
+                    type: string
+                  ibans:
+                    type: array
+                    items:
+                      type: string
+                      example: "NL91ABNA0417164300"
+        '404':
+          description: Customer not found.
+        '500':
+          description: Internal server error.
+
+          
+  /transactions:
+    get:
+      summary: Retrieve all transactions
+      description: This endpoint retrieves all transactions across all accounts.
+      operationId: getAllTransactions
+      responses:
+        '200':
+          description: List of all transactions retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Transaction'
+        '500':
+          description: Internal server error.
+  
+  /transactions/{userId}:
+    get:
+      summary: Retrieve transaction history of an user
+      description: This endpoint retrieves the transaction history for the specified account.
+      operationId: getTransactionHistory
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The userId of the account to retrieve transactions for.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Transaction history retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Transaction'
+        '404':
+          description: Account not found.
+        '500':
+          description: Internal server error.
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        email:
+          type: string
+        firstname:
+          type: string
+        lastname:
+          type: string
+        bsnNumber:
+          type: string
+        phoneNumber:
+          type: string
+    Account:
+      type: object
+      properties:
+        IBAN:
+          type: string
+        balance:
+          type: number
+          format: double
+        currency:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        sourceIBAN:
+          type: string
+        destinationIBAN:
+          type: string
+        type:
+          type: string
+          enum: [deposit, withdrawal, transfer]
+        amount:
+          type: number
+          format: double
+        timestamp:
+          type: string
+          format: date-time
+        initaitedBy:
+          type: integer
+    UserAccount:
+      allOf:
+        - $ref: '#/components/schemas/User'
+        - type: object
+          properties:
+            accounts:
+              type: array
+              items:
+                $ref: '#/components/schemas/Account'
