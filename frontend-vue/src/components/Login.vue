@@ -39,7 +39,7 @@
                         <a class="small" href="#">Forgot password</a>
                       </div>
                       <div>
-                        <a class="small" href="#">Register here</a>
+                        <a class="small" href="/register">Register here</a>
                       </div>
                     </div>
 
