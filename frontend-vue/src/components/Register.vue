@@ -18,6 +18,14 @@
                     </div>
                     <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Create an account</h5>
                     <div class="mb-4">
+                      <label class="form-label" for="username">Username</label>
+                      <input type="text" id="username" class="form-control form-control-lg" v-model="username" />
+                    </div>
+                    <div class="mb-4">
+                      <label class="form-label" for="password">Password</label>
+                      <input type="password" id="password" class="form-control form-control-lg" v-model="password" />
+                    </div>
+                    <div class="mb-4">
                       <label class="form-label" for="firstName">First Name</label>
                       <input type="text" id="firstName" class="form-control form-control-lg" v-model="firstName" />
                     </div>
