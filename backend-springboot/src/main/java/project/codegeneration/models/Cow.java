@@ -3,13 +3,9 @@ package project.codegeneration.models;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.HashSet;
-import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -25,7 +21,5 @@ public class Cow {
 
     private int age;
 
-    @OneToMany
-    private Set<Cheese> cheeses = new HashSet<>();
 }
 

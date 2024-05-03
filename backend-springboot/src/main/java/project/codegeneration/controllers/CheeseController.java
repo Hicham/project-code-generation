@@ -1,6 +1,5 @@
 package project.codegeneration.controllers;
 
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,7 +10,7 @@ import project.codegeneration.models.DTO.CheeseDTO;
 import java.util.List;
 
 @RestController
-@RequestMapping("cheeses")
+@RequestMapping("/api")
 public class CheeseController {
 
     private final CheeseService cheeseService;
@@ -21,15 +20,14 @@ public class CheeseController {
     }
 
 
-    @GetMapping
+    @GetMapping("/cheeses")
     public List<CheeseDTO> getCheeses() {
 
         List<Cheese> cheeses = cheeseService.getAllCheeses();
 
-        return cheeses.stream().map(cheese -> new CheeseDTO(cheese.getId(), cheese.getName(), cheese.getCow().getName())).toList();
+        return cheeses.stream().map(cheese -> new CheeseDTO(cheese.getId(), cheese.getName(), cheese.getAge(),cheese.getCow().getName())).toList();
 
     }
-
 
 
 }

@@ -20,20 +20,55 @@
           </div>
         </div>
       </div>
+
+
+
+
+      <div>
+        <h2>Cows</h2>
+        <ul>
+          <li v-for="cow in cows" :key="cow.id">{{ cow.name }}</li>
+        </ul>
+
+        <h2>Cheeses</h2>
+        <ul>
+          <li v-for="cheese in cheeses" :key="cheese.id">{{ cheese.name }} - {{ cheese.price }}</li>
+        </ul>
+      </div>
+
+
+
     </div>
   </section>
 </template>
 
 <script>
-import { useStore } from '@/stores/store';
-import axios from '../axios-auth';
+
+import axiosInstance from '../axios-instance';
+import { ref, onMounted } from 'vue';
 
 export default {
   name: 'Homepage',
   setup() {
-    // You can add any setup logic here
+    const cows = ref([]);
+    const cheeses = ref([]);
+
+    onMounted(async () => {
+      try {
+        const cowResponse = await axiosInstance.get('/cows');
+        cows.value = cowResponse.data;
+
+        const cheeseResponse = await axiosInstance.get('/cheeses');
+        cheeses.value = cheeseResponse.data;
+      } catch (error) {
+        console.error(error);
+      }
+    });
+
+    return { cows, cheeses };
   }
 };
+
 </script>
 
 <style scoped>

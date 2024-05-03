@@ -25,12 +25,15 @@ public class DataSeeder implements ApplicationRunner {
         // Add some data to the database
         Cow cow = new Cow();
         cow.setName("Betsy");
+        cow.setAge(5);
+
 
         cowRepository.save(cow);
 
         Cheese cheese = new Cheese();
         cheese.setName("Gouda");
         cheese.setPrice(5.99);
+        cheese.setAge(3);
         cheese.setCow(cow);
         cheeseRepository.save(cheese);
 
