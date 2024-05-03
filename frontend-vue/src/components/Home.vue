@@ -27,12 +27,16 @@
       <div>
         <h2>Cows</h2>
         <ul>
-          <li v-for="cow in cows" :key="cow.id">{{ cow.name }}</li>
+          <li v-for="cow in cows" :key="cow.id">
+            Name: {{ cow.name }} - Age: {{ cow.age }}
+          </li>
         </ul>
 
         <h2>Cheeses</h2>
         <ul>
-          <li v-for="cheese in cheeses" :key="cheese.id">{{ cheese.name }} - {{ cheese.price }}</li>
+          <li v-for="cheese in cheeses" :key="cheese.id">
+            Name: {{ cheese.name }} - Price: {{ cheese.price }} - Made from (Cow Name): {{ cheese.cowName }}
+          </li>
         </ul>
       </div>
 
