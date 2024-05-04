@@ -14,8 +14,7 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Account {
     @Id
-    @GeneratedValue
-    private int IBAN;
+    private String IBAN;
 
     @ManyToOne
     private User UserId;
