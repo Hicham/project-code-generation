@@ -6,14 +6,14 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class UserDTO {
-    private int UserId;
-    private String RoleName;
-    private boolean IsApproved;
-    private String Email;
-    private String Password;
-    private String FirstName;
-    private String LastName;
+    private int userId;
+    private String roleName;
+    private boolean isApproved;
+    private String email;
+    private String password;
+    private String firstName;
+    private String lastName;
     private String BSNNumber;
-    private int PhoneNumber;
-    private int PinCode;
+    private int phoneNumber;
+    private int pinCode;
 }

@@ -20,14 +20,6 @@ public class CheeseController {
     }
 
 
-    @GetMapping("/cheeses")
-    public List<CheeseDTO> getCheeses() {
-
-        List<Cheese> cheeses = cheeseService.getAllCheeses();
-
-        return cheeses.stream().map(cheese -> new CheeseDTO(cheese.getId(), cheese.getName(), cheese.getAge(),cheese.getCow().getName())).toList();
-
-    }
 
 
 }

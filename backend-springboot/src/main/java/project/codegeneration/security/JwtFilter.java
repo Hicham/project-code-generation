@@ -35,7 +35,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String token = getTokenFromRequest(request);
 
-        if (token != null) {
+        if (token == null) {
             filterChain.doFilter(request, response);
             return;
         }

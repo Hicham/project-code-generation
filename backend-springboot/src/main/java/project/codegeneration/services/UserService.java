@@ -2,11 +2,13 @@ package project.codegeneration.services;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import project.codegeneration.models.DTO.UserDTO;
 import project.codegeneration.models.User;
 import project.codegeneration.repositories.UserRepository;
 import project.codegeneration.security.JwtProvider;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
