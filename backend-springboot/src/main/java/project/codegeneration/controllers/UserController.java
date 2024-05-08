@@ -12,15 +12,15 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 public class UserController {
-    private final UserService userService;
-
-    public UserController(final UserService userService) {
-        this.userService = userService;
-    }
-
-    @GetMapping("/users")
-    public List<UserDTO> getUsers() {
-        List<User> users = userService.getAllUsers();
-        return users.stream().map(user -> new UserDTO(user.getUserId(), user.getRoleId().getRoleName(), user.isIsApproved(), user.getEmail(), user.getPassword(), user.getFirstName(), user.getLastName(), user.getBSNNumber(), user.getPhoneNumber(), user.getPinCode())).toList();
-    }
+//    private final UserService userService;
+//
+//    public UserController(final UserService userService) {
+//        this.userService = userService;
+//    }
+//
+//    @GetMapping("/users")
+//    public List<UserDTO> getUsers() {
+//        List<User> users = userService.getAllUsers();
+//        return users.stream().map(user -> new UserDTO(user.getUserId(), user.getRoleId().getRoleName(), user.isIsApproved(), user.getEmail(), user.getPassword(), user.getFirstName(), user.getLastName(), user.getBSNNumber(), user.getPhoneNumber(), user.getPinCode())).toList();
+//    }
 }

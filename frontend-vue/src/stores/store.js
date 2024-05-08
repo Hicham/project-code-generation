@@ -15,12 +15,12 @@ export const useStore = defineStore('counter', {
       {
           return JSON.parse(atob(token.split('.')[1]));
       },
-    login(username, password) {
+    login(email, password) {
         return new Promise((resolve, reject) => {
 
 
         axios.post("/users/login", {
-            username: username,
+            email: email,
             password: password,
           })
           .then((res) => {

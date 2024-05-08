@@ -1,8 +1,13 @@
 package project.codegeneration.repositories;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import project.codegeneration.models.User;
+import org.springframework.data.repository.CrudRepository;
 
-public interface UserRepository extends JpaRepository<User, Integer> {
+import java.util.Optional;
+
+
+public interface UserRepository extends CrudRepository<User, Long> {
+
+    Optional<User> findByUsername(String email);
 
 }

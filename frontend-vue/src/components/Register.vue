@@ -18,8 +18,8 @@
                     </div>
                     <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Create an account</h5>
                     <div class="mb-4">
-                      <label class="form-label" for="username">Username</label>
-                      <input type="text" id="username" class="form-control form-control-lg" v-model="username" />
+                      <label class="form-label" for="email">Email address</label>
+                      <input type="email" id="email" class="form-control form-control-lg" v-model="email" />
                     </div>
                     <div class="mb-4">
                       <label class="form-label" for="password">Password</label>
@@ -32,10 +32,6 @@
                     <div class="mb-4">
                       <label class="form-label" for="lastName">Last Name</label>
                       <input type="text" id="lastName" class="form-control form-control-lg" v-model="lastName" />
-                    </div>
-                    <div class="mb-4">
-                      <label class="form-label" for="email">Email address</label>
-                      <input type="email" id="email" class="form-control form-control-lg" v-model="email" />
                     </div>
                     <div class="mb-4">
                       <label class="form-label" for="bsn">BSN Number</label>

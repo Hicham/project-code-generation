@@ -1,37 +1,43 @@
 package project.codegeneration.services;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import project.codegeneration.models.User;
 import project.codegeneration.repositories.UserRepository;
+import project.codegeneration.security.JwtProvider;
 
 import java.util.List;
 
 @Service
 public class UserService {
+    private final UserRepository userRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final JwtProvider jwtProvider;
 
-        private final UserRepository userRepository;
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, JwtProvider jwtProvider) {
+        this.userRepository = userRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.jwtProvider = jwtProvider;
+    }
 
-        public UserService(UserRepository userRepository) {
-            this.userRepository = userRepository;
+    public User create(User user) {
+
+        if (userRepository.findByUsername(user.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("Email already exists");
         }
 
-        public User getUserById(int id) {
-            return userRepository.findById(id).orElseThrow();
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        return userRepository.save(user);
+    }
+
+    public String login(String email, String password){
+        User user = userRepository.findByUsername(email).orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        if (!bCryptPasswordEncoder.matches(password, user.getPassword())) {
+            throw new IllegalArgumentException("Invalid password");
         }
 
-        public List<User> getAllUsers() {
-            return userRepository.findAll();
-        }
+        return jwtProvider.createToken(user.getEmail(), user.getRoles());
+    }
 
-        public User updateUser(User user) {
-            return userRepository.save(user);
-        }
-
-        public User createUser(User user) {
-            return userRepository.save(user);
-        }
-
-        public void deleteUser(int id) {
-            userRepository.deleteById(id);
-        }
 }

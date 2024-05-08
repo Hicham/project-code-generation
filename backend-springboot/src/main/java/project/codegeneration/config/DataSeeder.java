@@ -5,8 +5,13 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 import project.codegeneration.models.Cheese;
 import project.codegeneration.models.Cow;
+import project.codegeneration.models.Role;
+import project.codegeneration.models.User;
 import project.codegeneration.repositories.CheeseRepository;
 import project.codegeneration.repositories.CowRepository;
+import project.codegeneration.services.UserService;
+
+import java.util.List;
 
 
 @Component
@@ -14,11 +19,14 @@ public class DataSeeder implements ApplicationRunner {
 
     private final CowRepository cowRepository;
     private final CheeseRepository cheeseRepository;
+    private UserService userService;
 
-    public DataSeeder(CowRepository cowRepository, CheeseRepository cheeseRepository) {
-        this.cowRepository = cowRepository;
-        this.cheeseRepository = cheeseRepository;
-    }
+
+       public DataSeeder(CowRepository cowRepository, CheeseRepository cheeseRepository, UserService userService) {
+            this.cowRepository = cowRepository;
+            this.cheeseRepository = cheeseRepository;
+            this.userService = userService;
+        }
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -36,6 +44,9 @@ public class DataSeeder implements ApplicationRunner {
         cheese.setAge(3);
         cheese.setCow(cow);
         cheeseRepository.save(cheese);
+
+        User user = new User(1, List.of(Role.ROLE_USER), false, "duha@gmail.com", "test", "Duha", "Kahya", "3652584", "06352615", 2514);
+        userService.create(user);
 
     }
 }

@@ -1,20 +1,13 @@
 package project.codegeneration.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Data
-@Entity
-public class Role {
-    @Id
-    @GeneratedValue
-    private int RoleId;
+public enum Role implements GrantedAuthority {
+    ROLE_USER,
+    ROLE_ADMIN;
 
-    private String RoleName;
+    @Override
+    public String getAuthority() {
+        return name();
+    }
 }

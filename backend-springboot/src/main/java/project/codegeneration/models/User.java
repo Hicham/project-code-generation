@@ -1,24 +1,25 @@
 package project.codegeneration.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Entity
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue
     private int UserId;
 
-    @ManyToOne
-    private Role RoleId;
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<Role> roles = new ArrayList<>();
 
     private boolean IsApproved;
 
@@ -32,8 +33,10 @@ public class User {
 
     private String BSNNumber;
 
-    private int PhoneNumber;
+    private String PhoneNumber;
 
     private int PinCode;
+
+
 
 }

@@ -67,14 +67,14 @@ export default {
   },
   data() {
     return {
-      username: "",
+      email: "",
       password: "",
       errorMessage : "",
     };
   },
   methods: {
     login() {
-      this.store.login(this.username, this.password)
+      this.store.login(this.email, this.password)
           .then((res) => {
             this.$router.replace("/home");
           })
