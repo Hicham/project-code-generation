@@ -22,7 +22,7 @@ public class UserService {
 
     public User create(User user) {
 
-        if (userRepository.findByUsername(user.getEmail()).isPresent()) {
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Email already exists");
         }
 
@@ -31,7 +31,7 @@ public class UserService {
     }
 
     public String login(String email, String password){
-        User user = userRepository.findByUsername(email).orElseThrow(() -> new IllegalArgumentException("User not found"));
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         if (!bCryptPasswordEncoder.matches(password, user.getPassword())) {
             throw new IllegalArgumentException("Invalid password");

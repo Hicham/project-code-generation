@@ -16,26 +16,26 @@ import java.util.List;
 public class User {
     @Id
     @GeneratedValue
-    private int UserId;
+    private int userId;
 
     @ElementCollection(fetch = FetchType.EAGER)
     private List<Role> roles = new ArrayList<>();
 
-    private boolean IsApproved;
+    private boolean isApproved;
 
-    private String Email;
+    private String email;
 
-    private String Password;
+    private String password;
 
-    private String FirstName;
+    private String firstName;
 
-    private String LastName;
+    private String lastName;
 
-    private String BSNNumber;
+    private String BSNnumber;
 
-    private String PhoneNumber;
+    private String phoneNumber;
 
-    private int PinCode;
+    private int pinCode;
 
 
 
