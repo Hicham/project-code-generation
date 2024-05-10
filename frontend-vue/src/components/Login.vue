@@ -48,6 +48,11 @@
               </div>
             </div>
           </div>
+
+          <div class="alert alert-danger mt-3" v-if="errorMessage">
+            {{ errorMessage }}
+          </div>
+
         </div>
       </div>
     </div>
@@ -72,11 +77,18 @@ export default {
       const store = useStore();
       store.login(this.email, this.password)
           .then(() => {
+            this.errorMessage = ""; // Reset error message
             alert("Ingelogd! Bearer code: " + store.token);
-            this.$router.push("/home");
+            this.$router.push("/");
           })
           .catch((error) => {
-            alert("Fout: " + error.data.errorMessage);
+            this.errorMessage = "Ongeldig e-mailadres of wachtwoord.";
+            // Wis de ingevoerde gegevens
+            this.email = "";
+            this.password = "";
+            setTimeout(() => {
+              this.errorMessage = ""; // Verwijder de error message na 10 seconden
+            }, 10000); // 10 seconden
           });
     },
   }

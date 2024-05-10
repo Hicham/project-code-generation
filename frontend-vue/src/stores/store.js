@@ -16,7 +16,7 @@ export const useStore = defineStore('counter', {
       {
           return JSON.parse(atob(token.split('.')[1]));
       },
-    login(email, password) {
+      login(email, password) {
         return new Promise((resolve, reject) => {
 
             axiosInstance.post("/login", {
@@ -36,7 +36,6 @@ export const useStore = defineStore('counter', {
 
             localStorage.setItem('token', res.data.token);
             localStorage.setItem('user', JSON.stringify(decoded));
-
 
             resolve();
         })

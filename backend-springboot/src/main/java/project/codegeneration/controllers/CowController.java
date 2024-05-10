@@ -19,5 +19,11 @@ public class CowController {
         this.cowService = cowService;
     }
 
+    @GetMapping("/cows")
+    public List<CowDTO> getCows() {
+        List<Cow> cows = cowService.getAllCows();
+        return cows.stream().map(cow -> new CowDTO(cow.getId(), cow.getName(), cow.getAge())).toList();
+    }
+
 
 }
