@@ -53,7 +53,7 @@ paths:
     post:
       summary: Create a new user account
       description: This endpoint creates a new user account with the provided details.
-      operationId: createAccount
+      operationId: createUser
       requestBody:
         required: true
         content:
@@ -100,11 +100,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: 'User created successfully.'
+                $ref: '#/components/schemas/User'
         '400':
           description: Bad request. Could be due to missing or invalid fields.
         '500':
@@ -215,7 +211,25 @@ paths:
           description: User not found.
         '500':
           description: Internal server error.
-
+    delete:
+      summary: Deactivate user by ID
+      description: Deactivate the user with the specified ID.
+      operationId: deleteUser
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The ID of the user to deactivate.
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: User deactivated successfully.
+        '404':
+          description: User not found.
+        '500':
+          description: Internal server error.
   /accounts/{IBAN}/deposit:
     post:
       summary: Deposit money into an account
@@ -358,8 +372,54 @@ paths:
           description: Account not found.
         '500':
           description: Internal server error.
-  
+    delete:
+      summary: Deactivate account
+      description: Deactivates the account with the specified IBAN.
+      operationId: deleteAccount
+      parameters:
+        - name: IBAN
+          in: path
+          required: true
+          description: The IBAN of the account to deactivate.
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Account deleted successfully.
+        '404':
+          description: Account not found.
+        '500':
+          description: Internal server error.
+        
   /accounts:
+    post:
+      summary: Create a new account
+      description: This endpoint allows to create a new bank account.
+      operationId: createAccount
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - userId
+              properties:
+                userId:
+                  type: integer
+                  description: UserId of the account owner
+                  example: '123'
+      responses:
+        '201':
+          description: Account created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '400':
+          description: Bad request. Could be due to missing or invalid fields.
+        '500':
+          description: Internal server error.
     get:
       summary: View all customer accounts
       description: This endpoint allows employees to view all customer accounts, or their own.
@@ -382,6 +442,7 @@ paths:
                   $ref: '#/components/schemas/UserAccount'
         '500':
           description: Internal server error.
+      
           
   /ibans:
     get:
@@ -421,8 +482,47 @@ paths:
   /transactions:
     get:
       summary: Retrieve all transactions
-      description: This endpoint retrieves all transactions across all accounts.
+      description: This endpoint retrieves all transactions across all accounts. It supports filtering by date range, transaction amount, and specific IBAN.
       operationId: getAllTransactions
+      parameters:
+        - name: userId
+          in: query
+          required: false
+          description: The userId of the account to retrieve transactions for.
+          schema:
+            type: string
+        - name: startDate
+          in: query
+          required: false
+          description: Start date for filtering transactions.
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          required: false
+          description: End date for filtering transactions.
+          schema:
+            type: string
+            format: date
+        - name: minAmount
+          in: query
+          required: false
+          description: Minimum amount to filter transactions. Transactions equal to or greater than this amount will be included.
+          schema:
+            type: number
+        - name: maxAmount
+          in: query
+          required: false
+          description: Maximum amount to filter transactions. Transactions equal to or less than this amount will be included.
+          schema:
+            type: number
+        - name: iban
+          in: query
+          required: false
+          description: IBAN to filter transactions. Only transactions to/from this IBAN will be included.
+          schema:
+            type: string
       responses:
         '200':
           description: List of all transactions retrieved successfully.
