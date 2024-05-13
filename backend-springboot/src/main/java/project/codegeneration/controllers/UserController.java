@@ -24,8 +24,12 @@ public class UserController {
     @GetMapping("/users")
     public List<UserDTO> getUsers() {
         List<User> users = userService.getAllUsers();
-        return users.stream().map(user -> new UserDTO(user.getUserId(), user.getRoles().toString(), user.isApproved(), user.getEmail(), user.getPassword(), user.getFirstName(), user.getLastName(), user.getBSNnumber(), user.getPhoneNumber(), user.getPinCode())).toList();
+        return users.stream().map(user -> new UserDTO(user.getUserId(), user.getRoles().toString(), user.isApproved(), user.getEmail(), user.getPassword(), user.getFirstName(), user.getLastName(), user.getBSNNumber(), user.getPhoneNumber(), user.getPinCode())).toList();
     }
 
-
+    @GetMapping("/unapproved-users")
+    public List<UserDTO> getNotApprovedUsers() {
+        List<User> users = userService.getNotApprovedUsers();
+        return users.stream().map(user -> new UserDTO(user.getUserId(), user.getRoles().toString(), user.isApproved(), user.getEmail(), user.getPassword(), user.getFirstName(), user.getLastName(), user.getBSNNumber(), user.getPhoneNumber(), user.getPinCode())).toList();
+    }
 }

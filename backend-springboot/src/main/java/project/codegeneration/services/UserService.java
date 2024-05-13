@@ -2,6 +2,7 @@ package project.codegeneration.services;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import project.codegeneration.models.Role;
 import project.codegeneration.models.User;
 import project.codegeneration.repositories.UserRepository;
 import project.codegeneration.security.JwtProvider;
@@ -45,4 +46,12 @@ public class UserService {
         return jwtProvider.createToken(user.getEmail(), user.getRoles());
     }
 
+    public List<User> getNotApprovedUsers() {
+        return userRepository.findNotApproved();
+    }
+
+    //new return
+//    public List<User> getNotApprovedUsers() {
+//        return userRepository.findNotApproved(Role.ROLE_USER);
+//    }
 }
