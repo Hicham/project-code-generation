@@ -47,11 +47,7 @@ public class UserService {
     }
 
     public List<User> getNotApprovedUsers() {
-        return userRepository.findNotApproved();
+        return userRepository.findNotApproved(Role.ROLE_USER);
     }
 
-    //new return
-//    public List<User> getNotApprovedUsers() {
-//        return userRepository.findNotApproved(Role.ROLE_USER);
-//    }
 }

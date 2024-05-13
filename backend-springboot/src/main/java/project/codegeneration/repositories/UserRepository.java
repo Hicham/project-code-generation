@@ -17,10 +17,6 @@ public interface UserRepository extends CrudRepository<User, Long> {
     Optional<User> findByEmail(String email);
 
     //Not approved accounts
-    @Query("SELECT u FROM User u WHERE u.isApproved = false")
-    List<User> findNotApproved();
-
-    //new query
-//    @Query("SELECT u FROM User u WHERE u.isApproved = false AND u.roles = :role")
-//    List<User> findNotApproved(@Param("role") Role role);
+    @Query("SELECT u FROM User u WHERE u.isApproved = false AND :role MEMBER OF u.roles")
+    List<User> findNotApproved(@Param("role") Role role);
 }
