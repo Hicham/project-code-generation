@@ -19,15 +19,15 @@
                     <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Sign into your account</h5>
                     <div class="mb-4">
                       <label class="form-label" for="email">Email address</label>
-                      <input type="email" id="email" class="form-control form-control-lg" />
+                      <input v-model="email" type="email" id="email" class="form-control form-control-lg" />
                     </div>
                     <div class="mb-4">
                       <label class="form-label" for="password">Password</label>
-                      <input type="password" id="password" class="form-control form-control-lg" />
+                      <input v-model="password" type="password" id="password" class="form-control form-control-lg" />
                     </div>
                     <div class="row mb-4">
                       <div class="col">
-                        <button class="btn btn-primary btn-lg btn-block w-100" type="button">Login</button>
+                        <button @click="login" class="btn btn-primary btn-lg btn-block w-100" type="button">Login</button>
                       </div>
                       <div class="col">
                         <button class="btn btn-secondary btn-lg btn-block w-100" type="button">Login ATM</button>
@@ -48,6 +48,11 @@
               </div>
             </div>
           </div>
+
+          <div class="alert alert-danger mt-3" v-if="errorMessage">
+            {{ errorMessage }}
+          </div>
+
         </div>
       </div>
     </div>
@@ -55,36 +60,40 @@
 </template>
 
 <script>
-import { storeToRefs } from 'pinia';
-import axios from '../axios-auth';
 import { useStore } from '@/stores/store';
 
 export default {
   name: "Login",
-  setup() {
-    const store = useStore();
-    return { store };
-  },
   data() {
     return {
       email: "",
       password: "",
-      errorMessage : "",
+      errorMessage: "",
     };
   },
   methods: {
     login() {
-      this.store.login(this.email, this.password)
-          .then((res) => {
-            this.$router.replace("/home");
+      // Gebruik `useStore` buiten de methode om toegang te krijgen tot de store
+      const store = useStore();
+      store.login(this.email, this.password)
+          .then(() => {
+            this.errorMessage = ""; // Reset error message
+            alert("Ingelogd! Bearer code: " + store.token);
+            this.$router.push("/");
           })
-          .catch((error) => this.errorMessage = error.data.errorMessage);
+          .catch((error) => {
+            this.errorMessage = "Ongeldig e-mailadres of wachtwoord.";
+            // Wis de ingevoerde gegevens
+            this.email = "";
+            this.password = "";
+            setTimeout(() => {
+              this.errorMessage = ""; // Verwijder de error message na 10 seconden
+            }, 10000); // 10 seconden
+          });
     },
   }
-
 };
 </script>
-
 
 <style>
 

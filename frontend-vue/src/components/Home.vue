@@ -59,10 +59,10 @@ export default {
 
     onMounted(async () => {
       try {
-        const cowResponse = await axiosInstance.get('/cows');
+        const cowResponse = await axiosInstance.get('/api/cows');
         cows.value = cowResponse.data;
 
-        const cheeseResponse = await axiosInstance.get('/cheeses');
+        const cheeseResponse = await axiosInstance.get('/api/cheeses');
         cheeses.value = cheeseResponse.data;
       } catch (error) {
         console.error(error);

@@ -24,4 +24,6 @@ public class CowController {
         List<Cow> cows = cowService.getAllCows();
         return cows.stream().map(cow -> new CowDTO(cow.getId(), cow.getName(), cow.getAge())).toList();
     }
+
+
 }

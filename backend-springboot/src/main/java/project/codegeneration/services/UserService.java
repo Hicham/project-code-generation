@@ -7,6 +7,7 @@ import project.codegeneration.repositories.UserRepository;
 import project.codegeneration.security.JwtProvider;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -18,6 +19,10 @@ public class UserService {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.jwtProvider = jwtProvider;
+    }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 
     public User create(User user) {

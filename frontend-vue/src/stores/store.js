@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import axios from '../axios-auth';
+import axiosInstance from '../axios-instance';
 
 
 export const useStore = defineStore('counter', {
@@ -15,28 +16,26 @@ export const useStore = defineStore('counter', {
       {
           return JSON.parse(atob(token.split('.')[1]));
       },
-    login(email, password) {
+      login(email, password) {
         return new Promise((resolve, reject) => {
 
-
-        axios.post("/users/login", {
+            axiosInstance.post("/login", {
             email: email,
             password: password,
           })
           .then((res) => {
 
-            axios.defaults.headers.common['Authorization'] = 'Bearer ' + res.data;
+            axios.defaults.headers.common['Authorization'] = 'Bearer ' + res.data.token;
 
-            this.token = res.data;
+            this.token = res.data.token;
 
             let decoded = this.decodeJwt(this.token).sub;
 
             this.user = decoded;
 
 
-            localStorage.setItem('token', res.data);
+            localStorage.setItem('token', res.data.token);
             localStorage.setItem('user', JSON.stringify(decoded));
-
 
             resolve();
         })
