@@ -45,9 +45,9 @@ public class DataSeeder implements ApplicationRunner {
         cheese.setCow(cow);
         cheeseRepository.save(cheese);
 
-//        User user = new User(1, List.of(Role.ROLE_USER), false, "duha@gmail.com", "test", "Duha", "Kahya", "3652584", "06352615", 2514);
-//        User user2 = new User(2, List.of(Role.ROLE_USER), false, "wouter@gmail.com", "test", "Wouter", "Zwart", "3652666", "06352666", 2556);
-//        User user3 = new User(3, List.of(Role.ROLE_USER), true, "woutert@gmail.com", "test", "Wouter", "Zwart", "3652666", "06352666", 2557);
+//        User user = new User(1, List.of(Role.ROLE_USER), false, "duha@gmail.com", "test", "Duha", "Kahya", "3652584", "06352615");
+//        User user2 = new User(2, List.of(Role.ROLE_USER), false, "wouter@gmail.com", "test", "Wouter", "Zwart", "3652666", "06352666");
+//        User user3 = new User(3, List.of(Role.ROLE_USER), true, "woutert@gmail.com", "test", "Wouter", "Zwart", "3652666", "06352666");
 //        userService.create(user);
 //        userService.create(user2);
 //        userService.create(user3);

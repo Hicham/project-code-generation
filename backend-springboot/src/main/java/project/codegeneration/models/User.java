@@ -34,9 +34,4 @@ public class User {
     private String BSNNumber;
 
     private String phoneNumber;
-
-    private int pinCode;
-
-
-
 }

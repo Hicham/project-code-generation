@@ -13,18 +13,31 @@
       </tr>
       </thead>
       <tbody>
-      <tr v-for="user in users" :key="user.id">
+      <tr v-for="user in users" :key="user.userId">
+        <td>{{ user.userId }}</td>
         <td>{{ user.firstName }}</td>
         <td>{{ user.lastName }}</td>
         <td>{{ user.bsnnumber }}</td>
         <td>{{ user.phoneNumber }}</td>
         <td>{{ user.email }}</td>
         <td>
-          <button class="btn btn-primary" @click="approveUser(user.id)">Approve</button>
+          <button class="btn btn-primary" @click="approveUser(user.userId)">Approve</button>
         </td>
       </tr>
       </tbody>
     </table>
+    <div v-if="showPopup" class="modal fade show" style="display: block;" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-body">
+            <p>Accounts have been created successfully.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" @click="closePopup">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -36,6 +49,21 @@ export default {
   name: "NoAccount",
   setup() {
     const users = ref([]);
+    const showPopup = ref(false);
+
+    const approveUser = async (userId) => {
+      console.log(userId);
+      try {
+        await axiosInstance.post(`/api/accounts?userId=${userId}`);
+        showPopup.value = true;
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    const closePopup = () => {
+      showPopup.value = false;
+    };
 
     onMounted(async () => {
       try {
@@ -46,7 +74,7 @@ export default {
       }
     });
 
-    return { users };
+    return { users, approveUser, showPopup, closePopup};
   },
 };
 

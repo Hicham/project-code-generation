@@ -22,4 +22,10 @@ public class Account {
     private String AccountType;
 
     private double Balance;
+
+    private int pinCode;
+
+    private boolean isActive;
+
+    private double absoluteLimit;
 }
