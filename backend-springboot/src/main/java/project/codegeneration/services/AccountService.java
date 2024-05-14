@@ -2,6 +2,7 @@ package project.codegeneration.services;
 
 import org.springframework.stereotype.Service;
 import project.codegeneration.models.Account;
+import project.codegeneration.models.User;
 import project.codegeneration.repositories.AccountRepository;
 
 import java.util.List;
@@ -33,4 +34,6 @@ public class AccountService {
     public void deleteAccount(int id) {
         accountRepository.deleteById(id);
     }
+
+
 }

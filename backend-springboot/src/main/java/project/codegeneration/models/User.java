@@ -37,6 +37,9 @@ public class User {
 
     private int pinCode;
 
+    @OneToMany(fetch = FetchType.EAGER)
+    private List<Account> accounts = new ArrayList<>();
+
 
 
 }
