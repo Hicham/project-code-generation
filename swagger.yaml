@@ -569,32 +569,6 @@ paths:
           description: Account not found.
         '500':
           description: Internal server error.
-  
-  /transactions/{userId}:
-    get:
-      summary: Retrieve transaction history of an user
-      description: This endpoint retrieves the transaction history for the specified account.
-      operationId: getTransactionHistory
-      parameters:
-        - name: userId
-          in: path
-          required: true
-          description: The userId of the account to retrieve transactions for.
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Transaction history retrieved successfully.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Transaction'
-        '404':
-          description: Account not found.
-        '500':
-          description: Internal server error.
 
 components:
   schemas:
