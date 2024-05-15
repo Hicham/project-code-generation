@@ -92,9 +92,6 @@ export const useStore = defineStore('counter', {
         let user = localStorage.getItem('user');
         let loginType = localStorage.getItem('loginType');
 
-        console.log(loginType);
-
-
         if (token) {
           this.token = token;
 

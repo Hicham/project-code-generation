@@ -3,13 +3,17 @@ package project.codegeneration.config;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
-import project.codegeneration.models.Account;
+import project.codegeneration.models.*;
+import project.codegeneration.repositories.AccountCardRepository;
 import project.codegeneration.repositories.AccountRepository;
 import project.codegeneration.repositories.CheeseRepository;
 import project.codegeneration.repositories.CowRepository;
 import project.codegeneration.services.AccountCardService;
 import project.codegeneration.services.AccountService;
 import project.codegeneration.services.UserService;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Component
@@ -21,15 +25,18 @@ public class DataSeeder implements ApplicationRunner {
 
     private final AccountService accountService;
     private final AccountCardService accountCardService;
+
+    private final AccountCardRepository accountCardRepository;
     private UserService userService;
 
 
-       public DataSeeder(CowRepository cowRepository, CheeseRepository cheeseRepository, AccountRepository accountRepository, AccountService accountService, AccountCardService accountCardService, UserService userService) {
+       public DataSeeder(CowRepository cowRepository, CheeseRepository cheeseRepository, AccountRepository accountRepository, AccountService accountService, AccountCardService accountCardService, AccountCardRepository accountCardRepository, UserService userService) {
            this.cowRepository = cowRepository;
            this.cheeseRepository = cheeseRepository;
            this.accountRepository = accountRepository;
            this.accountService = accountService;
            this.accountCardService = accountCardService;
+           this.accountCardRepository = accountCardRepository;
            this.userService = userService;
         }
 
@@ -50,26 +57,30 @@ public class DataSeeder implements ApplicationRunner {
 //        cheese.setCow(cow);
 //        cheeseRepository.save(cheese);
 
-//        User user = new User(List.of(Role.ROLE_USER), false, "Hicham@gmail.com", "test", "test", "test", "3652584", "06352615");
-//        userService.create(user);
+        User user = new User(List.of(Role.ROLE_USER), false, "Hicham@gmail.com", "test", "test", "test", "3652584", "06352615");
+        userService.create(user);
 //
 ////        User user = userService.findByEmail("Hicham@gmail.com").get();
 ////
-//        AccountCard card = new AccountCard("0000", "Hicham El Ans");
-////
-//        accountCardService.create(card);
+        AccountCard card = new AccountCard("0000", "Hicham El Ans");
 //
-//        List<AccountCard> cards = new ArrayList<>();
-//        cards.add(card);
-//
-//        Account account = new Account("IBANFAKE1", user, AccountType.SAVINGS, 1000, cards);
-//
-//        accountRepository.save(account);
+        accountCardService.create(card);
+
+        List<AccountCard> cards = new ArrayList<>();
+        cards.add(card);
+
+        Account account = new Account("IBANFAKE1", AccountType.SAVINGS, 1000, cards);
+
+        accountRepository.save(account);
 
 
 //            Account account = accountService.getAccountByIBAN("IBANFAKE1");
 //            System.out.println(account);
 
+
+//        String email = accountCardRepository.findUserEmailByCardId(1);
+//
+//        System.out.println(email);
 
     }
 }

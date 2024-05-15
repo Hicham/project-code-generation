@@ -23,6 +23,11 @@ public class AccountService {
         return accountRepository.findByIBAN(IBAN);
     }
 
+    public Account getAccountByAccountCard(long id)
+    {
+        return accountRepository.findByCards_Id(id);
+    }
+
     public List<Account> getAllAccounts() {
         return accountRepository.findAll();
     }

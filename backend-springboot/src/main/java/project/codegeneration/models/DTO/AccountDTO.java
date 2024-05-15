@@ -7,7 +7,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class AccountDTO {
     private String IBAN;
-    private int UserId;
+//    private int UserId;
     private String AccountType;
     private double Balance;
 }

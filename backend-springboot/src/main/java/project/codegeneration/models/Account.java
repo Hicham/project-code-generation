@@ -20,8 +20,8 @@ public class Account {
 //    @ManyToOne
 //    private User userId;
 
-    @ManyToOne
-    private User user;
+//    @ManyToOne
+//    private User user;
 
 
     private AccountType accountType;

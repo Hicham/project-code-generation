@@ -24,7 +24,37 @@
 
 
 <script>
+import axios from "axios";
+import { useStore } from '@/stores/store';
+import axiosInstance from '@/axios-instance';
+import {useRouter} from "vue-router";
+
 export default {
-  name: "Atm"
+  name: "Atm",
+  data() {
+    return {
+      account: null,
+    };
+  },
+  mounted() {
+    this.getAccount();
+  },
+  methods: {
+    getAccount() {
+      axiosInstance
+          .get("/api/accounts/IBANFAKE1", {
+            headers: {
+              Authorization: "Bearer " + useStore().token,
+            }
+          })
+          .then((result) => {
+            this.account = result.data;
+            console.log(this.account);
+          })
+          .catch((error) => console.log(error));
+
+    }
+  }
 }
+
 </script>

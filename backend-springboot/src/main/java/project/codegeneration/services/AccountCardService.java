@@ -38,6 +38,6 @@ public class AccountCardService {
             throw new IllegalArgumentException("Invalid pincode");
         }
 
-        return jwtProvider.createTokenFromCard(id, card.getPasHolderName());
+        return jwtProvider.createTokenFromCard(id, accountCardRepository.findUserEmailByCardId(id));
     }
 }
