@@ -1,12 +1,12 @@
 package project.codegeneration.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,10 +16,18 @@ public class Account {
     @Id
     private String IBAN;
 
+//    @ManyToOne
+//    private User userId;
+
     @ManyToOne
-    private User UserId;
+    private User user;
 
-    private String AccountType;
 
-    private double Balance;
+    private AccountType accountType;
+
+    private double balance;
+
+    @OneToMany(fetch = FetchType.EAGER)
+    private List<AccountCard> cards = new ArrayList<>();
+
 }

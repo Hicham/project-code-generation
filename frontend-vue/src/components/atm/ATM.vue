@@ -1,10 +1,10 @@
 <template>
-
+atm
 </template>
 
 
 <script>
 export default {
-  name: "atm"
+  name: "Atm"
 }
 </script>

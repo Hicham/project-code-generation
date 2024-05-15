@@ -7,7 +7,7 @@ import project.codegeneration.repositories.UserRepository;
 import project.codegeneration.security.JwtProvider;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -23,6 +23,10 @@ public class UserService {
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    public Optional<User> findByEmail(String email){
+        return userRepository.findByEmail(email);
     }
 
     public User create(User user) {

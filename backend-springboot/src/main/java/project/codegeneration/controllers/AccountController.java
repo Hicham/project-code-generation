@@ -21,6 +21,7 @@ public class AccountController {
     @GetMapping("/accounts")
     public List<AccountDTO> getAccounts() {
         List<Account> accounts = accountService.getAllAccounts();
-        return accounts.stream().map(account -> new AccountDTO(account.getIBAN(), account.getUserId().getUserId(), account.getAccountType(), account.getBalance())).toList();
+//        return accounts.stream().map(account -> new AccountDTO(account.getIBAN(), account.getUserId().getUserId(), account.getAccountType(), account.getBalance())).toList();
+        return accounts.stream().map(account -> new AccountDTO(account.getIBAN(), account.getUser().getUserId(), account.getAccountType().toString(), account.getBalance())).toList();
     }
 }
