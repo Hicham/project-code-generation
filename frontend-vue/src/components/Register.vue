@@ -56,6 +56,15 @@
               </div>
             </div>
           </div>
+
+          <div class="alert alert-danger mt-3" v-if="errorMessage">
+            {{ errorMessage }}
+          </div>
+
+          <div class="alert alert-success mt-3" v-if="successMessage">
+            {{ successMessage }}
+          </div>
+
         </div>
       </div>
     </div>
@@ -64,18 +73,45 @@
 
 <script setup>
 import { ref } from 'vue';
+import axios from '../axios-instance';
 
+const email = ref('');
+const password = ref('');
 const firstName = ref('');
 const lastName = ref('');
-const email = ref('');
 const bsn = ref('');
 const phoneNumber = ref('');
 
-const register = () => {
-  // Handle registration logic
+const errorMessage = ref('');
+const successMessage = ref('');
+
+const register = async () => {
+  errorMessage.value = '';
+  successMessage.value = '';
+
+  try {
+    const response = await axios.post('/api/register', {
+      email: email.value,
+      password: password.value,
+      firstName: firstName.value,
+      lastName: lastName.value,
+      BSNNumber: bsn.value,
+      phoneNumber: phoneNumber.value,
+      pinCode: 1234  // Or get this from user input if required
+    });
+    console.log(response.data);
+    if (response.data === "User registered successfully") {
+      successMessage.value = 'Account is aangemaakt';
+    } else {
+      errorMessage.value = response.data;
+    }
+  } catch (error) {
+    console.error('There was an error registering the user!', error);
+    errorMessage.value = 'Er was een probleem bij het registreren van de gebruiker';
+  }
 };
 </script>
 
 <style scoped>
-/* Add your custom styles here */
+/* Add your custom styles hier */
 </style>

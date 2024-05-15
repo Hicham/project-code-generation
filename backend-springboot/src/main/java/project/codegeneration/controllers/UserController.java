@@ -1,8 +1,6 @@
 package project.codegeneration.controllers;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import project.codegeneration.models.Cow;
 import project.codegeneration.models.DTO.CowDTO;
 import project.codegeneration.models.DTO.UserDTO;
@@ -24,8 +22,44 @@ public class UserController {
     @GetMapping("/users")
     public List<UserDTO> getUsers() {
         List<User> users = userService.getAllUsers();
-        return users.stream().map(user -> new UserDTO(user.getUserId(), user.getRoles().toString(), user.isApproved(), user.getEmail(), user.getPassword(), user.getFirstName(), user.getLastName(), user.getBSNnumber(), user.getPhoneNumber(), user.getPinCode())).toList();
+        return users.stream().map(user -> new UserDTO(
+                user.getUserId(),
+                user.getRoles().toString(),
+                user.isApproved(),
+                user.getEmail(),
+                user.getPassword(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getBSNnumber(),
+                user.getPhoneNumber(),
+                user.getPinCode()
+        )).toList();
     }
+
+
+    @PostMapping("/register")
+    public String registerUser(@RequestBody UserDTO userDTO) {
+        try {
+            User user = new User(
+                    userDTO.getUserId(),
+                    List.of(), // Set default roles or parse from DTO if necessary
+                    false, // Set default approval status or parse from DTO if necessary
+                    userDTO.getEmail(),
+                    userDTO.getPassword(),
+                    userDTO.getFirstName(),
+                    userDTO.getLastName(),
+                    userDTO.getBSNNumber(),
+                    userDTO.getPhoneNumber(),
+                    userDTO.getPinCode()
+            );
+
+            userService.create(user);
+            return "User registered successfully";
+        } catch (IllegalArgumentException e) {
+            return e.getMessage();
+        }
+    }
+
 
 
 }
