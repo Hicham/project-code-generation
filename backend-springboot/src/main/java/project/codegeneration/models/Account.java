@@ -13,6 +13,7 @@ import java.util.List;
 @Data
 @Entity
 public class Account {
+
     @Id
     private String IBAN;
 

@@ -65,26 +65,18 @@ export default {
     return { store, router };
   },
   methods: {
-    login(isAtm = false) {
-      this.store.login(this.email, this.password)
+    login() {
+      this.store.loginCard(this.cardNumber, this.pincode)
           .then(() => {
             this.errorMessage = ""; // Reset error message
             alert("Logged in! Bearer token: " + this.store.token);
 
-            // if (isAtm)
-            // {
-            //   this.router.push("/atm");
-            // }
-            // else
-            // {
-            //
-            // }
-            this.router.push("/");
+            this.router.push("/atm");
           })
           .catch(() => {
-            this.errorMessage = "Invalid email or password.";
-            this.email = "";
-            this.password = "";
+            this.errorMessage = "Invalid card combination";
+            this.cardNumber = "";
+            this.pincode = "";
             setTimeout(() => {
               this.errorMessage = ""; // Clear error message after 10 seconds
             }, 10000); // 10 seconds

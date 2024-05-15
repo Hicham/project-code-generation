@@ -15,6 +15,7 @@ public class AccountCardService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtProvider jwtProvider;
 
+
     public AccountCardService(AccountCardRepository accountCardRepository, BCryptPasswordEncoder bCryptPasswordEncoder, JwtProvider jwtProvider) {
         this.accountCardRepository = accountCardRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
@@ -37,6 +38,6 @@ public class AccountCardService {
             throw new IllegalArgumentException("Invalid pincode");
         }
 
-        return jwtProvider.createTokenFromCard(card.getId(), card.getPasHolderName());
+        return jwtProvider.createTokenFromCard(id, card.getPasHolderName());
     }
 }

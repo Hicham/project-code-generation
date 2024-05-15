@@ -16,9 +16,30 @@ const router = createRouter({
     { path: '/', component: Home },
     { path: '/login', component: Login },
     { path: '/register', component: Register},
-    { path: '/atm', component: Atm},
-    { path: '/atm/login', component: AtmLogin}
+    { path: '/myaccount', component: MyAccount, meta: { requiresAuth: true, loginType: 0 } },
+    { path: '/atm', component: Atm, meta: { requiresAuth: true, loginType: 1 } },
+    { path: '/atm/login', component: AtmLogin }
   ]
 })
+
+router.beforeEach((to, from, next) => {
+  const store = useStore();
+  const isLoggedIn = store.isLoggedIn;
+  const loginType = store.loginType;
+
+  if (to.meta.requiresAuth) {
+    if (!isLoggedIn) {
+      next('/login');
+    } else {
+      if (to.meta.loginType == loginType) {
+        next();
+      } else {
+        next('/');
+      }
+    }
+  } else {
+    next();
+  }
+});
 
 export default router

@@ -35,11 +35,17 @@ public class User {
 
     private String phoneNumber;
 
-    private int pinCode;
-
     @OneToMany(fetch = FetchType.EAGER)
     private List<Account> accounts = new ArrayList<>();
 
-
-
+    public User(List<Role> roles, boolean isApproved, String email, String password, String firstName, String lastName, String BSNnumber, String phoneNumber) {
+        this.roles = roles;
+        this.isApproved = isApproved;
+        this.email = email;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.BSNnumber = BSNnumber;
+        this.phoneNumber = phoneNumber;
+    }
 }
