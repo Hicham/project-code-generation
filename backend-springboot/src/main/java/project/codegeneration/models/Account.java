@@ -17,18 +17,12 @@ public class Account {
     @Id
     private String IBAN;
 
-//    @ManyToOne
-//    private User userId;
-
-//    @ManyToOne
-//    private User user;
-
+    @ManyToOne
+    private User user;
 
     private AccountType accountType;
 
     private double balance;
 
-    @OneToMany(fetch = FetchType.EAGER)
-    private List<AccountCard> cards = new ArrayList<>();
 
 }

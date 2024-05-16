@@ -4,9 +4,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import project.codegeneration.models.DTO.LoginRequest;
-import project.codegeneration.models.DTO.LoginRequestCard;
 import project.codegeneration.models.DTO.LoginResponse;
-import project.codegeneration.services.AccountCardService;
 import project.codegeneration.services.UserService;
 
 @RestController

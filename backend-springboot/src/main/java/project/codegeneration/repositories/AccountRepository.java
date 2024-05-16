@@ -6,5 +6,4 @@ import project.codegeneration.models.Account;
 public interface AccountRepository extends JpaRepository<Account, Integer> {
     Account findByIBAN(String IBAN);
 
-    Account findByCards_Id(long cardId); // New method declaration
 }

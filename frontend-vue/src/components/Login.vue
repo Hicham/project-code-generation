@@ -30,7 +30,7 @@
                         <button @click="login" class="btn btn-primary btn-lg btn-block w-100" type="button">Login</button>
                       </div>
                       <div class="col">
-                        <button v-on:click="$router.push('/atm/login')" class="btn btn-secondary btn-lg btn-block w-100" type="button">Login ATM</button>
+                        <button @click="login(true)" class="btn btn-secondary btn-lg btn-block w-100" type="button">Login ATM</button>
                       </div>
                     </div>
 
@@ -79,20 +79,19 @@ export default {
   },
   methods: {
     login(isAtm = false) {
-      this.store.login(this.email, this.password)
+      this.store.login(this.email, this.password, isAtm)
           .then(() => {
             this.errorMessage = ""; // Reset error message
             alert("Logged in! Bearer token: " + this.store.token);
 
-            // if (isAtm)
-            // {
-            //   this.router.push("/atm");
-            // }
-            // else
-            // {
-            //
-            // }
-            this.router.push("/");
+            if (isAtm)
+            {
+              this.router.push("/atm");
+            }
+            else
+            {
+
+            }
           })
           .catch(() => {
             this.errorMessage = "Invalid email or password.";

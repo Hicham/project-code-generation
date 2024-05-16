@@ -17,7 +17,7 @@ export const useStore = defineStore('counter', {
       {
           return JSON.parse(atob(token.split('.')[1]));
       },
-      login(email, password) {
+      login(email, password, isAtm) {
         return new Promise((resolve, reject) => {
 
             axiosInstance.post("/login", {
@@ -39,7 +39,9 @@ export const useStore = defineStore('counter', {
 
             localStorage.setItem('token', res.data.token);
             localStorage.setItem('user', JSON.stringify(decoded));
-            localStorage.setItem('loginType', 0);
+
+
+            localStorage.setItem('loginType', isAtm ? 1 : 0);
 
             resolve();
         })
@@ -47,36 +49,6 @@ export const useStore = defineStore('counter', {
         .catch((error) => reject(error.response));
         });
     },
-      loginCard(cardNumber, pincode) {
-          return new Promise((resolve, reject) => {
-
-              axiosInstance.post("/atm/login", {
-                  id: cardNumber,
-                  pincode: pincode,
-              })
-                  .then((res) => {
-
-                      axios.defaults.headers.common['Authorization'] = 'Bearer ' + res.data.token;
-
-                      this.token = res.data.token;
-
-                      let decoded = this.decodeJwt(this.token).sub;
-
-                      this.user = decoded;
-
-                      this.loginType = 1;
-
-
-                      localStorage.setItem('token', res.data.token);
-                      localStorage.setItem('user', JSON.stringify(decoded));
-                      localStorage.setItem('loginType', 1);
-
-                      resolve();
-                  })
-
-                  .catch((error) => reject(error.response));
-          });
-      },
       logout() {
 
           this.token = '';

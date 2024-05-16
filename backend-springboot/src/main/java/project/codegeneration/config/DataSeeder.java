@@ -4,11 +4,9 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 import project.codegeneration.models.*;
-import project.codegeneration.repositories.AccountCardRepository;
 import project.codegeneration.repositories.AccountRepository;
 import project.codegeneration.repositories.CheeseRepository;
 import project.codegeneration.repositories.CowRepository;
-import project.codegeneration.services.AccountCardService;
 import project.codegeneration.services.AccountService;
 import project.codegeneration.services.UserService;
 

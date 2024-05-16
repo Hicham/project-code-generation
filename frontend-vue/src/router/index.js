@@ -7,7 +7,6 @@ import Login from '../components/Login.vue';
 import MyAccount from '../components/MyAccount.vue';
 import Register from '../components/Register.vue';
 import Atm from '../components/atm/atm.vue';
-import AtmLogin from '../components/atm/Login.vue';
 
 
 const router = createRouter({
@@ -18,7 +17,6 @@ const router = createRouter({
     { path: '/register', component: Register},
     { path: '/myaccount', component: MyAccount, meta: { requiresAuth: true, loginType: 0 } },
     { path: '/atm', component: Atm, meta: { requiresAuth: true, loginType: 1 } },
-    { path: '/atm/login', component: AtmLogin }
   ]
 })
 

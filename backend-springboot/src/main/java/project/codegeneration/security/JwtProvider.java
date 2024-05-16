@@ -47,30 +47,6 @@ public class JwtProvider {
         return token;
     }
 
-    public String createTokenFromCard(int id, String email) {
-        Key privateKey = keyProvider.getPrivateKey();
-
-        Date now = new Date();
-        Date expiration = new Date(now.getTime() + 1000 * 60 * 60 * 24);
-
-
-        Account account = accountService.getAccountByAccountCard(id);
-
-        System.out.println(email);
-        System.out.println(email);
-        System.out.println(email);
-        System.out.println(email);
-
-        String token = Jwts.builder()
-                .subject(email)
-                .claim("IBAN", account.getIBAN())
-                .expiration(expiration)
-                .signWith(privateKey)
-                .compact();
-
-        return token;
-    }
-
     public Authentication getAuthentication(String token) {
         PublicKey publicKey = keyProvider.getPublicKey();
 
