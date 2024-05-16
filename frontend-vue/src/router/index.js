@@ -15,8 +15,8 @@ const router = createRouter({
     { path: '/', component: Home },
     { path: '/login', component: Login },
     { path: '/register', component: Register},
-    { path: '/myaccount', component: MyAccount, meta: { requiresAuth: true, loginType: 0 } },
-    { path: '/atm', component: Atm, meta: { requiresAuth: true, loginType: 1 } },
+    { path: '/myaccount', component: MyAccount, meta: { requiresAuth: true, loginType: 1 } },
+    { path: '/atm', component: Atm, meta: { requiresAuth: true, loginType: 2 } },
   ]
 })
 

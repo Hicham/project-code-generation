@@ -2,7 +2,7 @@ package project.codegeneration.services;
 
 import org.springframework.stereotype.Service;
 import project.codegeneration.models.Account;
-import project.codegeneration.models.User;
+import project.codegeneration.models.AccountType;
 import project.codegeneration.repositories.AccountRepository;
 
 import java.util.List;
@@ -23,10 +23,6 @@ public class AccountService {
         return accountRepository.findByIBAN(IBAN);
     }
 
-    public Account getAccountByAccountCard(long id)
-    {
-        return accountRepository.findByCards_Id(id);
-    }
 
     public List<Account> getAllAccounts() {
         return accountRepository.findAll();
@@ -44,5 +40,22 @@ public class AccountService {
         accountRepository.deleteById(id);
     }
 
+    public List<Account> getAccountsByUserId(int userId) {
+                return accountRepository.findByUserId(userId);
+    }
 
+
+    public List<Account> getCheckingAccountsByUserId(Integer userId) {
+        return accountRepository.findByUserIdAndAccountType(userId, AccountType.CHECKING);
+    }
+
+    public boolean deposit(Account account, double amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Deposit amount must be positive");
+        }
+
+        account.setBalance(account.getBalance() + amount);
+        accountRepository.save(account);
+        return true;
+    }
 }

@@ -46,7 +46,7 @@ public class UserService {
             throw new IllegalArgumentException("Invalid password");
         }
 
-        return jwtProvider.createToken(user.getEmail(), user.getRoles());
+        return jwtProvider.createToken(user);
     }
 
 }

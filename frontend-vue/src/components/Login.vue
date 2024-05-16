@@ -27,7 +27,7 @@
                     </div>
                     <div class="row mb-4">
                       <div class="col">
-                        <button @click="login" class="btn btn-primary btn-lg btn-block w-100" type="button">Login</button>
+                        <button @click="login(false)" class="btn btn-primary btn-lg btn-block w-100" type="button">Login</button>
                       </div>
                       <div class="col">
                         <button @click="login(true)" class="btn btn-secondary btn-lg btn-block w-100" type="button">Login ATM</button>
@@ -84,13 +84,14 @@ export default {
             this.errorMessage = ""; // Reset error message
             alert("Logged in! Bearer token: " + this.store.token);
 
+
             if (isAtm)
             {
               this.router.push("/atm");
             }
             else
             {
-
+              this.router.push("/");
             }
           })
           .catch(() => {

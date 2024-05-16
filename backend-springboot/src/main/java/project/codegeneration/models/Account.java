@@ -17,7 +17,8 @@ public class Account {
     @Id
     private String IBAN;
 
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
     private AccountType accountType;

@@ -22,19 +22,15 @@ public class DataSeeder implements ApplicationRunner {
     private final AccountRepository accountRepository;
 
     private final AccountService accountService;
-    private final AccountCardService accountCardService;
-
-    private final AccountCardRepository accountCardRepository;
     private UserService userService;
 
 
-       public DataSeeder(CowRepository cowRepository, CheeseRepository cheeseRepository, AccountRepository accountRepository, AccountService accountService, AccountCardService accountCardService, AccountCardRepository accountCardRepository, UserService userService) {
+       public DataSeeder(CowRepository cowRepository, CheeseRepository cheeseRepository, AccountRepository accountRepository, AccountService accountService, UserService userService) {
            this.cowRepository = cowRepository;
            this.cheeseRepository = cheeseRepository;
            this.accountRepository = accountRepository;
            this.accountService = accountService;
-           this.accountCardService = accountCardService;
-           this.accountCardRepository = accountCardRepository;
+
            this.userService = userService;
         }
 
@@ -55,22 +51,18 @@ public class DataSeeder implements ApplicationRunner {
 //        cheese.setCow(cow);
 //        cheeseRepository.save(cheese);
 
-        User user = new User(List.of(Role.ROLE_USER), false, "Hicham@gmail.com", "test", "test", "test", "3652584", "06352615");
-        userService.create(user);
+//        User user = new User(List.of(Role.ROLE_USER), false, "hicham@gmail.com", "test", "test", "test", "3652584", "06352615");
+//        User user = new User(List.of(Role.ROLE_USER), false, "hicham2@gmail.com", "test", "test", "test", "3652584", "06352615");
+//        userService.create(user);
+
+//        User user = userService.findByEmail("hicham@gmail.com").get();
 //
-////        User user = userService.findByEmail("Hicham@gmail.com").get();
-////
-        AccountCard card = new AccountCard("0000", "Hicham El Ans");
+//        Account account = new Account("IBANFAKE2", user ,AccountType.CHECKING, 1000);
+//        Account account2 = new Account("IBANFAKE3", user ,AccountType.CHECKING, 2000);
 //
-        accountCardService.create(card);
-
-        List<AccountCard> cards = new ArrayList<>();
-        cards.add(card);
-
-        Account account = new Account("IBANFAKE1", AccountType.SAVINGS, 1000, cards);
-
-        accountRepository.save(account);
-
+//        accountRepository.save(account);
+//        accountRepository.save(account2);
+//
 
 //            Account account = accountService.getAccountByIBAN("IBANFAKE1");
 //            System.out.println(account);

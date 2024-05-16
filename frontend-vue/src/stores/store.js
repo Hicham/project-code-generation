@@ -1,22 +1,23 @@
 import { defineStore } from 'pinia'
 import axios from '../axios-auth';
 import axiosInstance from '../axios-instance';
+import jwtDecode from "jwt-decode";
 
 
 export const useStore = defineStore('counter', {
   state: () => ({
     token: '',
-    user: '',
+    user: {
+      id: 0,
+      email: ''
+    },
       loginType: 0,
   }),
   getters: {
     isLoggedIn: (state) => state.token != '',
   },
   actions: {
-      decodeJwt(token)
-      {
-          return JSON.parse(atob(token.split('.')[1]));
-      },
+
       login(email, password, isAtm) {
         return new Promise((resolve, reject) => {
 
@@ -30,18 +31,23 @@ export const useStore = defineStore('counter', {
 
             this.token = res.data.token;
 
-            let decoded = this.decodeJwt(this.token).sub;
+            let decoded = jwtDecode(this.token);
 
-            this.user = decoded;
+            this.user.email = decoded.sub;
+            this.user.id = decoded.userId;
 
-            this.loginType = 0;
+            let loginType = isAtm ? '2' : '1';
+
+            this.loginType = loginType
 
 
             localStorage.setItem('token', res.data.token);
-            localStorage.setItem('user', JSON.stringify(decoded));
+            localStorage.setItem('user', JSON.stringify(this.user));
 
 
-            localStorage.setItem('loginType', isAtm ? 1 : 0);
+            localStorage.setItem('loginType', loginType);
+
+
 
             resolve();
         })
@@ -52,10 +58,14 @@ export const useStore = defineStore('counter', {
       logout() {
 
           this.token = '';
-          this.user = '';
+          this.user = {
+              id: 0,
+              email: ''
+          };
 
           localStorage.removeItem('token');
           localStorage.removeItem('user');
+          localStorage.removeItem('loginType');
 
           delete axios.defaults.headers.common['Authorization'];
       },
@@ -63,6 +73,7 @@ export const useStore = defineStore('counter', {
         let token = localStorage.getItem('token');
         let user = localStorage.getItem('user');
         let loginType = localStorage.getItem('loginType');
+
 
         if (token) {
           this.token = token;

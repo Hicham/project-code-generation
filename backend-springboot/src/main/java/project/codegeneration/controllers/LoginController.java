@@ -11,11 +11,9 @@ import project.codegeneration.services.UserService;
 public class LoginController {
 
     private final UserService userService;
-    private final AccountCardService accountCardService;
 
-    public LoginController(UserService userService, AccountCardService accountCardService) {
+    public LoginController(UserService userService) {
         this.userService = userService;
-        this.accountCardService = accountCardService;
     }
 
     @PostMapping("/login")
@@ -29,14 +27,4 @@ public class LoginController {
 
     }
 
-    @PostMapping("atm/login")
-    public LoginResponse loginCard(@RequestBody LoginRequestCard loginRequestCard){
-
-        String token = accountCardService.login((loginRequestCard.getId()), loginRequestCard.getPincode());
-
-        LoginResponse response = new LoginResponse();
-        response.setToken(token);
-        return response;
-
-    }
 }

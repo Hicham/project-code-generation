@@ -15,8 +15,8 @@ import java.util.List;
 @Table(name = "users")
 public class User {
     @Id
-    @GeneratedValue
-    private int userId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
 
     @ElementCollection(fetch = FetchType.EAGER)
     private List<Role> roles = new ArrayList<>();
