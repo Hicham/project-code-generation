@@ -1,9 +1,6 @@
 package project.codegeneration.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,14 +9,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Entity
+@Table(name = "accounts")
 public class Account {
     @Id
     private String IBAN;
 
     @ManyToOne
-    private User UserId;
+    private User user;
 
-    private String AccountType;
+    private String accountType;
 
-    private double Balance;
+    private double balance;
 }

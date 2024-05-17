@@ -1,10 +1,7 @@
 package project.codegeneration.controllers;
 
 import org.springframework.web.bind.annotation.*;
-import project.codegeneration.models.Cow;
-import project.codegeneration.models.DTO.CowDTO;
 import project.codegeneration.models.DTO.UserDTO;
-import project.codegeneration.models.Role;
 import project.codegeneration.models.User;
 import project.codegeneration.services.UserService;
 
@@ -24,7 +21,7 @@ public class UserController {
     public List<UserDTO> getUsers() {
         List<User> users = userService.getAllUsers();
         return users.stream().map(user -> new UserDTO(
-                user.getUserId(),
+                user.getId(),
                 user.getRoles().toString(),
                 user.isApproved(),
                 user.getEmail(),
@@ -42,7 +39,7 @@ public class UserController {
     public String registerUser(@RequestBody UserDTO userDTO) {
         try {
             User user = new User(
-                    userDTO.getUserId(),
+                    userDTO.getId(),
                     List.of(), // Set default roles or parse from DTO if necessary
                     false, // Set default approval status or parse from DTO if necessary
                     userDTO.getEmail(),
@@ -67,7 +64,7 @@ public class UserController {
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             return new UserDTO(
-                    user.getUserId(),
+                    user.getId(),
                     user.getRoles().toString(),
                     user.isApproved(),
                     user.getEmail(),

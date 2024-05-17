@@ -1,8 +1,16 @@
 package project.codegeneration.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.CrudRepository;
 import project.codegeneration.models.Account;
 
-public interface AccountRepository extends JpaRepository<Account, Integer> {
+import java.util.List;
+import java.util.Optional;
+
+public interface AccountRepository extends CrudRepository<Account, Long> {
+
+    List<Account> findAll();
+
+    Optional<Account> findAccountsByUserEmail(String email);
 
 }

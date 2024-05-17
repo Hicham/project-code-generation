@@ -5,6 +5,7 @@ import project.codegeneration.models.Account;
 import project.codegeneration.repositories.AccountRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AccountService {
@@ -12,10 +13,6 @@ public class AccountService {
 
     public AccountService(AccountRepository accountRepository) {
         this.accountRepository = accountRepository;
-    }
-
-    public Account getAccountById(int id) {
-        return accountRepository.findById(id).orElseThrow();
     }
 
     public List<Account> getAllAccounts() {
@@ -30,8 +27,9 @@ public class AccountService {
         return accountRepository.save(account);
     }
 
-    public void deleteAccount(int id) {
-        accountRepository.deleteById(id);
+
+    public Optional<Account> getAccountsByUserEmail(String email) {
+        return accountRepository.findAccountsByUserEmail(email);
     }
 
 }
