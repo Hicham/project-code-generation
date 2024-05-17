@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 import project.codegeneration.models.*;
 import project.codegeneration.repositories.TransactionRepository;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Service
@@ -18,17 +19,17 @@ public class TransactionService {
         this.accountService = accountService;
     }
 
-    public void createATMTransaction(String sourceIBAN, String destinationIBAN, Double amount, TransactionType type, User user) {
-
-        Transaction transaction = new Transaction(sourceIBAN, destinationIBAN, amount, type, LocalDateTime.now(), user);
-        transactionRepository.save(transaction);
-        transactionRepository.flush();
-    }
+//    public void createATMTransaction(String sourceIBAN, String destinationIBAN, Double amount, TransactionType type, User user) {
+//
+//        Transaction transaction = new Transaction(sourceIBAN, destinationIBAN, amount, type, LocalDateTime.now(), user);
+//        transactionRepository.save(transaction);
+//        transactionRepository.flush();
+//    }
 
     @Transactional
     public void createTransaction(String sourceIBAN, String destinationIBAN, Double amount, TransactionType type, User user) {
 
-        Transaction transaction = new Transaction(sourceIBAN, destinationIBAN, amount, type, LocalDateTime.now(), user);
+        Transaction transaction = new Transaction(sourceIBAN, destinationIBAN, amount, type, Instant.now().getEpochSecond(), user);
         transactionRepository.save(transaction);
         transactionRepository.flush();
 

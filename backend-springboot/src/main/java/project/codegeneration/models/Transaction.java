@@ -23,13 +23,13 @@ public class Transaction {
     private Double amount;
     private TransactionType type;
 
-    private LocalDateTime timestamp;
+    private Long timestamp;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
 
-    public Transaction(String sourceIBAN, String destinationIBAN, Double amount, TransactionType type, LocalDateTime timestamp, User user) {
+    public Transaction(String sourceIBAN, String destinationIBAN, Double amount, TransactionType type, Long timestamp, User user) {
         this.sourceIBAN = sourceIBAN;
         this.destinationIBAN = destinationIBAN;
         this.amount = amount;
