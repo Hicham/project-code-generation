@@ -9,6 +9,7 @@ import project.codegeneration.models.User;
 import project.codegeneration.services.UserService;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
@@ -60,6 +61,27 @@ public class UserController {
         }
     }
 
+    @GetMapping("/users/{email}")
+    public UserDTO getUserByEmail(@PathVariable String email) {
+        Optional<User> userOptional = userService.findByEmail(email);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            return new UserDTO(
+                    user.getUserId(),
+                    user.getRoles().toString(),
+                    user.isApproved(),
+                    user.getEmail(),
+                    user.getPassword(),
+                    user.getFirstName(),
+                    user.getLastName(),
+                    user.getBSNnumber(),
+                    user.getPhoneNumber(),
+                    user.getPinCode()
+            );
+        } else {
+            throw new IllegalArgumentException("User not found");
+        }
+    }
 
 
 }

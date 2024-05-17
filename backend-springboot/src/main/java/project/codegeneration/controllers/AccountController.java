@@ -23,4 +23,5 @@ public class AccountController {
         List<Account> accounts = accountService.getAllAccounts();
         return accounts.stream().map(account -> new AccountDTO(account.getIBAN(), account.getUserId().getUserId(), account.getAccountType(), account.getBalance())).toList();
     }
+
 }

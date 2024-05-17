@@ -45,8 +45,7 @@ public class DataSeeder implements ApplicationRunner {
         cheese.setCow(cow);
         cheeseRepository.save(cheese);
 
-//        User user = new User(1, List.of(Role.ROLE_USER), false, "duhaa@gmail.com", "test", "Duha", "Kahya", "3652584", "06352615", 2514);
-//        userService.create(user);
+
 
     }
 }
