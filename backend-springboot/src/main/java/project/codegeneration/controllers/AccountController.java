@@ -2,6 +2,7 @@ package project.codegeneration.controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -9,9 +10,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import project.codegeneration.models.Account;
 import project.codegeneration.models.DTO.AccountDTO;
+import project.codegeneration.models.DTO.ATMTransactionRequest;
 import project.codegeneration.models.Role;
+import project.codegeneration.models.TransactionType;
 import project.codegeneration.models.User;
 import project.codegeneration.services.AccountService;
+import project.codegeneration.services.TransactionService;
 import project.codegeneration.services.UserService;
 
 import java.util.List;
@@ -24,11 +28,13 @@ public class AccountController {
 
     private final AccountService accountService;
     private final UserService userService;
+    private final TransactionService transactionService;
 
     @Autowired
-    public AccountController(final AccountService accountService, UserService userService) {
+    public AccountController(final AccountService accountService, UserService userService, TransactionService transactionService) {
         this.accountService = accountService;
         this.userService = userService;
+        this.transactionService = transactionService;
     }
 
     @GetMapping("/accounts")
@@ -95,58 +101,49 @@ public class AccountController {
         }
     }
 
-//    @PostMapping("/account/{iban}/withdraw")
-//    public ResponseEntity<String> withdraw(@PathVariable String iban, @RequestParam double amount, HttpServletRequest request) {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        String currentUsername = authentication.getName();
-//        Optional<User> currentUser = userService.findByEmail(currentUsername);
-//
-//        Account account = accountService.getAccountByIBAN(iban);
-//
-//        if (account == null) {
-//            return ResponseEntity.notFound().build();
-//        }
-//
-//        if (currentUser.isPresent() && (currentUser.get().getId().equals(account.getUser().getId()) || isAdmin(authentication))) {
-//            boolean success = accountService.withdraw(iban, amount);
-//            if (success) {
-//                return ResponseEntity.ok("Withdrawal successful");
-//            } else {
-//                return ResponseEntity.badRequest().body("Insufficient funds or invalid amount");
-//            }
-//        } else {
-//            return ResponseEntity.status(403).body("Access denied");
-//        }
-//    }
+
+
 
     @PostMapping("/accounts/{IBAN}/deposit")
-    public ResponseEntity<String> deposit(@PathVariable String IBAN, @RequestBody double amount
+    public ResponseEntity<String> deposit(@PathVariable String IBAN, @RequestBody ATMTransactionRequest ATMTransactionRequest
     ) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUsername = authentication.getName();
         Optional<User> currentUser = userService.findByEmail(currentUsername);
 
-        Account account = accountService.getAccountByIBAN(IBAN);
-
-        if (account == null) {
-            return ResponseEntity.notFound().build();
+        if (currentUser.isPresent()) {
+            transactionService.createTransaction(null, IBAN, ATMTransactionRequest.getAmount(), TransactionType.DEPOSIT, currentUser.get());
+            return ResponseEntity.ok("Money deposited successfully.");
+        }
+        else
+        {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account not found.");
         }
 
-        if (currentUser.isPresent() && currentUser.get().getId() == account.getUser().getId() || isAdmin(authentication)) {
-            boolean success = accountService.deposit(account, amount);
-            if (success) {
-                return ResponseEntity.ok("Deposit successful");
-            } else {
-                return ResponseEntity.badRequest().body("Invalid amount");
-            }
-        } else {
-            return ResponseEntity.status(403).body("Access denied");
-        }
+
     }
 
-    private boolean isAdmin(Authentication authentication) {
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        return userDetails.getAuthorities().stream()
-                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(Role.ROLE_ADMIN.toString()));
+    @PostMapping("/accounts/{IBAN}/withdraw")
+    public ResponseEntity<String> withdraw(@PathVariable String IBAN, @RequestBody ATMTransactionRequest ATMTransactionRequest) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
+        Optional<User> currentUser = userService.findByEmail(currentUsername);
+
+        if (currentUser.isPresent()) {
+            transactionService.createTransaction(null, IBAN, ATMTransactionRequest.getAmount(), TransactionType.DEPOSIT, currentUser.get());
+            return ResponseEntity.ok("Money withdrawn successfully.");
+        }
+        else
+        {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account not found.");
+        }
+
     }
+
+
+//    private boolean isAdmin(Authentication authentication) {
+//        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+//        return userDetails.getAuthorities().stream()
+//                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(Role.ROLE_ADMIN.toString()));
+//    }
 }

@@ -25,8 +25,6 @@
                 <button class="btn btn-success" @click="deposit">Deposit</button>
               </div>
             </div>
-
-
           </div>
         </div>
       </div>
@@ -47,6 +45,8 @@ export default {
       accounts: [],
       selectedAccount: null,
       balance: 0,
+      withdrawAmount: 0,
+      depositAmount: 0
     };
   },
   mounted() {
@@ -67,14 +67,12 @@ export default {
           .then((result) => {
             this.accounts = result.data;
 
-            if (this.accounts)
-            {
+            if (this.accounts.length > 0) {
               this.selectedAccount = this.accounts[0];
+              this.selectAccount();
             }
-
-            this.selectAccount();
           })
-          .catch((error) => console.log(error));
+          .catch((error) => console.error("Error fetching accounts:", error));
     },
     selectAccount() {
       if (this.selectedAccount) {
@@ -82,10 +80,46 @@ export default {
       }
     },
     withdraw() {
+      if (this.withdrawAmount <= 0 || this.withdrawAmount > this.balance) {
+        alert("Invalid withdrawal amount");
+        return;
+      }
 
+      axiosInstance
+          .post(`/api/accounts/${this.selectedAccount.iban}/withdraw`, {
+            amount: this.withdrawAmount,
+          }, {
+            headers: {
+              Authorization: 'Bearer ' + useStore().token,
+            },
+          })
+          .then((response) => {
+
+            this.withdrawAmount = 0; // Clear the input field
+          })
+          .catch((error) => {
+            console.error("Withdrawal failed:", error);
+          });
     },
     deposit() {
-
+      if (this.depositAmount <= 0) {
+        alert("Invalid deposit amount");
+        return;
+      }
+      axiosInstance
+          .post(`/api/accounts/${this.selectedAccount.iban}/deposit`, {
+            amount: this.depositAmount,
+          }, {
+            headers: {
+              Authorization: 'Bearer ' + useStore().token,
+            },
+          })
+          .then((response) => {
+            this.depositAmount = 0; // Clear the input field
+          })
+          .catch((error) => {
+            console.error("Deposit failed:", error);
+          });
     }
   }
 }
