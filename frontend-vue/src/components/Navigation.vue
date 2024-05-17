@@ -2,7 +2,7 @@
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-3">
     <div class="container">
       <router-link class="navbar-brand" to="/"><i class="fa-solid fa-piggy-bank me-1" style="font-size: 1em;"></i>Mybank</router-link>
-      <router-link class="navbar-brand" to="/myaccount">My Account</router-link>
+      <router-link class="navbar-brand" to="/account">Account</router-link>
       <router-link v-if="!isLoggedIn" class="navbar-brand" to="/login">Login</router-link>
       <router-link v-if="isLoggedIn" class="navbar-brand" to="#">
         {{ firstName }}

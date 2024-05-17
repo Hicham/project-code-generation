@@ -50,6 +50,7 @@ export default {
     const isLoggedIn = computed(() => store.isLoggedIn);
     const userEmail = computed(() => localStorage.getItem('user'));
     const isUserApproved = ref(null);
+    const userObject = ref(null);
 
     const fetchUser = async () => {
       if (!userEmail.value) {
@@ -61,6 +62,8 @@ export default {
         const response = await axiosInstance.get(`/api/users/${userEmail.value}`);
         const user = response.data;
         isUserApproved.value = user.approved;
+        userObject.value = user;
+
       } catch (error) {
         console.error('Error fetching user data:', error);
         isUserApproved.value = false;
@@ -75,7 +78,8 @@ export default {
 
     return {
       isLoggedIn,
-      isUserApproved
+      isUserApproved,
+      userObject
     };
   },
   methods: {
