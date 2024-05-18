@@ -38,7 +38,7 @@ public class AccountController {
     }
 
     @GetMapping("/accounts")
-    public ResponseEntity<List<AccountDTO>> getAccounts(@RequestParam(required = false) Integer userId, Boolean isChecking) {
+    public ResponseEntity<List<AccountDTO>> getAccounts(@RequestParam(required = false) Integer userId, @RequestParam(required = false) Boolean isChecking) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
