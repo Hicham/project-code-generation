@@ -41,38 +41,34 @@ public class AccountController {
     public ResponseEntity<List<AccountDTO>> getAccounts(@RequestParam(required = false) Integer userId, Boolean isChecking) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = authentication.getName();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         boolean isAdmin = userDetails.getAuthorities().stream()
                 .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(Role.ROLE_ADMIN.toString()));
 
-        Optional<User> currentUser = userService.findByEmail(currentUsername);
-
+        Optional<User> currentUser = userService.findByEmail(userDetails.getUsername());
 
         List<Account> accounts = null;
 
+        // moet dit in de service?
         if (userId != null) {
-
-            if(isAdmin || currentUser.get().getId() == userId)
-            {
-                if (isChecking)
-                {
+            if (isAdmin || currentUser.isPresent() && currentUser.get().getId() == userId) {
+                if (isChecking) {
                     accounts = accountService.getCheckingAccountsByUserId(userId);
-                }
-                else
-                {
+                } else {
                     accounts = accountService.getAccountsByUserId(userId);
                 }
             }
-
         } else {
-
-            if (isAdmin)
-            {
+            if (isAdmin) {
                 accounts = accountService.getAllAccounts();
             }
         }
-
+        if (accounts == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
 
         List<AccountDTO> accountDTOs = accounts.stream()
                 .map(account -> new AccountDTO(account.getIBAN(), account.getUser().getId(), account.getAccountType().toString(), account.getBalance()))
@@ -81,15 +77,15 @@ public class AccountController {
         return ResponseEntity.ok(accountDTOs);
     }
 
+
     @GetMapping("/accounts/{IBAN}")
     public ResponseEntity<AccountDTO> getAccountByIBAN(@PathVariable String IBAN, HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (bearerToken == null || !bearerToken.startsWith("Bearer ")) {
-            return ResponseEntity.badRequest().body(null);
-        }
 
-        String jwt = bearerToken.substring(7);
-        System.out.println(jwt);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
         Account account = accountService.getAccountByIBAN(IBAN);
 

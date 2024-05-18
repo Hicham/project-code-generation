@@ -82,6 +82,11 @@ public class AccountService {
 //    }
 
     public void deposit(Account account, double amount) {
+
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Withdraw amount must be positive");
+        }
+
         account.setBalance(account.getBalance() + amount);
         accountRepository.save(account);
         accountRepository.flush();
@@ -89,7 +94,16 @@ public class AccountService {
 
 
     public void withdraw(Account account, double amount) {
-       account.setBalance(account.getBalance() - amount);
+
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Withdraw amount must be positive");
+        }
+
+        if (account.getBalance() < amount) {
+            throw new IllegalArgumentException("Insufficient funds");
+        }
+
+        account.setBalance(account.getBalance() - amount);
         accountRepository.flush();
     }
 }
