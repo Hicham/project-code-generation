@@ -95,7 +95,7 @@ export default {
           })
           .then((response) => {
 
-            this.withdrawAmount = 0; // Clear the input field
+            this.withdrawAmount = 0;
           })
           .catch((error) => {
             console.error("Withdrawal failed:", error);
@@ -115,7 +115,7 @@ export default {
             },
           })
           .then((response) => {
-            this.depositAmount = 0; // Clear the input field
+            this.depositAmount = 0;
           })
           .catch((error) => {
             console.error("Deposit failed:", error);
