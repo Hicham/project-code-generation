@@ -39,6 +39,7 @@ public class WebSecurityConfiguration {
 
         http.authorizeHttpRequests(requests -> requests.requestMatchers("/login").permitAll());
         http.authorizeHttpRequests(requests -> requests.requestMatchers("/atm/login").permitAll());
+        http.authorizeHttpRequests(requests -> requests.requestMatchers("/users").permitAll());
         http.authorizeHttpRequests(requests -> requests.requestMatchers("/demo").permitAll());
         http.authorizeHttpRequests(requests -> requests.requestMatchers("/h2-console").permitAll());
         http.authorizeHttpRequests(requests -> requests.requestMatchers("/h2-console/**").permitAll());

@@ -7,7 +7,7 @@ import Login from '../components/Login.vue';
 import MyAccount from '../components/MyAccount.vue';
 import Register from '../components/Register.vue';
 import Atm from '../components/atm/atm.vue';
-
+import Users from '../components/employee/NoAccount.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -17,6 +17,7 @@ const router = createRouter({
     { path: '/register', component: Register},
     { path: '/myaccount', component: MyAccount, meta: { requiresAuth: true, loginType: 1 } },
     { path: '/atm', component: Atm, meta: { requiresAuth: true, loginType: 2 } },
+    { path: '/users', component: Users, meta: { requiresAuth: true, loginType: 1 } }
   ]
 })
 

@@ -1,20 +1,83 @@
 <template>
-  <div>
-
+  <div class="container mt-5">
+    <h2 class="mb-4">Unapproved Users</h2>
+    <table class="table">
+      <thead>
+      <tr>
+        <th scope="col">First Name</th>
+        <th scope="col">Last Name</th>
+        <th scope="col">BSN Number</th>
+        <th scope="col">Phone Number</th>
+        <th scope="col">Email</th>
+        <th scope="col"></th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr v-for="user in users" :key="user.userId">
+        <td>{{ user.userId }}</td>
+        <td>{{ user.firstName }}</td>
+        <td>{{ user.lastName }}</td>
+        <td>{{ user.bsnnumber }}</td>
+        <td>{{ user.phoneNumber }}</td>
+        <td>{{ user.email }}</td>
+        <td>
+          <button class="btn btn-primary" @click="approveUser(user.userId)">Approve</button>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+    <div v-if="showPopup" class="modal fade show" style="display: block;" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-body">
+            <p>Accounts have been created successfully.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" @click="closePopup">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue';
+<script>
+import axiosInstance from "../../axios-instance";
+import { ref, onMounted } from "vue";
 
-// const customersWithoutAccount = ref([
-//   { id: 1, roleId: 1, isApproved: 0, email: "test@mail.com", firstName: "John", lastName: "Doe", bsnNumber: "12345678", phoneNumber: "0612345678", pinCode: 1111 }
-//   { id: 2, roleId: 2, isApproved: 1, email: "example@mail.com", firstName: "Jane", lastName: "Smith", bsnNumber: "87654321", phoneNumber: "0687654321", pinCode: 2222 }
-//   { id: 3, roleId: 1, isApproved: 1, email: "another@example.com", firstName: "Alice", lastName: "Johnson", bsnNumber: "13579246", phoneNumber: "0654321098", pinCode: 3333 }
-//   { id: 4, roleId: 3, isApproved: 0, email: "user@example.org", firstName: "David", lastName: "Brown", bsnNumber: "24681357", phoneNumber: "0678901234", pinCode: 4444 }
-//   { id: 5, roleId: 2, isApproved: 0, email: "someone@example.net", firstName: "Emily", lastName: "Taylor", bsnNumber: "98765432", phoneNumber: "0643210987", pinCode: 5555 }
-//
-// ]);
+export default {
+  name: "NoAccount",
+  setup() {
+    const users = ref([]);
+    const showPopup = ref(false);
+
+    const approveUser = async (userId) => {
+      console.log(userId);
+      try {
+        await axiosInstance.post(`/api/accounts?userId=${userId}`);
+        showPopup.value = true;
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    const closePopup = () => {
+      showPopup.value = false;
+    };
+
+    onMounted(async () => {
+      try {
+        const userResponse = await axiosInstance.get('/api/unapproved-users');
+        users.value = userResponse.data;
+      } catch (error) {
+        console.error(error);
+      }
+    });
+
+    return { users, approveUser, showPopup, closePopup};
+  },
+};
+
 </script>
 
 <style scoped>
