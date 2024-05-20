@@ -32,7 +32,7 @@ public class UserController {
     public String registerUser(@RequestBody UserDTO userDTO) {
         try {
             User user = new User(
-                    userDTO.getUserId(),
+//                    userDTO.getUserId(),
                     List.of(), // Set default roles or parse from DTO if necessary
                     false, // Set default approval status or parse from DTO if necessary
                     userDTO.getEmail(),
@@ -40,8 +40,8 @@ public class UserController {
                     userDTO.getFirstName(),
                     userDTO.getLastName(),
                     userDTO.getBSNNumber(),
-                    userDTO.getPhoneNumber(),
-            );
+                    userDTO.getPhoneNumber()
+                    );
 
             userService.create(user);
             return "User registered successfully";

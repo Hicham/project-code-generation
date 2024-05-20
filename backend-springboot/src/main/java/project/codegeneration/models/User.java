@@ -38,6 +38,9 @@ public class User {
     @OneToMany(fetch = FetchType.EAGER)
     private List<Account> accounts = new ArrayList<>();
 
+
+
+
     public User(List<Role> roles, boolean isApproved, String email, String password, String firstName, String lastName, String BSNnumber, String phoneNumber) {
         this.roles = roles;
         this.isApproved = isApproved;
@@ -48,4 +51,5 @@ public class User {
         this.BSNnumber = BSNnumber;
         this.phoneNumber = phoneNumber;
     }
+
 }
