@@ -1,5 +1,5 @@
 {
-  "name": "pinia-demo",
+  "name": "ProjectCodeGeneration",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "axios": "^1.2.1",
+    "jwt-decode": "^3.0.0",
     "pinia": "^2.0.28",
     "vue": "^3.2.45",
     "vue-router": "^4.1.6"

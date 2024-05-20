@@ -444,7 +444,7 @@ paths:
           description: Internal server error.
       
           
-  /ibans:
+  /accounts/ibans:
     get:
       summary: Find IBANs by customer first and last names
       description: This endpoint allows customers to find the IBANs of customers by their first and last names.

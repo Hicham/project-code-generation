@@ -3,8 +3,10 @@ package project.codegeneration.controllers;
 import org.springframework.web.bind.annotation.*;
 import project.codegeneration.models.Cow;
 import project.codegeneration.models.DTO.CowDTO;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import project.codegeneration.models.DTO.UserDTO;
-import project.codegeneration.models.Role;
 import project.codegeneration.models.User;
 import project.codegeneration.services.UserService;
 
@@ -22,18 +24,7 @@ public class UserController {
     @GetMapping("/users")
     public List<UserDTO> getUsers() {
         List<User> users = userService.getAllUsers();
-        return users.stream().map(user -> new UserDTO(
-                user.getUserId(),
-                user.getRoles().toString(),
-                user.isApproved(),
-                user.getEmail(),
-                user.getPassword(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getBSNnumber(),
-                user.getPhoneNumber(),
-                user.getPinCode()
-        )).toList();
+        return users.stream().map(user -> new UserDTO(user.getId(), user.getRoles().toString(), user.isApproved(), user.getEmail(), user.getPassword(), user.getFirstName(), user.getLastName(), user.getBSNnumber(), user.getPhoneNumber())).toList();
     }
 
 
@@ -50,7 +41,6 @@ public class UserController {
                     userDTO.getLastName(),
                     userDTO.getBSNNumber(),
                     userDTO.getPhoneNumber(),
-                    userDTO.getPinCode()
             );
 
             userService.create(user);

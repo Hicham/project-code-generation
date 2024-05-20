@@ -13,21 +13,17 @@ import java.util.List;
 @Data
 @Entity
 public class Account {
+
     @Id
     private String IBAN;
 
-//    @ManyToOne
-//    private User userId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
-
 
     private AccountType accountType;
 
     private double balance;
 
-    @OneToMany(fetch = FetchType.EAGER)
-    private List<AccountCard> cards = new ArrayList<>();
 
 }
