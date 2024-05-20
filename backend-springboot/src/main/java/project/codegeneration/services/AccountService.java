@@ -109,6 +109,7 @@ public class AccountService {
 
         account.setBalance(account.getBalance() - amount);
         accountRepository.flush();
+    }
     public void createAccountForApprovedUser(User user){
         if(user.isApproved()){
             //Generate unique IBAN
@@ -118,22 +119,21 @@ public class AccountService {
             //Create checking account
             Account checkingAccount = new Account();
             checkingAccount.setIBAN(checkingIBAN);
-            checkingAccount.setAccountType("Checking");
+            checkingAccount.setAccountType(AccountType.CHECKING);
             checkingAccount.setBalance(0);
-            checkingAccount.setPinCode(getRandomPinCode());
+
             checkingAccount.setActive(true);
             checkingAccount.setAbsoluteLimit(1000);
-            checkingAccount.setUserId(user);
+            checkingAccount.setUser(user);
 
             //Create savings account
             Account savingsAccount = new Account();
             savingsAccount.setIBAN(savingsIBAN);
-            savingsAccount.setAccountType("Savings");
+            savingsAccount.setAccountType(AccountType.SAVINGS);
             savingsAccount.setBalance(0);
-            savingsAccount.setPinCode(getRandomPinCode());
             savingsAccount.setActive(true);
             savingsAccount.setAbsoluteLimit(1000);
-            savingsAccount.setUserId(user);
+            savingsAccount.setUser(user);
 
             //Save Accounts
             accountRepository.save(checkingAccount);
@@ -150,7 +150,8 @@ public class AccountService {
     }
 
     public boolean existsByIBAN(String iban) {
-        return accountRepository.findByIBAN(iban).isPresent();
+        // was is .ispresent() maar doet het niet meer???
+        return accountRepository.findByIBAN(iban) != null;
     }
 
     public int getRandomPinCode(){

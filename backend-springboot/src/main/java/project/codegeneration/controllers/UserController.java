@@ -32,13 +32,13 @@ public class UserController {
     @GetMapping("/users")
     public List<UserDTO> getUsers() {
         List<User> users = userService.getAllUsers();
-        return users.stream().map(user -> new UserDTO(user.getId(), user.getRoles().toString(), user.isApproved(), user.getEmail(), user.getPassword(), user.getFirstName(), user.getLastName(), user.getBSNnumber(), user.getPhoneNumber())).toList();
+        return users.stream().map(user -> new UserDTO(user.getId(), user.getRoles().toString(), user.isApproved(), user.getEmail(), user.getPassword(), user.getFirstName(), user.getLastName(), user.getBSNNumber(), user.getPhoneNumber())).toList();
     }
 
     @GetMapping("/unapproved-users")
     public List<UserDTO> getNotApprovedUsers() {
         List<User> users = userService.getNotApprovedUsers();
-        return users.stream().map(user -> new UserDTO(user.getUserId(), user.getRoles().toString(), user.isApproved(), user.getEmail(), user.getPassword(), user.getFirstName(), user.getLastName(), user.getBSNNumber(), user.getPhoneNumber())).toList();
+        return users.stream().map(user -> new UserDTO(user.getId(), user.getRoles().toString(), user.isApproved(), user.getEmail(), user.getPassword(), user.getFirstName(), user.getLastName(), user.getBSNNumber(), user.getPhoneNumber())).toList();
     }
 
     @PostMapping("/register")
@@ -64,8 +64,6 @@ public class UserController {
     }
 
 
-
-}
     @PostMapping("/accounts")
     public ResponseEntity<String> approveUser(@RequestParam("userId") int userId) {
         try {

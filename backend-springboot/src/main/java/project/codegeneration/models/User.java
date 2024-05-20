@@ -41,14 +41,14 @@ public class User {
 
 
 
-    public User(List<Role> roles, boolean isApproved, String email, String password, String firstName, String lastName, String BSNnumber, String phoneNumber) {
+    public User(List<Role> roles, boolean isApproved, String email, String password, String firstName, String lastName, String BSNNumber, String phoneNumber) {
         this.roles = roles;
         this.isApproved = isApproved;
         this.email = email;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.BSNnumber = BSNnumber;
+        this.BSNNumber = BSNNumber;
         this.phoneNumber = phoneNumber;
     }
 

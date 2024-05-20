@@ -24,13 +24,10 @@ public class Account {
     private AccountType accountType;
 
     private double balance;
-
-
-    private double Balance;
-
-    private int pinCode;
+    
 
     private boolean isActive;
 
     private double absoluteLimit;
+
 }
