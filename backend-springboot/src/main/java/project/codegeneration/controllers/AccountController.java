@@ -69,11 +69,11 @@ public class AccountController {
                 if (isAdmin) {
                     Pageable pageable = PageRequest.of(pageNumber, 10);
                     accounts = accountService.getAllAccounts(pageable);
-
                 }
-            }
-            if (accounts == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                else
+                {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+                }
             }
 
             Page<AccountDTO> accountDTOPage = accounts.map(account -> new AccountDTO(
