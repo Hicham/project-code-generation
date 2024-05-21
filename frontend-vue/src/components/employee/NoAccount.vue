@@ -1,5 +1,9 @@
 <template>
   <div class="container mt-5">
+    <div v-if="users.length === 0" class="alert alert-info">
+      No Users to approve
+    </div>
+    <div v-else>
     <h2 class="mb-4">Unapproved Users</h2>
     <table class="table">
       <thead>
@@ -26,6 +30,7 @@
       </tr>
       </tbody>
     </table>
+    </div>
     <div v-if="showPopup" class="modal fade show" style="display: block;" tabindex="-1" role="dialog">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -55,6 +60,7 @@ export default {
       console.log(userId);
       try {
         await axiosInstance.post(`/api/accounts?userId=${userId}`);
+        users.value = users.value.filter((user) => user.userId !== userId);
         showPopup.value = true;
       } catch (error) {
         console.error(error);
