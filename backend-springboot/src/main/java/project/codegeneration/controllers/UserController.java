@@ -39,9 +39,8 @@ public class UserController {
                 user.getPassword(),
                 user.getFirstName(),
                 user.getLastName(),
-                user.getBSNnumber(),
-                user.getPhoneNumber(),
-                user.getPinCode()
+                user.getBSNNumber(),
+                user.getPhoneNumber()
         )).toList();
 
     }
@@ -56,16 +55,15 @@ public class UserController {
     public String registerUser(@RequestBody UserDTO userDTO) {
         try {
             User user = new User(
-                    userDTO.getId(),
-                    List.of(), // Set default roles or parse from DTO if necessary
-                    false, // Set default approval status or parse from DTO if necessary
+                    List.of(), // Assuming roles should be an empty list
+                    false, // Assuming approved status is false
                     userDTO.getEmail(),
                     userDTO.getPassword(),
                     userDTO.getFirstName(),
                     userDTO.getLastName(),
                     userDTO.getBSNNumber(),
                     userDTO.getPhoneNumber()
-                    );
+            );
 
             userService.create(user);
             return "User registered successfully";
@@ -87,9 +85,8 @@ public class UserController {
                     user.getPassword(),
                     user.getFirstName(),
                     user.getLastName(),
-                    user.getBSNnumber(),
-                    user.getPhoneNumber(),
-                    user.getPinCode()
+                    user.getBSNNumber(),
+                    user.getPhoneNumber()
             );
         } else {
             throw new IllegalArgumentException("User not found");

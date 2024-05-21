@@ -79,7 +79,7 @@ public class AccountController {
         }
 
         List<AccountDTO> accountDTOs = accounts.stream()
-                .map(account -> new AccountDTO(account.getIBAN(), account.getUser().getId(), account.getAccountType().toString(), account.getBalance(), account.isActive(), account.getAbsoluteLimit()))
+                .map(account -> new AccountDTO(account.getIBAN(), account.getUser(), account.getAccountType(), account.getBalance(), account.isActive(), account.getAbsoluteLimit()))
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(accountDTOs);
@@ -100,7 +100,7 @@ public class AccountController {
         if (account == null) {
             return ResponseEntity.notFound().build();
         } else {
-            AccountDTO accountDTO = new AccountDTO(account.getIBAN(), account.getUser().getId(), account.getAccountType().toString(), account.getBalance(), account.isActive(), account.getAbsoluteLimit());
+            AccountDTO accountDTO = new AccountDTO(account.getIBAN(), account.getUser(), account.getAccountType(), account.getBalance(), account.isActive(), account.getAbsoluteLimit());
             return ResponseEntity.ok(accountDTO);
         }
     }
@@ -151,22 +151,18 @@ public class AccountController {
 //                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(Role.ROLE_ADMIN.toString()));
 //    }
 
-    public List<AccountDTO> getAccounts() {
-        List<Account> accounts = accountService.getAllAccounts();
-        return accounts.stream().map(account -> new AccountDTO(account.getIBAN(), account.getUser(), account.getAccountType(), account.getBalance())).toList();
-    }
-
-    @GetMapping("/accounts/users/{email}")
-    public AccountDTO getAccountsByUserEmail(@PathVariable String email) {
-        Optional<Account> accounts = accountService.getAccountsByUserEmail(email);
-        if (accounts.isPresent()) {
-            Account account = accounts.get();
-            return new AccountDTO(account.getIBAN(), account.getUser(), account.getAccountType(), account.getBalance());
-        }
-        else {
-            return null;
-        }
-
-        }
+//
+//    @GetMapping("/accounts/users/{email}")
+//    public AccountDTO getAccountsByUserEmail(@PathVariable String email) {
+//        Optional<Account> accounts = accountService.getAccountsByUserEmail(email);
+//        if (accounts.isPresent()) {
+//            Account account = accounts.get();
+//            return new AccountDTO(account.getIBAN(), account.getUser(), account.getAccountType(), account.getBalance());
+//        }
+//        else {
+//            return null;
+//        }
+//
+//    }
 
 }
