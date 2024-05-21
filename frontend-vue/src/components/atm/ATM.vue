@@ -33,10 +33,8 @@
 </template>
 
 <script>
-import axios from "axios";
-import { useStore } from '@/stores/store';
 import axiosInstance from '@/axios-instance';
-import { useRouter } from "vue-router";
+import { useStore } from '@/stores/store';
 
 export default {
   name: "Atm",
@@ -66,11 +64,12 @@ export default {
           })
           .then((result) => {
             this.accounts = result.data;
-
-            if (this.accounts.length > 0) {
+            if (this.selectedAccount) {
+              this.selectedAccount = this.accounts.find(account => account.iban === this.selectedAccount.iban) || this.accounts[0];
+            } else if (this.accounts.length > 0) {
               this.selectedAccount = this.accounts[0];
-              this.selectAccount();
             }
+            this.selectAccount();
           })
           .catch((error) => console.error("Error fetching accounts:", error));
     },
@@ -94,8 +93,8 @@ export default {
             },
           })
           .then((response) => {
-
             this.withdrawAmount = 0;
+            this.getAccounts(); 
           })
           .catch((error) => {
             console.error("Withdrawal failed:", error);
@@ -116,6 +115,7 @@ export default {
           })
           .then((response) => {
             this.depositAmount = 0;
+            this.getAccounts();
           })
           .catch((error) => {
             console.error("Deposit failed:", error);
