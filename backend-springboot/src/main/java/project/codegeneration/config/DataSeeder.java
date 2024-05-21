@@ -15,6 +15,8 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 
 
 @Component
@@ -39,34 +41,29 @@ public class DataSeeder implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-
-        // Add some data to the database
-//        Cow cow = new Cow();
-//        cow.setName("Betsy");
-//        cow.setAge(5);
+//                User user = userService.findByEmail("hicham@gmail.com").get();
 //
+//        Random random = new Random();
 //
-//        cowRepository.save(cow);
-//
-//        Cheese cheese = new Cheese();
-//        cheese.setName("Gouda");
-//        cheese.setPrice(5.99);
-//        cheese.setAge(3);
-//        cheese.setCow(cow);
-//        cheeseRepository.save(cheese);
+//        for (int i = 0; i < 10; i++) {
+//            String iban = "IBAN" + UUID.randomUUID().toString().substring(0, 8).toUpperCase(); // Generate a random IBAN
+//            int balance = random.nextInt(10000); // Random balance between 0 and 9999
+//            Account account = new Account(iban, user, AccountType.CHECKING, balance, true, 999999999);
+//            accountRepository.save(account);
+//        }
 
 //        User user = new User(List.of(Role.ROLE_USER), false, "hicham@gmail.com", "test", "test", "test", "3652584", "06352615");
 //        User user = new User(List.of(Role.ROLE_USER), false, "hicham2@gmail.com", "test", "test", "test", "3652584", "06352615");
 //        userService.create(user);
 
-//        User user = userService.findByEmail("hicham@gmail.com").get();
-//
+
+////
 //        Account account = new Account("IBANFAKE2", user ,AccountType.CHECKING, 1000, true, 999999999);
 //        Account account2 = new Account("IBANFAKE3", user ,AccountType.CHECKING, 2000, true, 999999999);
 //
 //        accountRepository.save(account);
 //        accountRepository.save(account2);
-//
+////
 
 //            Account account = accountService.getAccountByIBAN("IBANFAKE1");
 //            System.out.println(account);

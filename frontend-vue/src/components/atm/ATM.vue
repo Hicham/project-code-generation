@@ -63,7 +63,7 @@ export default {
             },
           })
           .then((result) => {
-            this.accounts = result.data;
+            this.accounts = result.data.content;
             if (this.selectedAccount) {
               this.selectedAccount = this.accounts.find(account => account.iban === this.selectedAccount.iban) || this.accounts[0];
             } else if (this.accounts.length > 0) {

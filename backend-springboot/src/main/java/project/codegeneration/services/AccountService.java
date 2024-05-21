@@ -1,5 +1,7 @@
 package project.codegeneration.services;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.codegeneration.models.Account;
@@ -29,8 +31,8 @@ public class AccountService {
     }
 
 
-    public List<Account> getAllAccounts() {
-        return accountRepository.findAll();
+    public Page<Account> getAllAccounts(Pageable pageable) {
+        return accountRepository.findAll(pageable);
     }
 
     public Account updateAccount(Account account) {
@@ -45,44 +47,14 @@ public class AccountService {
         accountRepository.deleteById(id);
     }
 
-    public List<Account> getAccountsByUserId(int userId) {
-        return accountRepository.findByUserId(userId);
+    public Page<Account> getAccountsByUserId(Pageable pageable, int userId) {
+        return accountRepository.findByUserId(pageable, userId);
     }
 
 
-    public List<Account> getCheckingAccountsByUserId(Integer userId) {
-        return accountRepository.findByUserIdAndAccountType(userId, AccountType.CHECKING);
+    public Page<Account> getCheckingAccountsByUserId(Pageable pageable, Integer userId) {
+        return accountRepository.findByUserIdAndAccountType(pageable, userId, AccountType.CHECKING);
     }
-
-
-//    @Transactional
-//    public boolean deposit(Account account, double amount) {
-//        if (amount <= 0) {
-//            throw new IllegalArgumentException("Deposit amount must be positive");
-//        }
-//
-//        transactionService.createATMTransaction(null, account.getIBAN(), amount, TransactionType.DEPOSIT, account.getUser());
-//
-//        account.setBalance(account.getBalance() + amount);
-//        accountRepository.save(account);
-//        accountRepository.flush();
-//        return true;
-//    }
-//
-//    @Transactional
-//    public boolean withdraw(Account account, double amount) {
-//        if (amount <= 0) {
-//            throw new IllegalArgumentException("Withdraw amount must be positive");
-//        }
-//
-//        transactionService.createATMTransaction(account.getIBAN(), null, amount, TransactionType.WITHDRAW, account.getUser());
-//
-//        account.setBalance(account.getBalance() - amount);
-//        accountRepository.save(account);
-//        accountRepository.flush();
-//        return true;
-//    }
-
 
 
     public void deposit(Account account, double amount) {

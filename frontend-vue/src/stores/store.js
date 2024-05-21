@@ -9,7 +9,8 @@ export const useStore = defineStore('counter', {
     token: '',
     user: {
       id: 0,
-      email: ''
+      email: '',
+        roles: null,
     },
       loginType: 0,
   }),
@@ -35,6 +36,8 @@ export const useStore = defineStore('counter', {
 
             this.user.email = decoded.sub;
             this.user.id = decoded.userId;
+            this.user.roles = decoded.auth;
+
 
             let loginType = isAtm ? '2' : '1';
 
@@ -61,6 +64,7 @@ export const useStore = defineStore('counter', {
           this.user = {
               id: 0,
               email: ''
+
           };
 
           localStorage.removeItem('token');
@@ -73,6 +77,7 @@ export const useStore = defineStore('counter', {
         let token = localStorage.getItem('token');
         let user = localStorage.getItem('user');
         let loginType = localStorage.getItem('loginType');
+
 
 
         if (token) {
