@@ -12,11 +12,11 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 @Entity
-@Table(name = "accounts")
 public class Account {
 
     @Id
     private String IBAN;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
@@ -29,6 +29,5 @@ public class Account {
     private boolean isActive;
 
     private double absoluteLimit;
-
 
 }

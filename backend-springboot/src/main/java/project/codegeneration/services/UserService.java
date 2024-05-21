@@ -9,8 +9,6 @@ import project.codegeneration.security.JwtProvider;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
 
 @Service
 public class UserService {
@@ -52,7 +50,6 @@ public class UserService {
         return jwtProvider.createToken(user);
     }
 
-
     public List<User> getNotApprovedUsers() {
         return userRepository.findNotApproved(Role.ROLE_USER);
     }
@@ -66,7 +63,10 @@ public class UserService {
     public User getUserById(int userId) {
         return userRepository.findById((long) userId).orElseThrow();
     }
+<<<<<<< HEAD
 
 
 
+=======
+>>>>>>> parent of 1ea1feb (Merge branch 'duha' of https://github.com/Hicham/project-code-generation into duha)
 }

@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class UserDTO {
-    private int id;
+    private int userId;
     private String roleName;
     private boolean isApproved;
     private String email;

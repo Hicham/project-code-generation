@@ -1,19 +1,21 @@
 package project.codegeneration.controllers;
 
 import org.springframework.web.bind.annotation.*;
+import project.codegeneration.models.Cow;
+import project.codegeneration.models.DTO.CowDTO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import project.codegeneration.models.Cow;
+import project.codegeneration.models.DTO.CowDTO;
 import project.codegeneration.models.DTO.UserDTO;
 import project.codegeneration.models.User;
 import project.codegeneration.services.AccountService;
 import project.codegeneration.services.UserService;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
@@ -30,6 +32,7 @@ public class UserController {
     @GetMapping("/users")
     public List<UserDTO> getUsers() {
         List<User> users = userService.getAllUsers();
+<<<<<<< HEAD
 
         return users.stream().map(user -> new UserDTO(
                 user.getId(),
@@ -43,6 +46,9 @@ public class UserController {
                 user.getPhoneNumber()
         )).toList();
 
+=======
+        return users.stream().map(user -> new UserDTO(user.getId(), user.getRoles().toString(), user.isApproved(), user.getEmail(), user.getPassword(), user.getFirstName(), user.getLastName(), user.getBSNNumber(), user.getPhoneNumber())).toList();
+>>>>>>> parent of 1ea1feb (Merge branch 'duha' of https://github.com/Hicham/project-code-generation into duha)
     }
 
     @GetMapping("/unapproved-users")
@@ -55,8 +61,14 @@ public class UserController {
     public String registerUser(@RequestBody UserDTO userDTO) {
         try {
             User user = new User(
+<<<<<<< HEAD
                     List.of(), // Assuming roles should be an empty list
                     false, // Assuming approved status is false
+=======
+//                    userDTO.getUserId(),
+                    List.of(), // Set default roles or parse from DTO if necessary
+                    false, // Set default approval status or parse from DTO if necessary
+>>>>>>> parent of 1ea1feb (Merge branch 'duha' of https://github.com/Hicham/project-code-generation into duha)
                     userDTO.getEmail(),
                     userDTO.getPassword(),
                     userDTO.getFirstName(),
@@ -72,6 +84,7 @@ public class UserController {
         }
     }
 
+<<<<<<< HEAD
     @GetMapping("/users/{email}")
     public UserDTO getUserByEmail(@PathVariable String email) {
         Optional<User> userOptional = userService.findByEmail(email);
@@ -92,6 +105,8 @@ public class UserController {
             throw new IllegalArgumentException("User not found");
         }
     }
+=======
+>>>>>>> parent of 1ea1feb (Merge branch 'duha' of https://github.com/Hicham/project-code-generation into duha)
 
     @PostMapping("/accounts")
     public ResponseEntity<String> approveUser(@RequestParam("userId") int userId) {

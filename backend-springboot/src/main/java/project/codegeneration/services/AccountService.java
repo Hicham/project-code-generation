@@ -10,7 +10,6 @@ import project.codegeneration.repositories.AccountRepository;
 import project.codegeneration.util.IBANGenerator;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class AccountService {
@@ -21,7 +20,6 @@ public class AccountService {
         this.accountRepository = accountRepository;
     }
 
-
     public Account getAccountById(int id) {
         return accountRepository.findById(id).orElseThrow();
     }
@@ -29,6 +27,7 @@ public class AccountService {
     public Account getAccountByIBAN(String IBAN) {
         return accountRepository.findByIBAN(IBAN);
     }
+
 
     public List<Account> getAllAccounts() {
         return accountRepository.findAll();
@@ -42,9 +41,8 @@ public class AccountService {
         return accountRepository.save(account);
     }
 
-
-    public Optional<Account> getAccountsByUserEmail(String email) {
-        return accountRepository.findAccountsByUserEmail(email);
+    public void deleteAccount(int id) {
+        accountRepository.deleteById(id);
     }
 
     public List<Account> getAccountsByUserId(int userId) {
@@ -159,5 +157,4 @@ public class AccountService {
     public int getRandomPinCode(){
         return (int) (Math.random() * 10000);
     }
-
 }

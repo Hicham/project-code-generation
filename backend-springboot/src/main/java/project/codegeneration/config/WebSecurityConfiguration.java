@@ -30,10 +30,6 @@ public class WebSecurityConfiguration {
         http.csrf(csrf -> csrf.disable());
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        http.headers((headers) ->
-                headers
-                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
-        );
 
 
         http.headers((headers) ->
@@ -48,7 +44,6 @@ public class WebSecurityConfiguration {
         http.authorizeHttpRequests(requests -> requests.requestMatchers("/h2-console").permitAll());
         http.authorizeHttpRequests(requests -> requests.requestMatchers("/h2-console/**").permitAll());
         http.authorizeHttpRequests(requests -> requests.requestMatchers("/api/**").permitAll());
-
         http.authorizeHttpRequests(requests -> requests.anyRequest().permitAll());
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
 

@@ -4,7 +4,7 @@ import { useStore } from '@/stores/store';
 
 import Home from '../components/Home.vue';
 import Login from '../components/Login.vue';
-import MyAccount from '../components/employee/Account.vue';
+import MyAccount from '../components/MyAccount.vue';
 import Register from '../components/Register.vue';
 import Atm from '../components/atm/atm.vue';
 
@@ -13,14 +13,17 @@ const router = createRouter({
   routes: [
     { path: '/', component: Home },
     { path: '/login', component: Login },
-
     { path: '/register', component: Register},
     { path: '/myaccount', component: MyAccount, meta: { requiresAuth: true, loginType: 1 } },
     { path: '/atm', component: Atm, meta: { requiresAuth: true, loginType: 2 } },
+<<<<<<< HEAD
     { path: '/users', component: Users, meta: { requiresAuth: true, loginType: 1 } },
 
     { path: '/account', component: MyAccount},
     { path: '/register', component: Register}
+=======
+    { path: '/users', component: Users, meta: { requiresAuth: true, loginType: 1 } }
+>>>>>>> parent of 1ea1feb (Merge branch 'duha' of https://github.com/Hicham/project-code-generation into duha)
   ]
 })
 
