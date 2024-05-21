@@ -8,6 +8,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import project.codegeneration.models.Account;
 import project.codegeneration.models.DTO.AccountDTO;
 import project.codegeneration.models.DTO.ATMTransactionRequest;
@@ -20,7 +26,9 @@ import project.codegeneration.services.UserService;
 
 import java.util.List;
 import java.util.Optional;
+
 import java.util.stream.Collectors;
+
 
 @RestController
 @RequestMapping("/api")
@@ -142,4 +150,23 @@ public class AccountController {
 //        return userDetails.getAuthorities().stream()
 //                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(Role.ROLE_ADMIN.toString()));
 //    }
+
+    public List<AccountDTO> getAccounts() {
+        List<Account> accounts = accountService.getAllAccounts();
+        return accounts.stream().map(account -> new AccountDTO(account.getIBAN(), account.getUser(), account.getAccountType(), account.getBalance())).toList();
+    }
+
+    @GetMapping("/accounts/users/{email}")
+    public AccountDTO getAccountsByUserEmail(@PathVariable String email) {
+        Optional<Account> accounts = accountService.getAccountsByUserEmail(email);
+        if (accounts.isPresent()) {
+            Account account = accounts.get();
+            return new AccountDTO(account.getIBAN(), account.getUser(), account.getAccountType(), account.getBalance());
+        }
+        else {
+            return null;
+        }
+
+        }
+
 }

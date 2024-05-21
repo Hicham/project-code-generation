@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class UserDTO {
-    private int userId;
+    private int id;
     private String roleName;
     private boolean isApproved;
     private String email;

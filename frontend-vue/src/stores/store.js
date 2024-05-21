@@ -1,91 +1,114 @@
 import { defineStore } from 'pinia'
 import axios from '../axios-auth';
 import axiosInstance from '../axios-instance';
-import jwtDecode from "jwt-decode";
-
 
 export const useStore = defineStore('counter', {
-  state: () => ({
-    token: '',
-    user: {
-      id: 0,
-      email: ''
+    state: () => ({
+        token: '',
+        user: '',  // This will hold the email of the logged-in user
+        userId: '',
+        firstName: '',
+        lastName: '',
+        isApproved: ''
+    }),
+    getters: {
+        isLoggedIn: (state) => state.token != '',
     },
-      loginType: 0,
-  }),
-  getters: {
-    isLoggedIn: (state) => state.token != '',
-  },
-  actions: {
+    actions: {
+        decodeJwt(token) {
+            return JSON.parse(atob(token.split('.')[1]));
+        },
+        login(email, password) {
+            return new Promise((resolve, reject) => {
+                axiosInstance.post("/login", {
+                    email: email,
+                    password: password,
+                })
+                    .then((res) => {
+                        axios.defaults.headers.common['Authorization'] = 'Bearer ' + res.data.token;
+                        this.token = res.data.token;
+                        this.user = email;
 
-      login(email, password, isAtm) {
-        return new Promise((resolve, reject) => {
+                        localStorage.setItem('token', res.data.token);
+                        localStorage.setItem('user', email);
 
-            axiosInstance.post("/login", {
-            email: email,
-            password: password,
-          })
-          .then((res) => {
+                        // Fetch user details using email
+                        this.fetchUserDetails(email).then(() => {
+                            resolve();
+                        }).catch((error) => {
+                            reject(error);
+                        });
+                    })
+                    .catch((error) => reject(error.response));
+            });
+        },
+        fetchUserDetails(email) {
+            return axiosInstance.get(`/api/users/${email}`)
+                .then((res) => {
+                    const userData = res.data;
 
-            axios.defaults.headers.common['Authorization'] = 'Bearer ' + res.data.token;
+                    this.userId = userData.userId;
+                    this.firstName = userData.firstName;
+                    this.lastName = userData.lastName;
+                    this.isApproved = userData.approved;
 
-            this.token = res.data.token;
-
-            let decoded = jwtDecode(this.token);
-
-            this.user.email = decoded.sub;
-            this.user.id = decoded.userId;
-
-            let loginType = isAtm ? '2' : '1';
-
-            this.loginType = loginType
-
-
-            localStorage.setItem('token', res.data.token);
-            localStorage.setItem('user', JSON.stringify(this.user));
-
-
-            localStorage.setItem('loginType', loginType);
-
-
-
-            resolve();
-        })
-
-        .catch((error) => reject(error.response));
-        });
-    },
-      logout() {
-
-          this.token = '';
-          this.user = {
-              id: 0,
-              email: ''
-          };
-
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-          localStorage.removeItem('loginType');
-
-          delete axios.defaults.headers.common['Authorization'];
-      },
-    autoLogin() {
-        let token = localStorage.getItem('token');
-        let user = localStorage.getItem('user');
-        let loginType = localStorage.getItem('loginType');
+                    // Optionally store these details in localStorage
+                    localStorage.setItem('userId', userData.userId);
+                    localStorage.setItem('firstName', userData.firstName);
+                    localStorage.setItem('lastName', userData.lastName);
+                    localStorage.setItem('isApproved', userData.approved);
 
 
-        if (token) {
-          this.token = token;
+                })
+                .catch((error) => {
+                    console.error('Failed to fetch user details:', error);
+                    throw error;
+                });
+        },
+        logout() {
+            this.token = '';
+            this.user = '';
+            this.userId = '';
+            this.firstName = '';
+            this.lastName = '';
+            this.isApproved = '';
 
-          this.user = JSON.parse(user);
-          this.loginType = loginType;
-          axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            localStorage.removeItem('userId');
+            localStorage.removeItem('firstName');
+            localStorage.removeItem('lastName');
+            localStorage.removeItem('isApproved');
 
+            delete axios.defaults.headers.common['Authorization'];
+        },
+        autoLogin() {
+            let token = localStorage.getItem('token');
+            let user = localStorage.getItem('user');
+            let userId = localStorage.getItem('userId');
+            let firstName = localStorage.getItem('firstName');
+            let lastName = localStorage.getItem('lastName');
+            let isApproved = localStorage.getItem('isApproved');
+
+            if (token && user && userId && firstName && lastName && isApproved) {
+                this.token = token;
+                this.user = user;
+                this.userId = userId;
+                this.firstName = firstName;
+                this.lastName = lastName;
+                this.isApproved = isApproved;
+
+                axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+            } else {
+                // Clear localStorage if any required data is missing
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                localStorage.removeItem('userId');
+                localStorage.removeItem('firstName');
+                localStorage.removeItem('lastName');
+                localStorage.removeItem('isApproved');
+            }
         }
 
-      },
-
-  },
-
-})
+    },
+});
