@@ -77,8 +77,7 @@ public class AccountController {
             }
 
             Page<AccountDTO> accountDTOPage = accounts.map(account -> new AccountDTO(
-                    account.getIBAN(),
-//                account.getUser().getId(),
+                    account.getIBAN(),  
                     account.getUser(),
                     account.getAccountType().toString(),
                     account.getBalance(),
@@ -156,4 +155,19 @@ public class AccountController {
 //        return userDetails.getAuthorities().stream()
 //                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(Role.ROLE_ADMIN.toString()));
 //    }
+
+
+   @GetMapping("/accounts/users/{email}")
+   public AccountDTO getAccountsByUserEmail(@PathVariable String email) {
+       Optional<Account> accounts = accountService.getAccountsByUserEmail(email);
+       if (accounts.isPresent()) {
+           Account account = accounts.get();
+           return new AccountDTO(account.getIBAN(), account.getUser(), account.getAccountType(), account.getBalance());
+       }
+       else {
+           return null;
+       }
+
+   }
+
 }

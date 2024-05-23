@@ -32,7 +32,23 @@ public class UserController {
     @GetMapping("/users")
     public List<UserDTO> getUsers() {
         List<User> users = userService.getAllUsers();
+<<<<<<< HEAD
+
+        return users.stream().map(user -> new UserDTO(
+                user.getId(),
+                user.getRoles().toString(),
+                user.isApproved(),
+                user.getEmail(),
+                user.getPassword(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getBSNNumber(),
+                user.getPhoneNumber()
+        )).toList();
+
+=======
         return users.stream().map(user -> new UserDTO(user.getId(), user.getRoles().toString(), user.isApproved(), user.getEmail(), user.getPassword(), user.getFirstName(), user.getLastName(), user.getBSNNumber(), user.getPhoneNumber())).toList();
+>>>>>>> parent of 1ea1feb (Merge branch 'duha' of https://github.com/Hicham/project-code-generation into duha)
     }
 
     @GetMapping("/unapproved-users")
@@ -45,16 +61,21 @@ public class UserController {
     public String registerUser(@RequestBody UserDTO userDTO) {
         try {
             User user = new User(
+<<<<<<< HEAD
+                    List.of(), // Assuming roles should be an empty list
+                    false, // Assuming approved status is false
+=======
 //                    userDTO.getUserId(),
                     List.of(), // Set default roles or parse from DTO if necessary
                     false, // Set default approval status or parse from DTO if necessary
+>>>>>>> parent of 1ea1feb (Merge branch 'duha' of https://github.com/Hicham/project-code-generation into duha)
                     userDTO.getEmail(),
                     userDTO.getPassword(),
                     userDTO.getFirstName(),
                     userDTO.getLastName(),
                     userDTO.getBSNNumber(),
                     userDTO.getPhoneNumber()
-                    );
+            );
 
             userService.create(user);
             return "User registered successfully";
@@ -63,6 +84,29 @@ public class UserController {
         }
     }
 
+<<<<<<< HEAD
+    @GetMapping("/users/{email}")
+    public UserDTO getUserByEmail(@PathVariable String email) {
+        Optional<User> userOptional = userService.findByEmail(email);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            return new UserDTO(
+                    user.getId(),
+                    user.getRoles().toString(),
+                    user.isApproved(),
+                    user.getEmail(),
+                    user.getPassword(),
+                    user.getFirstName(),
+                    user.getLastName(),
+                    user.getBSNNumber(),
+                    user.getPhoneNumber()
+            );
+        } else {
+            throw new IllegalArgumentException("User not found");
+        }
+    }
+=======
+>>>>>>> parent of 1ea1feb (Merge branch 'duha' of https://github.com/Hicham/project-code-generation into duha)
 
     @PostMapping("/accounts")
     public ResponseEntity<String> approveUser(@RequestParam("userId") int userId) {

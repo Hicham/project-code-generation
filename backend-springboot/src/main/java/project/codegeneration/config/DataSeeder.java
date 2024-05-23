@@ -4,9 +4,12 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 import project.codegeneration.models.*;
+<<<<<<< HEAD
+=======
 import project.codegeneration.repositories.AccountRepository;
 import project.codegeneration.repositories.CheeseRepository;
 import project.codegeneration.repositories.CowRepository;
+>>>>>>> parent of 1ea1feb (Merge branch 'duha' of https://github.com/Hicham/project-code-generation into duha)
 import project.codegeneration.services.AccountService;
 import project.codegeneration.services.UserService;
 
@@ -22,11 +25,15 @@ import java.util.UUID;
 @Component
 public class DataSeeder implements ApplicationRunner {
 
+<<<<<<< HEAD
+    private AccountService accountService;
+=======
     private final CowRepository cowRepository;
     private final CheeseRepository cheeseRepository;
     private final AccountRepository accountRepository;
 
     private final AccountService accountService;
+>>>>>>> parent of 1ea1feb (Merge branch 'duha' of https://github.com/Hicham/project-code-generation into duha)
     private UserService userService;
 
 
@@ -52,16 +59,22 @@ public class DataSeeder implements ApplicationRunner {
 //            accountRepository.save(account);
 //        }
 
-//        User user = new User(List.of(Role.ROLE_USER), false, "hicham@gmail.com", "test", "test", "test", "3652584", "06352615");
+//       User user = new User(List.of(Role.ROLE_USER), false, "hichamm@gmail.com", "test", "test", "test", "3652584", "06352615");
 //        User user = new User(List.of(Role.ROLE_USER), false, "hicham2@gmail.com", "test", "test", "test", "3652584", "06352615");
+<<<<<<< HEAD
+        //        userService.create(user);
+
+
+=======
 //        userService.create(user);
+>>>>>>> parent of 1ea1feb (Merge branch 'duha' of https://github.com/Hicham/project-code-generation into duha)
 
 
 ////
 //        Account account = new Account("IBANFAKE2", user ,AccountType.CHECKING, 1000, true, 999999999);
 //        Account account2 = new Account("IBANFAKE3", user ,AccountType.CHECKING, 2000, true, 999999999);
 //
-//        accountRepository.save(account);
+ //      accountService.createAccount(account);
 //        accountRepository.save(account2);
 ////
 
