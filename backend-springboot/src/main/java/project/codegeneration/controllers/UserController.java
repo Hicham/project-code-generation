@@ -16,6 +16,7 @@ import project.codegeneration.services.AccountService;
 import project.codegeneration.services.UserService;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
@@ -32,8 +33,6 @@ public class UserController {
     @GetMapping("/users")
     public List<UserDTO> getUsers() {
         List<User> users = userService.getAllUsers();
-<<<<<<< HEAD
-
         return users.stream().map(user -> new UserDTO(
                 user.getId(),
                 user.getRoles().toString(),
@@ -46,9 +45,7 @@ public class UserController {
                 user.getPhoneNumber()
         )).toList();
 
-=======
-        return users.stream().map(user -> new UserDTO(user.getId(), user.getRoles().toString(), user.isApproved(), user.getEmail(), user.getPassword(), user.getFirstName(), user.getLastName(), user.getBSNNumber(), user.getPhoneNumber())).toList();
->>>>>>> parent of 1ea1feb (Merge branch 'duha' of https://github.com/Hicham/project-code-generation into duha)
+
     }
 
     @GetMapping("/unapproved-users")
@@ -61,14 +58,9 @@ public class UserController {
     public String registerUser(@RequestBody UserDTO userDTO) {
         try {
             User user = new User(
-<<<<<<< HEAD
                     List.of(), // Assuming roles should be an empty list
                     false, // Assuming approved status is false
-=======
 //                    userDTO.getUserId(),
-                    List.of(), // Set default roles or parse from DTO if necessary
-                    false, // Set default approval status or parse from DTO if necessary
->>>>>>> parent of 1ea1feb (Merge branch 'duha' of https://github.com/Hicham/project-code-generation into duha)
                     userDTO.getEmail(),
                     userDTO.getPassword(),
                     userDTO.getFirstName(),
@@ -84,7 +76,6 @@ public class UserController {
         }
     }
 
-<<<<<<< HEAD
     @GetMapping("/users/{email}")
     public UserDTO getUserByEmail(@PathVariable String email) {
         Optional<User> userOptional = userService.findByEmail(email);
@@ -105,8 +96,7 @@ public class UserController {
             throw new IllegalArgumentException("User not found");
         }
     }
-=======
->>>>>>> parent of 1ea1feb (Merge branch 'duha' of https://github.com/Hicham/project-code-generation into duha)
+
 
     @PostMapping("/accounts")
     public ResponseEntity<String> approveUser(@RequestParam("userId") int userId) {

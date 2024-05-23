@@ -63,10 +63,5 @@ public class UserService {
     public User getUserById(int userId) {
         return userRepository.findById((long) userId).orElseThrow();
     }
-<<<<<<< HEAD
 
-
-
-=======
->>>>>>> parent of 1ea1feb (Merge branch 'duha' of https://github.com/Hicham/project-code-generation into duha)
 }

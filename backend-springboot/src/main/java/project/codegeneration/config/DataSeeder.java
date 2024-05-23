@@ -3,48 +3,28 @@ package project.codegeneration.config;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
-import project.codegeneration.models.*;
-<<<<<<< HEAD
-=======
 import project.codegeneration.repositories.AccountRepository;
-import project.codegeneration.repositories.CheeseRepository;
-import project.codegeneration.repositories.CowRepository;
->>>>>>> parent of 1ea1feb (Merge branch 'duha' of https://github.com/Hicham/project-code-generation into duha)
+import project.codegeneration.repositories.UserRepository;
 import project.codegeneration.services.AccountService;
 import project.codegeneration.services.UserService;
-
-import java.sql.Timestamp;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
 
 
 @Component
 public class DataSeeder implements ApplicationRunner {
 
-<<<<<<< HEAD
-    private AccountService accountService;
-=======
-    private final CowRepository cowRepository;
-    private final CheeseRepository cheeseRepository;
+    private final AccountService accountService;
     private final AccountRepository accountRepository;
 
-    private final AccountService accountService;
->>>>>>> parent of 1ea1feb (Merge branch 'duha' of https://github.com/Hicham/project-code-generation into duha)
-    private UserService userService;
+    private final UserRepository userRepository;
+    private final UserService userService;
 
+    public DataSeeder(AccountService accountService, AccountRepository accountRepository, UserRepository userRepository, UserService userService) {
+        this.accountService = accountService;
+        this.accountRepository = accountRepository;
+        this.userRepository = userRepository;
+        this.userService = userService;
+    }
 
-       public DataSeeder(CowRepository cowRepository, CheeseRepository cheeseRepository, AccountRepository accountRepository, AccountService accountService, UserService userService) {
-           this.cowRepository = cowRepository;
-           this.cheeseRepository = cheeseRepository;
-           this.accountRepository = accountRepository;
-           this.accountService = accountService;
-
-           this.userService = userService;
-        }
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -61,13 +41,11 @@ public class DataSeeder implements ApplicationRunner {
 
 //       User user = new User(List.of(Role.ROLE_USER), false, "hichamm@gmail.com", "test", "test", "test", "3652584", "06352615");
 //        User user = new User(List.of(Role.ROLE_USER), false, "hicham2@gmail.com", "test", "test", "test", "3652584", "06352615");
-<<<<<<< HEAD
         //        userService.create(user);
 
 
-=======
 //        userService.create(user);
->>>>>>> parent of 1ea1feb (Merge branch 'duha' of https://github.com/Hicham/project-code-generation into duha)
+
 
 
 ////

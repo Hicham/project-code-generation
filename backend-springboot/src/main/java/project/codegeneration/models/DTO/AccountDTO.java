@@ -10,7 +10,6 @@ import project.codegeneration.models.AccountType;
 public class AccountDTO {
     private String IBAN;
     private User user;
-    private String AccountType;
     private AccountType AccountType;
     private double Balance;
     private boolean isActive;
