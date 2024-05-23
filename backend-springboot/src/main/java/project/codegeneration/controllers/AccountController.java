@@ -80,7 +80,7 @@ public class AccountController {
                     account.getIBAN(),
 //                account.getUser().getId(),
                     account.getUser(),
-                    account.getAccountType().toString(),
+                    account.getAccountType(),
                     account.getBalance(),
                     account.isActive(),
                     account.getAbsoluteLimit()
@@ -108,8 +108,7 @@ public class AccountController {
         if (account == null) {
             return ResponseEntity.notFound().build();
         } else {
-//            AccountDTO accountDTO = new AccountDTO(account.getIBAN(), account.getUser().getId(), account.getAccountType().toString(), account.getBalance(), account.isActive(), account.getAbsoluteLimit());
-            AccountDTO accountDTO = new AccountDTO(account.getIBAN(), account.getUser(), account.getAccountType().toString(), account.getBalance(), account.isActive(), account.getAbsoluteLimit());
+            AccountDTO accountDTO = new AccountDTO(account.getIBAN(), account.getUser(), account.getAccountType(), account.getBalance(), account.isActive(), account.getAbsoluteLimit());
             return ResponseEntity.ok(accountDTO);
         }
     }
@@ -156,4 +155,17 @@ public class AccountController {
 //        return userDetails.getAuthorities().stream()
 //                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(Role.ROLE_ADMIN.toString()));
 //    }
+
+    @GetMapping("/accounts/users/{email}")
+    public AccountDTO getAccountsByUserEmail(@PathVariable String email) {
+        Optional<Account> accounts = accountService.getAccountsByUserEmail(email);
+        if (accounts.isPresent()) {
+            Account account = accounts.get();
+            return new AccountDTO(account.getIBAN(), account.getUser(), account.getAccountType(), account.getBalance(), account.isActive(), account.getAbsoluteLimit());
+        }
+        else {
+            return null;
+        }
+
+    }
 }

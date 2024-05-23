@@ -3,41 +3,32 @@ package project.codegeneration.config;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
-import project.codegeneration.models.*;
+import project.codegeneration.models.Account;
+import project.codegeneration.models.AccountType;
+import project.codegeneration.models.Role;
+import project.codegeneration.models.User;
 import project.codegeneration.repositories.AccountRepository;
-import project.codegeneration.repositories.CheeseRepository;
-import project.codegeneration.repositories.CowRepository;
 import project.codegeneration.services.AccountService;
 import project.codegeneration.services.UserService;
 
-import java.sql.Timestamp;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-import java.util.UUID;
 
 
 @Component
 public class DataSeeder implements ApplicationRunner {
 
-    private final CowRepository cowRepository;
-    private final CheeseRepository cheeseRepository;
+
     private final AccountRepository accountRepository;
 
     private final AccountService accountService;
     private UserService userService;
 
 
-       public DataSeeder(CowRepository cowRepository, CheeseRepository cheeseRepository, AccountRepository accountRepository, AccountService accountService, UserService userService) {
-           this.cowRepository = cowRepository;
-           this.cheeseRepository = cheeseRepository;
-           this.accountRepository = accountRepository;
-           this.accountService = accountService;
-
-           this.userService = userService;
-        }
+    public DataSeeder(AccountRepository accountRepository, AccountService accountService, UserService userService) {
+        this.accountRepository = accountRepository;
+        this.accountService = accountService;
+        this.userService = userService;
+    }
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -51,18 +42,17 @@ public class DataSeeder implements ApplicationRunner {
 //            Account account = new Account(iban, user, AccountType.CHECKING, balance, true, 999999999);
 //            accountRepository.save(account);
 //        }
-
-//        User user = new User(List.of(Role.ROLE_USER), false, "hicham@gmail.com", "test", "test", "test", "3652584", "06352615");
+        User user = new User(List.of(Role.ROLE_USER), false, "hicham@gmail.com", "test", "test", "test", "3652584", "06352615");
 //        User user = new User(List.of(Role.ROLE_USER), false, "hicham2@gmail.com", "test", "test", "test", "3652584", "06352615");
-//        userService.create(user);
+        userService.create(user);
 
 
 ////
-//        Account account = new Account("IBANFAKE2", user ,AccountType.CHECKING, 1000, true, 999999999);
-//        Account account2 = new Account("IBANFAKE3", user ,AccountType.CHECKING, 2000, true, 999999999);
+        Account account = new Account("IBANFAKE2", user ,AccountType.CHECKING, 1000, true, 999999999);
+        Account account2 = new Account("IBANFAKE3", user , AccountType.CHECKING, 2000, true, 999999999);
 //
-//        accountRepository.save(account);
-//        accountRepository.save(account2);
+        accountRepository.save(account);
+        accountRepository.save(account2);
 ////
 
 //            Account account = accountService.getAccountByIBAN("IBANFAKE1");

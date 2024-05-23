@@ -12,9 +12,15 @@ import java.util.Optional;
 import java.util.List;
 
 public interface AccountRepository extends JpaRepository<Account, Integer> {
+
+    List<Account> findAll();
+
     Account findByIBAN(String IBAN);
 
     Page<Account> findByUserId(Pageable pageable, int id);
 
     Page<Account> findByUserIdAndAccountType(Pageable pageable, Integer userId, AccountType accountType);
+
+    Optional<Account> findAccountsByUserEmail(String email);
+
 }
