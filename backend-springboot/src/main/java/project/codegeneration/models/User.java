@@ -38,6 +38,9 @@ public class User {
     @OneToMany(fetch = FetchType.EAGER)
     private List<Account> accounts = new ArrayList<>();
 
+//    @OneToMany(fetch = FetchType.EAGER)
+//    private List<Transaction> transactions = new ArrayList<>();
+
 
 
 

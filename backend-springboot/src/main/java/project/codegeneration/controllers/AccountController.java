@@ -1,7 +1,9 @@
 package project.codegeneration.controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -30,7 +32,6 @@ public class AccountController {
     private final UserService userService;
     private final TransactionService transactionService;
 
-    @Autowired
     public AccountController(final AccountService accountService, UserService userService, TransactionService transactionService) {
         this.accountService = accountService;
         this.userService = userService;
@@ -38,49 +39,64 @@ public class AccountController {
     }
 
     @GetMapping("/accounts")
-    public ResponseEntity<List<AccountDTO>> getAccounts(@RequestParam(required = false) Integer userId, @RequestParam(required = false) Boolean isChecking) {
+    public ResponseEntity<Page<AccountDTO>> getAccounts(@RequestParam(required = false) Integer userId, @RequestParam(required = false) Boolean isChecking, @RequestParam(required = false, defaultValue = "0") Integer pageNumber) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        boolean isAdmin = userDetails.getAuthorities().stream()
-                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(Role.ROLE_ADMIN.toString()));
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            boolean isAdmin = userDetails.getAuthorities().stream()
+                    .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(Role.ROLE_ADMIN.toString()));
 
-        Optional<User> currentUser = userService.findByEmail(userDetails.getUsername());
+            Optional<User> currentUser = userService.findByEmail(userDetails.getUsername());
 
-        List<Account> accounts = null;
+            Page<Account> accounts = null;
 
-        // moet dit in de service?
-        if (userId != null) {
-            if (isAdmin || currentUser.isPresent() && currentUser.get().getId() == userId) {
-                if (isChecking) {
-                    accounts = accountService.getCheckingAccountsByUserId(userId);
-                } else {
-                    accounts = accountService.getAccountsByUserId(userId);
+            if (userId != null) {
+
+                Pageable pageable = PageRequest.of(pageNumber, Integer.MAX_VALUE);
+
+                if (isAdmin || currentUser.isPresent() && currentUser.get().getId() == userId) {
+                    if (isChecking) {
+                        accounts = accountService.getCheckingAccountsByUserId(pageable, userId);
+                    } else {
+                        accounts = accountService.getAccountsByUserId(pageable, userId);
+                    }
+                }
+            } else {
+                if (isAdmin) {
+                    Pageable pageable = PageRequest.of(pageNumber, 10);
+                    accounts = accountService.getAllAccounts(pageable);
+                }
+                else
+                {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
                 }
             }
-        } else {
-            if (isAdmin) {
-                accounts = accountService.getAllAccounts();
-            }
-        }
-        if (accounts == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
 
-        List<AccountDTO> accountDTOs = accounts.stream()
-                .map(account -> new AccountDTO(account.getIBAN(), account.getUser().getId(), account.getAccountType().toString(), account.getBalance(), account.isActive(), account.getAbsoluteLimit()))
-                .collect(Collectors.toList());
+            Page<AccountDTO> accountDTOPage = accounts.map(account -> new AccountDTO(
+                    account.getIBAN(),
+//                account.getUser().getId(),
+                    account.getUser(),
+                    account.getAccountType().toString(),
+                    account.getBalance(),
+                    account.isActive(),
+                    account.getAbsoluteLimit()
+            ));
 
-        return ResponseEntity.ok(accountDTOs);
+            return ResponseEntity.ok(accountDTOPage);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
+
 
 
     @GetMapping("/accounts/{IBAN}")
     public ResponseEntity<AccountDTO> getAccountByIBAN(@PathVariable String IBAN, HttpServletRequest request) {
-
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -92,12 +108,11 @@ public class AccountController {
         if (account == null) {
             return ResponseEntity.notFound().build();
         } else {
-            AccountDTO accountDTO = new AccountDTO(account.getIBAN(), account.getUser().getId(), account.getAccountType().toString(), account.getBalance(), account.isActive(), account.getAbsoluteLimit());
+//            AccountDTO accountDTO = new AccountDTO(account.getIBAN(), account.getUser().getId(), account.getAccountType().toString(), account.getBalance(), account.isActive(), account.getAbsoluteLimit());
+            AccountDTO accountDTO = new AccountDTO(account.getIBAN(), account.getUser(), account.getAccountType().toString(), account.getBalance(), account.isActive(), account.getAbsoluteLimit());
             return ResponseEntity.ok(accountDTO);
         }
     }
-
-
 
 
     @PostMapping("/accounts/{IBAN}/deposit")
@@ -125,7 +140,7 @@ public class AccountController {
         Optional<User> currentUser = userService.findByEmail(currentUsername);
 
         if (currentUser.isPresent()) {
-            transactionService.createTransaction(null, IBAN, ATMTransactionRequest.getAmount(), TransactionType.DEPOSIT, currentUser.get());
+            transactionService.createTransaction(IBAN, null, ATMTransactionRequest.getAmount(), TransactionType.WITHDRAW, currentUser.get());
             return ResponseEntity.ok("Money withdrawn successfully.");
         }
         else

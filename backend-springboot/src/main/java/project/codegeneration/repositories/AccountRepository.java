@@ -1,5 +1,7 @@
 package project.codegeneration.repositories;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import project.codegeneration.models.Account;
@@ -12,7 +14,7 @@ import java.util.List;
 public interface AccountRepository extends JpaRepository<Account, Integer> {
     Account findByIBAN(String IBAN);
 
-    List<Account> findByUserId(int id);
+    Page<Account> findByUserId(Pageable pageable, int id);
 
-    List<Account> findByUserIdAndAccountType(Integer userId, AccountType accountType);
+    Page<Account> findByUserIdAndAccountType(Pageable pageable, Integer userId, AccountType accountType);
 }

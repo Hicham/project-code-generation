@@ -25,9 +25,9 @@ public class Transaction {
 
     private Long timestamp;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+//    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private User user;
-
 
     public Transaction(String sourceIBAN, String destinationIBAN, Double amount, TransactionType type, Long timestamp, User user) {
         this.sourceIBAN = sourceIBAN;
