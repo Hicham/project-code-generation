@@ -63,4 +63,6 @@ public class UserService {
     public User getUserById(int userId) {
         return userRepository.findById((long) userId).orElseThrow();
     }
+
+
 }

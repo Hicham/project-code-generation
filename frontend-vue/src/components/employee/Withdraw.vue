@@ -11,19 +11,17 @@
               </option>
             </select>
 
-            <!-- Display checking account balance -->
-            <div v-if="selectedAccount && selectedAccount.accountType === 'CHECKING'">
-              <h3>Balance CHECKING: €{{ balance }}</h3>
+            <div>
+              <h3>Balance: €{{ balance }}</h3>
             </div>
 
-            <!-- Display savings account balance -->
-            <div v-if="selectedAccount && selectedAccount.accountType === 'SAVINGS'">
-              <h3>Balance SAVINGS: €{{ balance }}</h3>
+            <div class="mb-3">
+              <div class="input-group mb-2">
+                <input type="number" class="form-control" placeholder="Enter amount" v-model="withdrawAmount">
+                <button class="btn btn-primary" @click="withdraw">Withdraw</button>
+              </div>
             </div>
 
-            <router-link to="/withdraw" class="btn btn-primary">Withdraw</router-link>
-
-            <!-- Transaction list -->
             <div class="transaction-container">
               <h3>Transactions</h3>
               <div class="transaction-list">
@@ -63,6 +61,7 @@ export default {
     const accounts = ref([]);
     const selectedAccount = ref(null);
     const balance = ref(0);
+    const withdrawAmount = ref(0);
     const transactions = ref([]);
 
     const getAccounts = () => {
@@ -73,7 +72,6 @@ export default {
             },
             params: {
               userId: store.user.id,
-              isChecking: false,
             },
           })
           .then((result) => {
@@ -95,6 +93,29 @@ export default {
       }
     };
 
+    const withdraw = () => {
+      if (withdrawAmount.value <= 0 || withdrawAmount.value > balance.value) {
+        alert("Invalid withdrawal amount");
+        return;
+      }
+
+      axiosInstance
+          .post(`/api/accounts/${selectedAccount.value.iban}/withdraw`, {
+            amount: withdrawAmount.value,
+          }, {
+            headers: {
+              Authorization: 'Bearer ' + store.token,
+            },
+          })
+          .then(() => {
+            withdrawAmount.value = 0;
+            getAccounts();
+          })
+          .catch((error) => {
+            console.error("Withdrawal failed:", error);
+          });
+    };
+
     const getTransactions = (iban) => {
       axiosInstance
           .get(`/api/accounts/${iban}/transactions`, {
@@ -110,11 +131,14 @@ export default {
           });
     };
 
+
     // Function to format timestamp to date string
     const formatDate = (timestamp) => {
       const date = new Date(timestamp);
       return date.toLocaleDateString();
     };
+
+
 
     onMounted(() => {
       getAccounts();
@@ -124,8 +148,10 @@ export default {
       accounts,
       selectedAccount,
       balance,
+      withdrawAmount,
       transactions,
       selectAccount,
+      withdraw,
       formatDate,
     };
   },
