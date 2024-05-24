@@ -25,10 +25,12 @@ public class TransactionController {
 
 
     private final TransactionService transactionService;
+    private final AccountService accountService;
 
 
-    public TransactionController( TransactionService transactionService) {
+    public TransactionController(TransactionService transactionService, AccountService accountService) {
         this.transactionService = transactionService;
+        this.accountService = accountService;
     }
 
 
@@ -54,6 +56,37 @@ public class TransactionController {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
 
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/accounts/{iban}/transactions")
+    public ResponseEntity<Page<Transaction>> getAccountTransactions(@PathVariable String iban,
+                                                                    @RequestParam(required = false, defaultValue = "0") Integer pageNumber) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
+            Optional<Account> optionalAccount = Optional.ofNullable(accountService.getAccountByIBAN(iban));
+            if (optionalAccount.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            boolean isAdmin = userDetails.getAuthorities().stream()
+                    .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(Role.ROLE_ADMIN.toString()));
+
+            if (isAdmin || userDetails.getUsername().equals(optionalAccount.get().getUser().getEmail())) {
+                Pageable pageable = PageRequest.of(pageNumber, 10);
+                Page<Transaction> transactions = transactionService.getAccountTransactions(iban, pageable);
+                return ResponseEntity.ok(transactions);
+            } else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

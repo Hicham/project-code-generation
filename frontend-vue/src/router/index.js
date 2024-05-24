@@ -3,7 +3,7 @@ import { useStore } from '@/stores/store';
 
 import Home from '../components/Home.vue';
 import Login from '../components/Login.vue';
-import MyAccount from '../components/MyAccount.vue';
+import MyAccount from '../components/employee/MyAccount.vue';
 import Register from '../components/Register.vue';
 import Atm from '../components/atm/atm.vue';
 import Users from '../components/employee/NoAccount.vue';

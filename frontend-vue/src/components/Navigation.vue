@@ -5,9 +5,9 @@
         <i class="fa-solid fa-piggy-bank me-1" style="font-size: 1em;"></i>Mybank
       </router-link>
 
-      <router-link class="navbar-brand" to="/myaccountdetails">Account</router-link>
+      <router-link class="navbar-brand" to="/myaccount">Account</router-link>
       <router-link v-if="!isLoggedIn" class="navbar-brand" to="/login">Login</router-link>
-      <router-link v-if="isLoggedIn" class="navbar-brand" to="#">
+      <router-link v-if="isLoggedIn" class="navbar-brand" to="/myaccountdetails">
         {{ firstName }}
       </router-link>
       <button v-if="isLoggedIn" @click="logout" class="btn btn-primary">Logout</button>

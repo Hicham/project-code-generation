@@ -54,4 +54,8 @@ public class TransactionService {
         return transactionRepository.findAll(pageable);
 
     }
+
+    public Page<Transaction> getAccountTransactions(String iban, Pageable pageable) {
+        return transactionRepository.findBySourceIBANOrDestinationIBANOrderByTimestampDesc(iban, iban, pageable);
+    }
 }
