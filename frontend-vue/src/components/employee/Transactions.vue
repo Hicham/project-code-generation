@@ -1,19 +1,19 @@
 <template>
   <div class="container">
+    <div v-if="error" class="row">
+      <div class="col-12 text-center">
+        <p class="text-danger">{{ error }}</p>
+      </div>
+    </div>
     <div class="row">
-      <nav aria-label="Page navigation">
-        <ul class="pagination justify-content-center">
-          <li class="page-item" :class="{ 'disabled': currentPage === 1 }">
-            <button class="page-link" @click.prevent="prevPage">&laquo;</button>
-          </li>
-          <li class="page-item" v-for="page in totalPages" :key="page" :class="{ 'active': page === currentPage }">
-            <button class="page-link" @click.prevent="goToPage(page)">{{ page }}</button>
-          </li>
-          <li class="page-item" :class="{ 'disabled': currentPage === totalPages }">
-            <button class="page-link" @click.prevent="nextPage">&raquo;</button>
-          </li>
-        </ul>
-      </nav>
+      <div class="col-md-8">
+        <input type="text" class="form-control" placeholder="Search for user">
+      </div>
+      <div class="col-md-4">
+        <select class="form-select">
+          <option selected>Select an user</option>
+        </select>
+      </div>
     </div>
     <div class="row">
       <div v-for="transaction in transactions" :key="transaction.id" class="col-12">
@@ -31,10 +31,20 @@
         </div>
       </div>
     </div>
-    <div v-if="error" class="row">
-      <div class="col-12 text-center">
-        <p class="text-danger">{{ error }}</p>
-      </div>
+    <div class="row">
+      <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+          <li class="page-item" :class="{ 'disabled': currentPage === 1 }">
+            <button class="page-link" @click.prevent="prevPage">&laquo;</button>
+          </li>
+          <li class="page-item" v-for="page in totalPages" :key="page" :class="{ 'active': page === currentPage }">
+            <button class="page-link" @click.prevent="goToPage(page)">{{ page }}</button>
+          </li>
+          <li class="page-item" :class="{ 'disabled': currentPage === totalPages }">
+            <button class="page-link" @click.prevent="nextPage">&raquo;</button>
+          </li>
+        </ul>
+      </nav>
     </div>
   </div>
 </template>

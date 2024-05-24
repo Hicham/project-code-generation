@@ -15,6 +15,7 @@ import project.codegeneration.models.User;
 import project.codegeneration.services.AccountService;
 import project.codegeneration.services.UserService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,9 +31,20 @@ public class UserController {
         this.accountService = accountService;
     }
 
-    @GetMapping("/users")
-    public List<UserDTO> getUsers() {
-        List<User> users = userService.getAllUsers();
+    @GetMapping("/users" )
+    public List<UserDTO> getUsers(@RequestParam(required = false, defaultValue = "") String email) {
+
+        List<User> users;
+
+        if (email != null)
+        {
+            users = userService.getFilteredUsersByEmail(email);
+        }
+        else
+        {
+            users = userService.getAllUsers();
+        }
+
         return users.stream().map(user -> new UserDTO(
                 user.getId(),
                 user.getRoles().toString(),

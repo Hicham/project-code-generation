@@ -64,4 +64,7 @@ public class UserService {
         return userRepository.findById((long) userId).orElseThrow();
     }
 
+    public List<User> getFilteredUsersByEmail(String email) {
+        return userRepository.findByEmailContaining(email);
+    }
 }
