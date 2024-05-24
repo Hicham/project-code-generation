@@ -8,14 +8,14 @@
           <ul class="list-unstyled">
             <li><strong>Email:</strong> {{ userObject.email }}</li>
             <li><strong>Name:</strong> {{ userObject.firstName }} {{ userObject.lastName }}</li>
-            <li v-if="userObject.roleName === 'customer'"><strong>BSN number:</strong> {{ userObject.BSNNumber }}</li>
+            <li><strong>BSN number:</strong> {{ userObject }}</li>
             <li><strong>Phone number:</strong> {{ userObject.phoneNumber }}</li>
           </ul>
 
           <ul class="list-unstyled">
-          <h3 class="mt-4">Accounts</h3>
+            <h3 class="mt-4">Accounts</h3>
             <li v-for="account in accounts" :key="account.iban">
-              <strong>Account IBAN:</strong>  {{ account.iban }}<br />
+              <strong>Account IBAN:</strong> {{ account.iban }}<br />
               <strong>Account Balance:</strong> € {{ account.balance }}
             </li>
           </ul>
@@ -49,10 +49,31 @@ export default {
 
     const isLoggedIn = computed(() => store.isLoggedIn);
     const userObject = computed(() => store.user);
+
     const accounts = ref([]);
     const totalBalance = computed(() => {
       return accounts.value.reduce((acc, curr) => acc + curr.balance, 0);
     });
+
+    const fetchUser = async () => {
+      try {
+        const response = await axiosInstance.get(`/api/users/${userObject.value.email}`);
+        const user = response.data;
+
+        // Update the userObject with fetched user data including BSN number and phone number
+        store.user = {
+          ...store.user,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          phoneNumber: user.phoneNumber,
+          roleName: user.roleName,
+          BSNNumber: user.BSNNumber,
+        };
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
 
     const fetchUserAccounts = () => {
       axiosInstance
@@ -78,6 +99,7 @@ export default {
 
     onMounted(() => {
       if (isLoggedIn.value) {
+        fetchUser();
         fetchUserAccounts();
       }
     });

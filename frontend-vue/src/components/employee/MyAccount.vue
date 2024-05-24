@@ -21,7 +21,7 @@
               <h3>Balance SAVINGS: €{{ balance }}</h3>
             </div>
 
-            <router-link to="/withdraw" class="btn btn-primary">Withdraw</router-link>
+            <router-link to="/transfer" class="btn btn-primary">Transfer</router-link>
 
             <!-- Transaction list -->
             <div class="transaction-container">
