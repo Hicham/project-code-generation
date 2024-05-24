@@ -122,7 +122,7 @@ public class AccountController {
         Optional<User> currentUser = userService.findByEmail(currentUsername);
 
         if (currentUser.isPresent()) {
-            transactionService.createTransaction(null, IBAN, ATMTransactionRequest.getAmount(), TransactionType.DEPOSIT, currentUser.get());
+            transactionService.createTransaction(null, IBAN, ATMTransactionRequest.getAmount(), ATMTransactionRequest.getDescription(), TransactionType.DEPOSIT, currentUser.get());
             return ResponseEntity.ok("Money deposited successfully.");
         }
         else
@@ -139,7 +139,7 @@ public class AccountController {
         Optional<User> currentUser = userService.findByEmail(currentUsername);
 
         if (currentUser.isPresent()) {
-            transactionService.createTransaction(IBAN, null, ATMTransactionRequest.getAmount(), TransactionType.WITHDRAW, currentUser.get());
+            transactionService.createTransaction(IBAN, null, ATMTransactionRequest.getAmount(), ATMTransactionRequest.getDescription(), TransactionType.WITHDRAW, currentUser.get());
             return ResponseEntity.ok("Money withdrawn successfully.");
         }
         else

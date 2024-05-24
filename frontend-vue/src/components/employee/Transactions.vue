@@ -23,6 +23,7 @@
             <p class="card-text">Source IBAN: {{ transaction.sourceIBAN || 'N/A' }}</p>
             <p class="card-text">Destination IBAN: {{ transaction.destinationIBAN }}</p>
             <p class="card-text">Amount: {{ transaction.amount }}</p>
+            <p class="card-text">Description: {{ transaction.description }}</p>
             <p class="card-text">Type: {{ transaction.type }}</p>
             <p class="card-text">Timestamp: {{ formatTimestamp(transaction.timestamp) }}</p>
             <p class="card-text">Iniated Transfer: {{ transaction.user.email }}</p>
