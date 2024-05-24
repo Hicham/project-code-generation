@@ -42,17 +42,17 @@ public class DataSeeder implements ApplicationRunner {
 //            Account account = new Account(iban, user, AccountType.CHECKING, balance, true, 999999999);
 //            accountRepository.save(account);
 //        }
-//        User user = new User(List.of(Role.ROLE_USER), false, "hicham@gmail.com", "test", "test", "test", "3652584", "06352615");
+        User user = new User(List.of(Role.ROLE_USER), false, "test@gmail.com", "test", "test", "test", "3652584", "06352615");
 //        User user = new User(List.of(Role.ROLE_USER), false, "hicham2@gmail.com", "test", "test", "test", "3652584", "06352615");
-//        userService.create(user);
+        userService.create(user);
 
 
 ////
-//        Account account = new Account("IBANFAKE2", user ,AccountType.CHECKING, 1000, true, 999999999);
-//        Account account2 = new Account("IBANFAKE3", user , AccountType.CHECKING, 2000, true, 999999999);
-////
-//        accountRepository.save(account);
-//        accountRepository.save(account2);
+        Account account = new Account("IBANFAKE2", user ,AccountType.CHECKING, 1000, true, 999999999);
+        Account account2 = new Account("IBANFAKE3", user , AccountType.CHECKING, 2000, true, 999999999);
+
+        accountRepository.save(account);
+        accountRepository.save(account2);
 ////
 
 //            Account account = accountService.getAccountByIBAN("IBANFAKE1");
