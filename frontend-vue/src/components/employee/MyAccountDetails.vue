@@ -11,6 +11,15 @@
             <li v-if="userObject.roleName === 'customer'"><strong>BSN number:</strong> {{ userObject.BSNNumber }}</li>
             <li><strong>Phone number:</strong> {{ userObject.phoneNumber }}</li>
           </ul>
+
+          <ul class="list-unstyled">
+          <h3 class="mt-4">Accounts</h3>
+            <li v-for="account in accounts" :key="account.iban">
+              <strong>Account IBAN:</strong>  {{ account.iban }}<br />
+              <strong>Account Balance:</strong> € {{ account.balance }}
+            </li>
+          </ul>
+          <h3>Total Balance: € {{ totalBalance }}</h3>
           <button @click="logout" class="btn btn-primary btn-lg">Logout</button>
         </div>
       </div>
@@ -40,50 +49,44 @@ export default {
 
     const isLoggedIn = computed(() => store.isLoggedIn);
     const userObject = computed(() => store.user);
-
-    const isUserApproved = ref(null);
-
-    const fetchUser = async () => {
-      if (!userObject.value.email) {
-        isUserApproved.value = false;
-        return;
-      }
-
-      try {
-        const response = await axiosInstance.get(`/api/users/${userObject.value.email}`);
-        const user = response.data;
-        isUserApproved.value = user.isApproved;
-
-        store.user = {
-          ...store.user,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          phoneNumber: user.phoneNumber,
-          roleName: user.roleName,
-          BSNNumber: user.BSNNumber,
-        };
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-        isUserApproved.value = false;
-      }
-    };
-
-    onMounted(() => {
-      if (isLoggedIn.value) {
-        fetchUser();
-      }
+    const accounts = ref([]);
+    const totalBalance = computed(() => {
+      return accounts.value.reduce((acc, curr) => acc + curr.balance, 0);
     });
+
+    const fetchUserAccounts = () => {
+      axiosInstance
+          .get('/api/accounts', {
+            headers: {
+              Authorization: 'Bearer ' + store.token,
+            },
+            params: {
+              userId: store.user.id,
+              isChecking: false,
+            },
+          })
+          .then((result) => {
+            accounts.value = result.data.content;
+          })
+          .catch((error) => console.error("Error fetching accounts:", error));
+    };
 
     const logout = () => {
       store.logout();
       router.push('/');
     };
 
+    onMounted(() => {
+      if (isLoggedIn.value) {
+        fetchUserAccounts();
+      }
+    });
+
     return {
       isLoggedIn,
-      isUserApproved,
       userObject,
+      accounts,
+      totalBalance,
       logout,
     };
   },
