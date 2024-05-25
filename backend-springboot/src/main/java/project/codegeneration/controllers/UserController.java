@@ -1,7 +1,11 @@
 package project.codegeneration.controllers;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import project.codegeneration.models.Cow;
+import project.codegeneration.models.DTO.AccountDTO;
 import project.codegeneration.models.DTO.CowDTO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,20 +36,16 @@ public class UserController {
     }
 
     @GetMapping("/users" )
-    public List<UserDTO> getUsers(@RequestParam(required = false, defaultValue = "") String email) {
+    public ResponseEntity<Page<UserDTO>> getUsers(@RequestParam(required = false, defaultValue = "0") Integer pageNumber, @RequestParam(required = false, defaultValue = "") String email) {
 
-        List<User> users;
+        Page<User> users;
 
-        if (email != null)
-        {
-            users = userService.getFilteredUsersByEmail(email);
-        }
-        else
-        {
-            users = userService.getAllUsers();
-        }
+        Pageable pageable = PageRequest.of(pageNumber, 10);
 
-        return users.stream().map(user -> new UserDTO(
+        users = userService.getUsers(pageable, email);
+
+
+        Page<UserDTO> userDTOpage = users.map(user -> new UserDTO(
                 user.getId(),
                 user.getRoles().toString(),
                 user.isApproved(),
@@ -55,7 +55,9 @@ public class UserController {
                 user.getLastName(),
                 user.getBSNNumber(),
                 user.getPhoneNumber()
-        )).toList();
+        ));
+
+        return ResponseEntity.ok(userDTOpage);
 
 
     }
@@ -72,7 +74,6 @@ public class UserController {
             User user = new User(
                     List.of(), // Assuming roles should be an empty list
                     false, // Assuming approved status is false
-//                    userDTO.getUserId(),
                     userDTO.getEmail(),
                     userDTO.getPassword(),
                     userDTO.getFirstName(),
