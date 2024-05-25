@@ -7,8 +7,9 @@
           <p class="card-text">Here are your account details:</p>
           <ul class="list-unstyled">
             <li><strong>Email:</strong> {{ userObject.email }}</li>
-            <li><strong>Name:</strong> {{ userObject.firstName }} {{ userObject.lastName }}</li>
-            <li><strong>BSN number:</strong> {{ userObject }}</li>
+            <li><strong>First name:</strong> {{ userObject.firstName }}</li>
+            <li><strong>Last name:</strong> {{ userObject.lastName }}</li>
+            <li><strong>BSN number:</strong> {{ userObject.BSNNumber }}</li>
             <li><strong>Phone number:</strong> {{ userObject.phoneNumber }}</li>
           </ul>
 
@@ -67,9 +68,10 @@ export default {
           firstName: user.firstName,
           lastName: user.lastName,
           phoneNumber: user.phoneNumber,
-          roleName: user.roleName,
-          BSNNumber: user.BSNNumber,
+          BSNNumber: user.bsnnumber,
         };
+
+
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
