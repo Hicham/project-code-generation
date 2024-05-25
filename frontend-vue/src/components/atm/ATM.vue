@@ -59,7 +59,7 @@ export default {
             },
             params: {
               userId: useStore().user.id,
-              isChecking: true,
+              isChecking: false,
             },
           })
           .then((result) => {

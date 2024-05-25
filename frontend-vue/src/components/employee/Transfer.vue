@@ -4,43 +4,59 @@
       <div class="col-md-8">
         <div class="card">
           <div class="card-body">
-            <h1 class="mb-4">Account Management</h1>
-            <select class="form-select form-select-lg mb-3" v-model="selectedAccount" @change="selectAccount">
-              <option v-for="account in accounts" :key="account.iban" :value="account">
-                {{ account.iban }}
-              </option>
-            </select>
-
-            <div>
-              <h3>Balance: €{{ balance }}</h3>
+            <h1 class="mb-4 text-center">Transfer</h1>
+            <div class="mb-4">
+              <label class="form-label">Select Your Account</label>
+              <select class="form-select" v-model="selectedAccount" @change="selectAccount">
+                <option v-for="account in accounts" :key="account.iban" :value="account">
+                  {{ account.iban }}
+                </option>
+              </select>
             </div>
+            <div v-if="selectedAccount">
+              <div class="account-details mb-4">
+                <div class="detail">
+                  <strong>First Name:</strong> {{ selectedAccount.user.firstName }}
+                </div>
+                <div class="detail">
+                  <strong>Last Name:</strong> {{ selectedAccount.user.lastName }}
+                </div>
+                <div class="detail">
+                  <strong>Balance:</strong> €{{ balance }}
+                </div>
+                <div class="detail">
+                  <strong>IBAN:</strong> {{ selectedAccount.iban }}
+                </div>
+              </div>
 
-            <div class="mb-3">
-              <div class="input-group mb-2">
-                <input type="number" class="form-control" placeholder="Enter amount" v-model="withdrawAmount">
-                <button class="btn btn-primary" @click="withdraw">Withdraw</button>
+              <div class="mb-3">
+                <label class="form-label">Description (max 50 characters)</label>
+                <textarea class="form-control" v-model="description" maxlength="50" placeholder="Enter description" rows="3"></textarea>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Amount to Transfer</label>
+                <input type="number" class="form-control" v-model="transferAmount">
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Destination Account</label>
+                <select class="form-select" v-model="destinationAccount">
+                  <option v-for="account in filteredAccounts" :key="account.iban" :value="account.iban">
+                    {{ account.iban }}
+                  </option>
+                </select>
+              </div>
+
+              <button class="btn btn-primary w-100" @click="sendTransfer">Send</button>
+
+              <div v-if="confirmation" class="alert alert-success mt-3">
+                <p>Transfer of €{{ transferAmount }} to {{ destinationAccount }} was successful.</p>
+                <p>Description: {{ description }}</p>
               </div>
             </div>
-
-            <div class="transaction-container">
-              <h3>Transactions</h3>
-              <div class="transaction-list">
-                <ul>
-                  <li v-for="transaction in transactions" :key="transaction.id" class="transaction">
-                    <div>
-                      <span class="transaction-date">{{ formatDate(transaction.timestamp) }}</span>
-                      <span>{{ transaction.name }} Name of transaction</span>
-                    </div>
-                    <span>
-                      <span v-if="transaction.type === 'WITHDRAW'" class="withdraw">- €{{ transaction.amount }}</span>
-                      <span v-else class="deposit">+ €{{ transaction.amount }}</span>
-                    </span>
-                  </li>
-                </ul>
-              </div>
-              <div v-if="transactions.length === 0" class="no-transactions">
-                No transactions available.
-              </div>
+            <div v-else>
+              <p>Please select an account.</p>
             </div>
           </div>
         </div>
@@ -51,18 +67,20 @@
 
 <script>
 import axiosInstance from '@/axios-instance';
-import { useStore } from '@/stores/store';
-import { ref, onMounted } from 'vue';
+import {useStore} from '@/stores/store';
+import {ref, onMounted, computed} from 'vue';
 
 export default {
-  name: "AccountManagement",
+  name: "TransferFunds",
   setup() {
     const store = useStore();
     const accounts = ref([]);
     const selectedAccount = ref(null);
     const balance = ref(0);
-    const withdrawAmount = ref(0);
-    const transactions = ref([]);
+    const transferAmount = ref(0);
+    const destinationAccount = ref(null);
+    const description = ref('');
+    const confirmation = ref(false);
 
     const getAccounts = () => {
       axiosInstance
@@ -72,16 +90,15 @@ export default {
             },
             params: {
               userId: store.user.id,
+              isChecking: false,
             },
           })
           .then((result) => {
             accounts.value = result.data.content;
-            if (selectedAccount.value) {
-              selectedAccount.value = accounts.value.find(account => account.iban === selectedAccount.value.iban) || accounts.value[0];
-            } else if (accounts.value.length > 0) {
+            if (accounts.value.length > 0) {
               selectedAccount.value = accounts.value[0];
+              balance.value = selectedAccount.value.balance;
             }
-            selectAccount();
           })
           .catch((error) => console.error("Error fetching accounts:", error));
     };
@@ -89,55 +106,44 @@ export default {
     const selectAccount = () => {
       if (selectedAccount.value) {
         balance.value = selectedAccount.value.balance;
-        getTransactions(selectedAccount.value.iban);
       }
     };
 
-    const withdraw = () => {
-      if (withdrawAmount.value <= 0 || withdrawAmount.value > balance.value) {
-        alert("Invalid withdrawal amount");
+    const sendTransfer = () => {
+      if (transferAmount.value <= 0 || transferAmount.value > balance.value || !destinationAccount.value) {
+        alert("Invalid transfer details");
         return;
       }
 
       axiosInstance
-          .post(`/api/accounts/${selectedAccount.value.iban}/withdraw`, {
-            amount: withdrawAmount.value,
+          .post('/api/accounts/transfer', {
+            sourceIBAN: selectedAccount.value.iban,
+            destinationIBAN: destinationAccount.value,
+            amount: transferAmount.value,
+            description: description.value,
           }, {
             headers: {
               Authorization: 'Bearer ' + store.token,
             },
           })
           .then(() => {
-            withdrawAmount.value = 0;
-            getAccounts();
+            confirmation.value = true;
+            setTimeout(() => {
+              confirmation.value = false;
+              transferAmount.value = 0;
+              description.value = '';
+              destinationAccount.value = null;
+              getAccounts();
+            }, 3000);
           })
           .catch((error) => {
-            console.error("Withdrawal failed:", error);
+            console.error("Transfer failed:", error);
           });
     };
 
-    const getTransactions = (iban) => {
-      axiosInstance
-          .get(`/api/accounts/${iban}/transactions`, {
-            headers: {
-              Authorization: 'Bearer ' + store.token,
-            },
-          })
-          .then((response) => {
-            transactions.value = response.data.content; // Assuming transactions are stored in the 'content' property
-          })
-          .catch((error) => {
-            console.error("Error fetching transactions:", error);
-          });
-    };
-
-
-    // Function to format timestamp to date string
-    const formatDate = (timestamp) => {
-      const date = new Date(timestamp);
-      return date.toLocaleDateString();
-    };
-
+    const filteredAccounts = computed(() => {
+      return accounts.value.filter(account => account.iban !== selectedAccount.value?.iban);
+    });
 
 
     onMounted(() => {
@@ -148,11 +154,13 @@ export default {
       accounts,
       selectedAccount,
       balance,
-      withdrawAmount,
-      transactions,
+      transferAmount,
+      description,
+      destinationAccount,
+      confirmation,
       selectAccount,
-      withdraw,
-      formatDate,
+      sendTransfer,
+      filteredAccounts,
     };
   },
 };
@@ -160,13 +168,15 @@ export default {
 
 <style scoped>
 .container {
-  max-width: 1000px;
+  max-width: 800px;
   margin: 0 auto;
   padding: 20px;
 }
 
 h1 {
   margin-top: 0;
+  font-size: 2rem;
+  color: #343a40;
 }
 
 .card-body {
@@ -175,42 +185,31 @@ h1 {
   align-items: center;
 }
 
-.transaction-container {
+.account-details {
   width: 100%;
   border: 1px solid #ccc;
   border-radius: 5px;
   padding: 20px;
-  margin-top: 20px;
+  margin-bottom: 20px;
+  background-color: #f8f9fa;
 }
 
-.transaction-list {
-  margin-top: 20px;
-}
-
-.transaction-date {
-  font-size: 12px;
-  color: #888;
-  margin-right: 30px;
-}
-
-.transaction {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.detail {
   margin-bottom: 10px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #ccc;
 }
 
-.deposit {
-  color: green;
+.detail strong {
+  display: inline-block;
+  width: 150px;
 }
 
-.withdraw {
-  color: red;
+.btn-primary {
+  background-color: #007bff;
+  border: none;
 }
 
-.no-transactions {
-  padding: 10px 0;
+.alert-success {
+  width: 100%;
+  text-align: center;
 }
 </style>
