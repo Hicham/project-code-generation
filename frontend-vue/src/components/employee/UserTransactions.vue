@@ -7,12 +7,7 @@
     </div>
     <div class="row">
       <div class="col-md-8">
-        <input type="text" class="form-control" placeholder="Search for user">
-      </div>
-      <div class="col-md-4">
-        <select class="form-select">
-          <option selected>Select an user</option>
-        </select>
+        search func
       </div>
     </div>
     <div class="row">
@@ -52,6 +47,7 @@
 <script>
 import axiosInstance from '@/axios-instance';
 import { useStore } from "@/stores/store";
+import { useRoute } from 'vue-router';
 
 export default {
   name: "Transactions",
@@ -69,8 +65,16 @@ export default {
   methods: {
     fetchTransactions() {
       this.error = null;
-      axiosInstance.get(`/api/transactions?pageNumber=${this.currentPage - 1}`, {
+      const route = useRoute();
+      const userId = route.params.userId;
+
+      const params = {
+        pageNumber: this.currentPage - 1,
+        userId: userId
+      };
+      axiosInstance.get(`/api/transactions`, {
         headers: {
+          params: params,
           Authorization: 'Bearer ' + useStore().token,
         }
       })

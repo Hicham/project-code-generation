@@ -77,8 +77,7 @@ public class AccountController {
             }
 
             Page<AccountDTO> accountDTOPage = accounts.map(account -> new AccountDTO(
-                    account.getIBAN(),
-//                account.getUser().getId(),
+                    account.getIBAN(),  
                     account.getUser(),
                     account.getAccountType(),
                     account.getBalance(),
@@ -122,7 +121,7 @@ public class AccountController {
         Optional<User> currentUser = userService.findByEmail(currentUsername);
 
         if (currentUser.isPresent()) {
-            transactionService.createTransaction(null, IBAN, ATMTransactionRequest.getAmount(), TransactionType.DEPOSIT, currentUser.get());
+            transactionService.createTransaction(null, IBAN, ATMTransactionRequest.getAmount(), ATMTransactionRequest.getDescription(), TransactionType.DEPOSIT, currentUser.get());
             return ResponseEntity.ok("Money deposited successfully.");
         }
         else
@@ -139,7 +138,7 @@ public class AccountController {
         Optional<User> currentUser = userService.findByEmail(currentUsername);
 
         if (currentUser.isPresent()) {
-            transactionService.createTransaction(IBAN, null, ATMTransactionRequest.getAmount(), TransactionType.WITHDRAW, currentUser.get());
+            transactionService.createTransaction(IBAN, null, ATMTransactionRequest.getAmount(), ATMTransactionRequest.getDescription(), TransactionType.WITHDRAW, currentUser.get());
             return ResponseEntity.ok("Money withdrawn successfully.");
         }
         else
@@ -156,16 +155,18 @@ public class AccountController {
 //                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(Role.ROLE_ADMIN.toString()));
 //    }
 
-    @GetMapping("/accounts/users/{email}")
-    public AccountDTO getAccountsByUserEmail(@PathVariable String email) {
-        Optional<Account> accounts = accountService.getAccountsByUserEmail(email);
-        if (accounts.isPresent()) {
-            Account account = accounts.get();
-            return new AccountDTO(account.getIBAN(), account.getUser(), account.getAccountType(), account.getBalance(), account.isActive(), account.getAbsoluteLimit());
-        }
-        else {
-            return null;
-        }
 
-    }
+//   @GetMapping("/accounts/users/{email}")
+//   public AccountDTO getAccountsByUserEmail(@PathVariable String email) {
+//       Optional<Account> accounts = accountService.getAccountsByUserEmail(email);
+//       if (accounts.isPresent()) {
+//           Account account = accounts.get();
+//           return new AccountDTO(account.getIBAN(), account.getUser(), account.getAccountType(), account.getBalance());
+//       }
+//       else {
+//           return null;
+//       }
+//
+//   }
+
 }

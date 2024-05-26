@@ -6,10 +6,11 @@ import Login from '../components/Login.vue';
 import MyAccount from '../components/MyAccount.vue';
 import Register from '../components/Register.vue';
 import Atm from '../components/atm/atm.vue';
-import Users from '../components/employee/NoAccount.vue';
+
 import Accounts from "@/components/employee/Accounts.vue";
 import Transactions from "@/components/employee/Transactions.vue";
-import MyAccountDetails from "@/components/employee/MyAccountDetails.vue";
+import UserTransactions from "@/components/employee/UserTransactions.vue";
+import Users from "@/components/employee/Users.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -17,12 +18,13 @@ const router = createRouter({
     { path: '/', component: Home },
     { path: '/login', component: Login },
     { path: '/register', component: Register},
-    { path: '/myaccount', component: MyAccount, meta: { requiresAuth: true, loginType: 1 } },
-    { path: '/myaccountdetails', component: MyAccountDetails, meta: { requiresAuth: true, loginType: 1 } },
+    { path: '/account', component: MyAccount, meta: { requiresAuth: true, loginType: 1 } },
     { path: '/atm', component: Atm, meta: { requiresAuth: true, loginType: 2 } },
-    { path: '/users', component: Users, meta: { requiresAuth: true, loginType: 1 } },
     { path: '/admin/accounts', component: Accounts, meta: { requiresAuth: true, loginType: 1, role: 'ROLE_ADMIN' } },
     { path: '/admin/transactions', component: Transactions, meta: { requiresAuth: true, loginType: 1, role: 'ROLE_ADMIN' } },
+    { path: '/admin/users/:userId/Transactions', component: UserTransactions, meta: { requiresAuth: true, loginType: 1, role: 'ROLE_ADMIN' } },
+    { path: '/admin/users', component: Users, meta: { requiresAuth: true, loginType: 1, role: 'ROLE_ADMIN' } },
+    { path: '/register', component: Register}
   ]
 })
 

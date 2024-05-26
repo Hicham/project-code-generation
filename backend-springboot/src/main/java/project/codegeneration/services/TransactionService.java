@@ -23,9 +23,9 @@ public class TransactionService {
 
 
     @Transactional
-    public void createTransaction(String sourceIBAN, String destinationIBAN, Double amount, TransactionType type, User user) {
+    public void createTransaction(String sourceIBAN, String destinationIBAN, Double amount, String description, TransactionType type, User user) {
 
-        Transaction transaction = new Transaction(sourceIBAN, destinationIBAN, amount, type, Instant.now().getEpochSecond(), user);
+        Transaction transaction = new Transaction(sourceIBAN, destinationIBAN, amount, description, type, Instant.now().getEpochSecond(), user);
         transactionRepository.save(transaction);
         transactionRepository.flush();
 

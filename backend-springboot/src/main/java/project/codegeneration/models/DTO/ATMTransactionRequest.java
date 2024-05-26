@@ -5,4 +5,5 @@ import lombok.Data;
 @Data
 public class ATMTransactionRequest {
     private double amount;
+    private String description;
 }

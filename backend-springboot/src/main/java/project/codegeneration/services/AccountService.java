@@ -99,7 +99,6 @@ public class AccountService {
             checkingAccount.setIBAN(checkingIBAN);
             checkingAccount.setAccountType(AccountType.CHECKING);
             checkingAccount.setBalance(0);
-
             checkingAccount.setActive(true);
             checkingAccount.setAbsoluteLimit(1000);
             checkingAccount.setUser(user);
@@ -130,9 +129,5 @@ public class AccountService {
     public boolean existsByIBAN(String iban) {
         // was is .ispresent() maar doet het niet meer???
         return accountRepository.findByIBAN(iban) != null;
-    }
-
-    public int getRandomPinCode(){
-        return (int) (Math.random() * 10000);
     }
 }
