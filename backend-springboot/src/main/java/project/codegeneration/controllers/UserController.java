@@ -4,9 +4,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
-import project.codegeneration.models.Cow;
-import project.codegeneration.models.DTO.AccountDTO;
-import project.codegeneration.models.DTO.CowDTO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,7 +13,6 @@ import project.codegeneration.models.User;
 import project.codegeneration.services.AccountService;
 import project.codegeneration.services.UserService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -86,26 +82,6 @@ public class UserController {
         }
     }
 
-    @GetMapping("/users/{email}")
-    public UserDTO getUserByEmail(@PathVariable String email) {
-        Optional<User> userOptional = userService.findByEmail(email);
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            return new UserDTO(
-                    user.getId(),
-                    user.getRoles().toString(),
-                    user.isApproved(),
-                    user.getEmail(),
-                    user.getPassword(),
-                    user.getFirstName(),
-                    user.getLastName(),
-                    user.getBSNNumber(),
-                    user.getPhoneNumber()
-            );
-        } else {
-            throw new IllegalArgumentException("User not found");
-        }
-    }
 
 
     @PostMapping("/accounts")
@@ -119,26 +95,26 @@ public class UserController {
         }
     }
 
-    @GetMapping("/users/{email}")
-    public UserDTO getUserByEmail(@PathVariable String email) {
-        Optional<User> userOptional = userService.findByEmail(email);
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            return new UserDTO(
-                    user.getId(),
-                    user.getRoles().toString(),
-                    user.isApproved(),
-                    user.getEmail(),
-                    user.getPassword(),
-                    user.getFirstName(),
-                    user.getLastName(),
-                    user.getBSNNumber(),
-                    user.getPhoneNumber()
-            );
-        } else {
-            throw new IllegalArgumentException("User not found");
-        }
-    }
+//    @GetMapping("/users/{email}")
+//    public UserDTO getUserByEmail(@PathVariable String email) {
+//        Optional<User> userOptional = userService.findByEmail(email);
+//        if (userOptional.isPresent()) {
+//            User user = userOptional.get();
+//            return new UserDTO(
+//                    user.getId(),
+//                    user.getRoles().toString(),
+//                    user.isApproved(),
+//                    user.getEmail(),
+//                    user.getPassword(),
+//                    user.getFirstName(),
+//                    user.getLastName(),
+//                    user.getBSNNumber(),
+//                    user.getPhoneNumber()
+//            );
+//        } else {
+//            throw new IllegalArgumentException("User not found");
+//        }
+//    }
 
 
 }
