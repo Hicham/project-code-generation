@@ -20,9 +20,6 @@ export const useStore = defineStore('counter', {
         isLoggedIn: (state) => state.token != ''
     },
     actions: {
-        decodeJwt(token) {
-            return JSON.parse(atob(token.split('.')[1]));
-        },
         login(email, password, isAtm) {
             return new Promise((resolve, reject) => {
                 axiosInstance.post("/login", {
@@ -43,6 +40,7 @@ export const useStore = defineStore('counter', {
 
                         localStorage.setItem('token', res.data.token);
                         localStorage.setItem('loginType', loginType);
+
 
                         // Fetch user details using email
                         this.fetchUserDetails(email).then(() => {

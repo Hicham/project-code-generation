@@ -95,26 +95,26 @@ public class UserController {
         }
     }
 
-//    @GetMapping("/users/{email}")
-//    public UserDTO getUserByEmail(@PathVariable String email) {
-//        Optional<User> userOptional = userService.findByEmail(email);
-//        if (userOptional.isPresent()) {
-//            User user = userOptional.get();
-//            return new UserDTO(
-//                    user.getId(),
-//                    user.getRoles().toString(),
-//                    user.isApproved(),
-//                    user.getEmail(),
-//                    user.getPassword(),
-//                    user.getFirstName(),
-//                    user.getLastName(),
-//                    user.getBSNNumber(),
-//                    user.getPhoneNumber()
-//            );
-//        } else {
-//            throw new IllegalArgumentException("User not found");
-//        }
-//    }
+    @GetMapping("/users/{email}")
+    public UserDTO getUserByEmail(@PathVariable String email) {
+        Optional<User> userOptional = userService.findByEmail(email);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            return new UserDTO(
+                    user.getId(),
+                    user.getRoles().toString(),
+                    user.isApproved(),
+                    user.getEmail(),
+                    user.getPassword(),
+                    user.getFirstName(),
+                    user.getLastName(),
+                    user.getBSNNumber(),
+                    user.getPhoneNumber()
+            );
+        } else {
+            throw new IllegalArgumentException("User not found");
+        }
+    }
 
 
 }
