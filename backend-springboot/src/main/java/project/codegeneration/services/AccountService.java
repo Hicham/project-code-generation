@@ -4,11 +4,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import project.codegeneration.models.Account;
-import project.codegeneration.models.AccountType;
-import project.codegeneration.models.TransactionType;
-import project.codegeneration.models.User;
+import project.codegeneration.models.*;
 import project.codegeneration.repositories.AccountRepository;
+import project.codegeneration.repositories.TransactionLimitRepository;
 import project.codegeneration.util.IBANGenerator;
 
 import java.util.List;
@@ -19,9 +17,11 @@ public class AccountService {
 
 
     private final AccountRepository accountRepository;
+    private final TransactionLimitRepository transactionLimitRepository;
 
-    public AccountService(AccountRepository accountRepository) {
+    public AccountService(AccountRepository accountRepository, TransactionLimitRepository transactionLimitRepository) {
         this.accountRepository = accountRepository;
+        this.transactionLimitRepository = transactionLimitRepository;
     }
 
     public Account getAccountById(int id) {
@@ -100,8 +100,17 @@ public class AccountService {
             checkingAccount.setAccountType(AccountType.CHECKING);
             checkingAccount.setBalance(0);
             checkingAccount.setActive(true);
-            checkingAccount.setAbsoluteLimit(1000);
+            checkingAccount.setAbsoluteLimit(0);
             checkingAccount.setUser(user);
+
+//            //Create transaction limit
+            TransactionLimit transactionLimit = new TransactionLimit();
+            transactionLimit.setAccount(checkingAccount);
+            transactionLimit.setDailyLimit(1000);
+            transactionLimit.setWeeklyLimit(5000);
+            transactionLimit.setMonthlyLimit(20000);
+            checkingAccount.setTransactionLimit(transactionLimit);
+
 
             //Create savings account
             Account savingsAccount = new Account();
@@ -109,12 +118,23 @@ public class AccountService {
             savingsAccount.setAccountType(AccountType.SAVINGS);
             savingsAccount.setBalance(0);
             savingsAccount.setActive(true);
-            savingsAccount.setAbsoluteLimit(1000);
+            savingsAccount.setAbsoluteLimit(0);
             savingsAccount.setUser(user);
+
+            //Create transaction limit
+            TransactionLimit transactionLimit2 = new TransactionLimit();
+            transactionLimit2.setAccount(savingsAccount);
+            transactionLimit2.setDailyLimit(1000);
+            transactionLimit2.setWeeklyLimit(5000);
+            transactionLimit2.setMonthlyLimit(20000);
+            savingsAccount.setTransactionLimit(transactionLimit2);
+
 
             //Save Accounts
             accountRepository.save(checkingAccount);
             accountRepository.save(savingsAccount);
+            transactionLimitRepository.save(transactionLimit);
+            transactionLimitRepository.save(transactionLimit2);
         }
     }
 
@@ -130,4 +150,18 @@ public class AccountService {
         // was is .ispresent() maar doet het niet meer???
         return accountRepository.findByIBAN(iban) != null;
     }
+
+    //disable account
+    public void disableAccount(Account account){
+        account.setActive(false);
+        accountRepository.save(account);
+    }
+
+    //enable account
+    public void enableAccount(Account account){
+        account.setActive(true);
+        accountRepository.save(account);
+    }
+
+
 }

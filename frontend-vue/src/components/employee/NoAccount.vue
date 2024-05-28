@@ -60,7 +60,7 @@ export default {
       console.log(userId);
       try {
         await axiosInstance.post(`/api/accounts?userId=${userId}`);
-        users.value = users.value.filter((user) => user.userId !== userId);
+        users.value = users.value.filter(user => user.userId !== userId);
         showPopup.value = true;
       } catch (error) {
         console.error(error);

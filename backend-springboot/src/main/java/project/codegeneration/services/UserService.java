@@ -50,7 +50,7 @@ public class UserService {
     }
 
     public List<User> getNotApprovedUsers() {
-        return userRepository.findNotApproved(Role.ROLE_USER);
+        return userRepository.findByIsApprovedAndRolesContains(false, Role.ROLE_USER);
     }
 
     public void approveUser(int userId) {
