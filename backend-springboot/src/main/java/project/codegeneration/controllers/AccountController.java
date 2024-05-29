@@ -107,7 +107,6 @@ public class AccountController {
         if (account == null) {
             return ResponseEntity.notFound().build();
         } else {
-//            AccountDTO accountDTO = new AccountDTO(account.getIBAN(), account.getUser().getId(), account.getAccountType().toString(), account.getBalance(), account.isActive(), account.getAbsoluteLimit());
             AccountDTO accountDTO = new AccountDTO(account.getIBAN(), account.getUser(), account.getAccountType(), account.getBalance(), account.isActive(), account.getAbsoluteLimit());
             return ResponseEntity.ok(accountDTO);
         }
