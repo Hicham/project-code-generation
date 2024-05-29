@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.ResponseEntity;
+import project.codegeneration.models.DTO.ApproveUserDTO;
 import project.codegeneration.models.DTO.UserDTO;
 import project.codegeneration.models.User;
 import project.codegeneration.services.AccountService;
@@ -85,10 +86,10 @@ public class UserController {
 
 
     @PostMapping("/accounts")
-    public ResponseEntity<String> approveUser(@RequestParam("userId") int userId) {
+    public ResponseEntity<String> approveUser(@RequestBody ApproveUserDTO request) {
         try {
-            userService.approveUser(userId);
-            accountService.createAccountForApprovedUser(userService.getUserById(userId));
+            userService.approveUser(request.getUserId());
+            accountService.createAccountForApprovedUser(userService.getUserById(request.getUserId()), request.getTransactionLimit());
             return ResponseEntity.ok("User approved");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());

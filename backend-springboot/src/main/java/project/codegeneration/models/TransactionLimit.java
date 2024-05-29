@@ -14,7 +14,6 @@ public class TransactionLimit {
     private String IBAN;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IBAN")
     private Account account;
 
     private double dailyLimit;

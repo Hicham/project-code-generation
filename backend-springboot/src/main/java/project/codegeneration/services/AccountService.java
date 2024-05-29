@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.codegeneration.models.*;
+import project.codegeneration.models.DTO.TransactionLimitDTO;
 import project.codegeneration.repositories.AccountRepository;
 import project.codegeneration.repositories.TransactionLimitRepository;
 import project.codegeneration.util.IBANGenerator;
@@ -88,13 +89,13 @@ public class AccountService {
         account.setBalance(account.getBalance() - amount);
         accountRepository.flush();
     }
-    public void createAccountForApprovedUser(User user){
+    public void createAccountForApprovedUser(User user, TransactionLimitDTO transactionLimitDTO){
         if(user.isApproved()){
-            //Generate unique IBAN
+            // Generate unique IBAN
             String checkingIBAN = generateUniqueIBAN();
             String savingsIBAN = generateUniqueIBAN();
 
-            //Create checking account
+            // Create checking account
             Account checkingAccount = new Account();
             checkingAccount.setIBAN(checkingIBAN);
             checkingAccount.setAccountType(AccountType.CHECKING);
@@ -103,16 +104,25 @@ public class AccountService {
             checkingAccount.setAbsoluteLimit(0);
             checkingAccount.setUser(user);
 
-//            //Create transaction limit
+            // Save checking account
+            accountRepository.save(checkingAccount);
+
+            // Create transaction limit for checking account
             TransactionLimit transactionLimit = new TransactionLimit();
+            transactionLimit.setIBAN(checkingIBAN);
             transactionLimit.setAccount(checkingAccount);
-            transactionLimit.setDailyLimit(1000);
-            transactionLimit.setWeeklyLimit(5000);
-            transactionLimit.setMonthlyLimit(20000);
+            transactionLimit.setDailyLimit(transactionLimitDTO.getDailyLimit());
+            transactionLimit.setWeeklyLimit(transactionLimitDTO.getWeeklyLimit());
+            transactionLimit.setMonthlyLimit(transactionLimitDTO.getMonthlyLimit());
+
+            // Save transaction limit for checking account
+            transactionLimitRepository.save(transactionLimit);
+
+            // Update checking account with transaction limit reference and save again
             checkingAccount.setTransactionLimit(transactionLimit);
+            accountRepository.save(checkingAccount);
 
-
-            //Create savings account
+            // Create savings account
             Account savingsAccount = new Account();
             savingsAccount.setIBAN(savingsIBAN);
             savingsAccount.setAccountType(AccountType.SAVINGS);
@@ -121,20 +131,23 @@ public class AccountService {
             savingsAccount.setAbsoluteLimit(0);
             savingsAccount.setUser(user);
 
-            //Create transaction limit
-            TransactionLimit transactionLimit2 = new TransactionLimit();
-            transactionLimit2.setAccount(savingsAccount);
-            transactionLimit2.setDailyLimit(1000);
-            transactionLimit2.setWeeklyLimit(5000);
-            transactionLimit2.setMonthlyLimit(20000);
-            savingsAccount.setTransactionLimit(transactionLimit2);
-
-
-            //Save Accounts
-            accountRepository.save(checkingAccount);
+            // Save savings account
             accountRepository.save(savingsAccount);
-            transactionLimitRepository.save(transactionLimit);
+
+            // Create transaction limit for savings account
+            TransactionLimit transactionLimit2 = new TransactionLimit();
+            transactionLimit2.setIBAN(savingsIBAN);
+            transactionLimit2.setAccount(savingsAccount);
+            transactionLimit2.setDailyLimit(transactionLimitDTO.getDailyLimit());
+            transactionLimit2.setWeeklyLimit(transactionLimitDTO.getWeeklyLimit());
+            transactionLimit2.setMonthlyLimit(transactionLimitDTO.getMonthlyLimit());
+
+            // Save transaction limit for savings account
             transactionLimitRepository.save(transactionLimit2);
+
+            // Update savings account with transaction limit reference and save again
+            savingsAccount.setTransactionLimit(transactionLimit2);
+            accountRepository.save(savingsAccount);
         }
     }
 

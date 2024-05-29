@@ -17,7 +17,7 @@ public class Account {
     @Id
     private String IBAN;
 
-    @OneToOne(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private TransactionLimit transactionLimit;
 
     @ManyToOne(fetch = FetchType.LAZY)
