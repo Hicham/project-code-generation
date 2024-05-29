@@ -4,15 +4,22 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
+import project.codegeneration.models.Cow;
+import project.codegeneration.models.DTO.AccountDTO;
+import project.codegeneration.models.DTO.CowDTO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import project.codegeneration.models.Cow;
+import project.codegeneration.models.DTO.CowDTO;
 import project.codegeneration.models.DTO.UserDTO;
 import project.codegeneration.models.User;
 import project.codegeneration.services.AccountService;
 import project.codegeneration.services.UserService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -82,19 +89,6 @@ public class UserController {
         }
     }
 
-
-
-    @PostMapping("/accounts")
-    public ResponseEntity<String> approveUser(@RequestParam("userId") int userId) {
-        try {
-            userService.approveUser(userId);
-            accountService.createAccountForApprovedUser(userService.getUserById(userId));
-            return ResponseEntity.ok("User approved");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
     @GetMapping("/users/{email}")
     public UserDTO getUserByEmail(@PathVariable String email) {
         Optional<User> userOptional = userService.findByEmail(email);
@@ -117,4 +111,14 @@ public class UserController {
     }
 
 
+    @PostMapping("/accounts")
+    public ResponseEntity<String> approveUser(@RequestParam("userId") int userId) {
+        try {
+            userService.approveUser(userId);
+            accountService.createAccountForApprovedUser(userService.getUserById(userId));
+            return ResponseEntity.ok("User approved");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }
