@@ -5,30 +5,42 @@
         <p class="text-danger">{{ error }}</p>
       </div>
     </div>
-    <div class="row">
+    <div class="row mb-3">
       <div class="col-md-8">
         <input type="text" class="form-control" placeholder="Search for user">
       </div>
       <div class="col-md-4">
         <select class="form-select">
-          <option selected>Select an user</option>
+          <option selected>Select a user</option>
         </select>
       </div>
     </div>
     <div class="row">
-      <div v-for="transaction in transactions" :key="transaction.id" class="col-12">
-        <div class="card mb-2">
-          <div class="card-body">
-            <h5 class="card-title">Transaction ID: {{ transaction.id }}</h5>
-            <p class="card-text">Source IBAN: {{ transaction.sourceIBAN || 'N/A' }}</p>
-            <p class="card-text">Destination IBAN: {{ transaction.destinationIBAN }}</p>
-            <p class="card-text">Amount: {{ transaction.amount }}</p>
-            <p class="card-text">Description: {{ transaction.description }}</p>
-            <p class="card-text">Type: {{ transaction.type }}</p>
-            <p class="card-text">Timestamp: {{ formatTimestamp(transaction.timestamp) }}</p>
-            <p class="card-text">Iniated Transfer: {{ transaction.user.email }}</p>
-          </div>
-        </div>
+      <div class="col-12">
+        <table class="table table-striped">
+          <thead>
+          <tr>
+            <th scope="col">Transaction ID</th>
+            <th scope="col">Source IBAN</th>
+            <th scope="col">Destination IBAN</th>
+            <th scope="col">Amount</th>
+            <th scope="col">Type</th>
+            <th scope="col">Timestamp</th>
+            <th scope="col">Initiated Transfer</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr v-for="transaction in transactions" :key="transaction.id">
+            <td>{{ transaction.id }}</td>
+            <td>{{ transaction.sourceIBAN || 'N/A' }}</td>
+            <td>{{ transaction.destinationIBAN }}</td>
+            <td>{{ transaction.amount }}</td>
+            <td>{{ transaction.type }}</td>
+            <td>{{ formatTimestamp(transaction.timestamp) }}</td>
+            <td>{{ transaction.user.email }}</td>
+          </tr>
+          </tbody>
+        </table>
       </div>
     </div>
     <div class="row">
