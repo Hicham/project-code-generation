@@ -8,6 +8,7 @@ import Register from '../components/Register.vue';
 import Atm from '../components/atm/atm.vue';
 
 import Accounts from "@/components/employee/Accounts.vue";
+import NoAccounts from "@/components/employee/NoAccount.vue";
 import Transactions from "@/components/employee/Transactions.vue";
 import UserTransactions from "@/components/employee/UserTransactions.vue";
 import Users from "@/components/employee/Users.vue";
@@ -21,6 +22,7 @@ const router = createRouter({
     { path: '/account', component: MyAccount, meta: { requiresAuth: true, loginType: 1 } },
     { path: '/atm', component: Atm, meta: { requiresAuth: true, loginType: 2 } },
     { path: '/admin/accounts', component: Accounts, meta: { requiresAuth: true, loginType: 1, role: 'ROLE_ADMIN' } },
+    { path: '/admin/noaccounts', component: NoAccounts, meta: { requiresAuth: true, loginType: 1, role: 'ROLE_ADMIN' } },
     { path: '/admin/transactions', component: Transactions, meta: { requiresAuth: true, loginType: 1, role: 'ROLE_ADMIN' } },
     { path: '/admin/users/:userId/Transactions', component: UserTransactions, meta: { requiresAuth: true, loginType: 1, role: 'ROLE_ADMIN' } },
     { path: '/admin/users', component: Users, meta: { requiresAuth: true, loginType: 1, role: 'ROLE_ADMIN' } },

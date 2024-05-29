@@ -26,7 +26,6 @@ public class Account {
     private AccountType accountType;
 
     private double balance;
-    
 
     private boolean isActive;
 

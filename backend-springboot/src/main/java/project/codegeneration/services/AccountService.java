@@ -11,9 +11,12 @@ import project.codegeneration.repositories.TransactionLimitRepository;
 import project.codegeneration.util.IBANGenerator;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AccountService {
+
+
     private final AccountRepository accountRepository;
     private final TransactionLimitRepository transactionLimitRepository;
 
@@ -49,6 +52,10 @@ public class AccountService {
 
     public Page<Account> getAccountsByUserId(Pageable pageable, int userId) {
         return accountRepository.findByUserId(pageable, userId);
+    }
+
+    public Optional<Account> getAccountsByUserEmail(String email) {
+        return accountRepository.findAccountsByUserEmail(email);
     }
 
 
