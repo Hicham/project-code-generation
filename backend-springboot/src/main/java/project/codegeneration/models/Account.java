@@ -17,10 +17,10 @@ public class Account {
     @Id
     private String IBAN;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private TransactionLimit transactionLimit;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private User user;
 
     private AccountType accountType;

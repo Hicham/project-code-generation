@@ -57,6 +57,7 @@ public class UserService {
         User user = userRepository.findById((long) userId).orElseThrow();
         user.setApproved(true);
         userRepository.save(user);
+        userRepository.flush();
     }
 
     public User getUserById(int userId) {

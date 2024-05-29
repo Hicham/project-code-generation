@@ -55,14 +55,14 @@ public class DataSeeder implements ApplicationRunner {
 //            userService.create(user4);
 //            userService.create(user5);
 //
-//        TransactionLimit transactionLimit = new TransactionLimit("IBANFAKE1", null, 1000, 10000, 100000);
+//        TransactionLimit transactionLimit = new TransactionLimit("IBANFAKE1", 1000, 10000, 100000);
 //
-//        Account account = new Account("IBANFAKE1", transactionLimit, user , AccountType.CHECKING, 1000, true, 999999999);
-
-        //Account account = new Account("IBANFAKE2", user , AccountType.CHECKING, 1000, true, 999999999);
-        //Account account2 = new Account("IBANFAKE3", user ,AccountType.CHECKING, 2000, true, 999999999);
-
-       //accountService.createAccount(account);
+//        Account account = new Account("IBANFAKE1", user , AccountType.CHECKING, 1000, true, 999999999);
+//
+//        //Account account = new Account("IBANFAKE2", user , AccountType.CHECKING, 1000, true, 999999999);
+//        //Account account2 = new Account("IBANFAKE3", user ,AccountType.CHECKING, 2000, true, 999999999);
+//
+//       accountService.createAccount(account);
         //accountRepository.save(account2);
 
 
