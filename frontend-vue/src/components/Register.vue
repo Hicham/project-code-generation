@@ -3,16 +3,6 @@
     <div class="container">
       <div class="row justify-content-center align-items-center">
         <div class="col-md-8">
-
-          <div class="alert alert-danger mt-3" v-if="errorMessage">
-            {{ errorMessage }}
-          </div>
-
-          <div class="alert alert-success mt-3" v-if="successMessage">
-            {{ successMessage }} go to <router-link to="/login">LOGIN!</router-link>
-          </div>
-
-
           <div class="card rounded-3">
             <div class="row g-0">
               <div class="col-md-4">
@@ -66,6 +56,15 @@
               </div>
             </div>
           </div>
+
+          <div class="alert alert-danger mt-3" v-if="errorMessage">
+            {{ errorMessage }}
+          </div>
+
+          <div class="alert alert-success mt-3" v-if="successMessage">
+            {{ successMessage }}
+          </div>
+
         </div>
       </div>
     </div>

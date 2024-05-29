@@ -1,12 +1,36 @@
 <template>
   <div class="container">
     <div class="row">
+      <div class="col-12">
+        <table class="table table-striped">
+          <thead>
+          <tr>
+            <th scope="col">IBAN</th>
+            <th scope="col">Balance</th>
+            <th scope="col">Account Type</th>
+            <th scope="col">User Email</th>
+            <th scope="col">Active</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr v-for="account in accounts" :key="account.iban">
+            <td>{{ account.iban }}</td>
+            <td>{{ account.balance }}</td>
+            <td>{{ account.accountType }}</td>
+            <td>{{ account.user.email }}</td>
+            <td>{{ account.active }}</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="row">
       <nav aria-label="Page navigation">
         <ul class="pagination justify-content-center">
           <li class="page-item" :class="{ 'disabled': currentPage === 1 }">
             <button class="page-link" @click.prevent="prevPage">&laquo;</button>
           </li>
-          <li class="page-item" v-for="page in totalPages" :key="page" :class="{ 'active': page === currentPage } ">
+          <li class="page-item" v-for="page in totalPages" :key="page" :class="{ 'active': page === currentPage }">
             <button class="page-link" @click.prevent="goToPage(page)">{{ page }}</button>
           </li>
           <li class="page-item" :class="{ 'disabled': currentPage === totalPages }">
@@ -35,7 +59,7 @@
 
 <script>
 import axiosInstance from '@/axios-instance';
-import {useStore} from "@/stores/store";
+import { useStore } from "@/stores/store";
 
 export default {
   name: "accounts",
@@ -51,9 +75,11 @@ export default {
   },
   methods: {
     fetchAccounts() {
-      axiosInstance.get(`/api/accounts?pageNumber=${this.currentPage - 1}`, { headers: {
+      axiosInstance.get(`/api/accounts?pageNumber=${this.currentPage - 1}`, {
+        headers: {
           Authorization: 'Bearer ' + useStore().token,
-        }})
+        }
+      })
           .then(response => {
             this.accounts = response.data.content;
             this.totalPages = response.data.totalPages;
