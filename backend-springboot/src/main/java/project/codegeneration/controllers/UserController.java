@@ -82,9 +82,7 @@ public class UserController {
             return e.getMessage();
         }
     }
-
-
-
+    
     @PostMapping("/accounts")
     public ResponseEntity<String> approveUser(@RequestBody ApproveUserDTO request) {
         try {
