@@ -10,6 +10,18 @@
       <router-link v-if="isLoggedIn" class="navbar-brand" to="#">
         {{ firstName }}
       </router-link>
+
+      <div class="nav-item dropdown">
+        <a class="navbar-brand dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          Admin
+        </a>
+        <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+          <li><router-link class="dropdown-item" to="/admin/accounts">Accounts</router-link></li>
+          <li><router-link class="dropdown-item" to="/admin/transactions">Transactions</router-link></li>
+          <li><router-link class="dropdown-item" to="/admin/users">Users</router-link></li>
+        </ul>
+      </div>
+
       <button v-if="isLoggedIn" @click="logout" class="btn btn-primary">Logout</button>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -20,6 +32,7 @@
       </div>
     </div>
   </nav>
+
 </template>
 
 <script>
