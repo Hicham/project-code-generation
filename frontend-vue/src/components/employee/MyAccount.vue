@@ -31,11 +31,15 @@
                   <li v-for="transaction in transactions" :key="transaction.id" class="transaction">
                     <div>
                       <span class="transaction-date">{{ formatDate(transaction.timestamp) }}</span>
-                      <span>{{ transaction.name }} Name of transaction</span>
+                      <span>{{ transaction.description }} </span>
                     </div>
-                    <span>
-                      <span v-if="transaction.type === 'WITHDRAW'" class="withdraw">- €{{ transaction.amount }}</span>
-                      <span v-else class="deposit">+ €{{ transaction.amount }}</span>
+                    <span :class="{ 'deposit': transaction.type === 'TRANSFER' && transaction.destinationIBAN === selectedAccount.iban, 'withdraw': transaction.type === 'TRANSFER' && transaction.sourceIBAN === selectedAccount.iban }">
+                      <span v-if="transaction.type === 'TRANSFER' && transaction.destinationIBAN === selectedAccount.iban" class="deposit">+ €{{ transaction.amount }}</span>
+                      <span v-else-if="transaction.type === 'TRANSFER' && transaction.sourceIBAN === selectedAccount.iban" class="withdraw">- €{{ transaction.amount }}</span>
+                      <span v-else-if="transaction.type !== 'TRANSFER'" :class="{ 'deposit': transaction.type === 'DEPOSIT', 'withdraw': transaction.type === 'WITHDRAW' }">
+                        <span v-if="transaction.type === 'DEPOSIT'" class="deposit">+ €{{ transaction.amount }}</span>
+                        <span v-else class="withdraw">- €{{ transaction.amount }}</span>
+                      </span>
                     </span>
                   </li>
                 </ul>

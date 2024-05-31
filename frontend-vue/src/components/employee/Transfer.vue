@@ -48,7 +48,7 @@
                 </select>
               </div>
 
-              <button class="btn btn-primary w-100" @click="sendTransfer">Send</button>
+              <button class="btn btn-primary w-100" @click="confirmTransfer">Send</button>
 
               <div v-if="confirmation" class="alert alert-success mt-3">
                 <p>Transfer of €{{ transferAmount }} to {{ destinationAccount }} was successful.</p>
@@ -67,8 +67,8 @@
 
 <script>
 import axiosInstance from '@/axios-instance';
-import {useStore} from '@/stores/store';
-import {ref, onMounted, computed} from 'vue';
+import { useStore } from '@/stores/store';
+import { ref, onMounted, computed } from 'vue';
 
 export default {
   name: "TransferFunds",
@@ -78,7 +78,7 @@ export default {
     const selectedAccount = ref(null);
     const balance = ref(0);
     const transferAmount = ref(0);
-    const destinationAccount = ref(null);
+    const destinationAccount = ref('');
     const description = ref('');
     const confirmation = ref(false);
 
@@ -109,14 +109,22 @@ export default {
       }
     };
 
-    const sendTransfer = () => {
+    const confirmTransfer = () => {
       if (transferAmount.value <= 0 || transferAmount.value > balance.value || !destinationAccount.value) {
         alert("Invalid transfer details");
         return;
       }
 
+      if (confirm("Are you sure you want to transfer €" + transferAmount.value + " to " + destinationAccount.value + "?")) {
+        sendTransfer();
+      } else {
+        // User cancelled
+      }
+    };
+
+    const sendTransfer = () => {
       axiosInstance
-          .post('/api/accounts/transfer', {
+          .post('/api/transactions', {
             sourceIBAN: selectedAccount.value.iban,
             destinationIBAN: destinationAccount.value,
             amount: transferAmount.value,
@@ -132,7 +140,7 @@ export default {
               confirmation.value = false;
               transferAmount.value = 0;
               description.value = '';
-              destinationAccount.value = null;
+              destinationAccount.value = '';
               getAccounts();
             }, 3000);
           })
@@ -159,6 +167,7 @@ export default {
       destinationAccount,
       confirmation,
       selectAccount,
+      confirmTransfer,
       sendTransfer,
       filteredAccounts,
     };

@@ -11,11 +11,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import project.codegeneration.models.*;
-import project.codegeneration.models.DTO.ATMTransactionRequest;
+import project.codegeneration.models.DTO.TransactionRequestDTO;
 import project.codegeneration.models.DTO.AccountDTO;
 import project.codegeneration.services.AccountService;
 import project.codegeneration.services.TransactionService;
 import project.codegeneration.services.UserService;
+import project.codegeneration.models.TransactionType;
 
 import java.util.Optional;
 
@@ -26,11 +27,13 @@ public class TransactionController {
 
     private final TransactionService transactionService;
     private final AccountService accountService;
+    private final UserService userService;
 
 
-    public TransactionController(TransactionService transactionService, AccountService accountService) {
+    public TransactionController(TransactionService transactionService, AccountService accountService, UserService userService) {
         this.transactionService = transactionService;
         this.accountService = accountService;
+        this.userService = userService;
     }
 
 
@@ -92,5 +95,50 @@ public class TransactionController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    @PostMapping("/transactions")
+    public ResponseEntity<?> createTransaction(@RequestBody TransactionRequestDTO transactionRequest) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+            // Assuming the user is always present in the authentication details
+            User user = userService.getUserByEmail(userDetails.getUsername());
+
+
+            // Validate the request
+            if (transactionRequest.getAmount() <= 0) {
+                return ResponseEntity.badRequest().body("Invalid amount");
+            }
+
+            if (transactionRequest.getSourceIBAN() == null || transactionRequest.getDestinationIBAN() == null) {
+                return ResponseEntity.badRequest().body("Source and destination IBANs are required");
+            }
+
+            TransactionType type = TransactionType.TRANSFER;
+
+            // Perform the transaction
+            transactionService.createTransaction(
+                    transactionRequest.getSourceIBAN(),
+                    transactionRequest.getDestinationIBAN(),
+                    transactionRequest.getAmount(),
+                    transactionRequest.getDescription(),
+                    type,
+                    user
+            );
+
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
+
 
 }

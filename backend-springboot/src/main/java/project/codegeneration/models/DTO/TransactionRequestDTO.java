@@ -9,5 +9,7 @@ public class TransactionRequestDTO {
     private String sourceIBAN;
     private String destinationIBAN;
     private Double amount;
+    private String description;
+
 
 }

@@ -64,6 +64,10 @@ public class UserService {
         return userRepository.findById((long) userId).orElseThrow();
     }
 
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow();
+    }
+
 
     public Page<User> getUsers(Pageable pageable, String email) {
 

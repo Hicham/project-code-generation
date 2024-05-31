@@ -25,7 +25,7 @@ public class TransactionService {
     @Transactional
     public void createTransaction(String sourceIBAN, String destinationIBAN, Double amount, String description, TransactionType type, User user) {
 
-        Transaction transaction = new Transaction(sourceIBAN, destinationIBAN, amount, description, type, Instant.now().getEpochSecond(), user);
+        Transaction transaction = new Transaction(sourceIBAN, destinationIBAN, amount, description, type, user);
         transactionRepository.save(transaction);
         transactionRepository.flush();
 
@@ -58,4 +58,5 @@ public class TransactionService {
     public Page<Transaction> getAccountTransactions(String iban, Pageable pageable) {
         return transactionRepository.findBySourceIBANOrDestinationIBANOrderByTimestampDesc(iban, iban, pageable);
     }
+
 }

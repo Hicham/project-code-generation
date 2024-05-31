@@ -30,12 +30,13 @@ public class Transaction {
     @ManyToOne(fetch = FetchType.EAGER)
     private User user;
 
-    public Transaction(String sourceIBAN, String destinationIBAN, Double amount, String description, TransactionType type, Long timestamp, User user) {
+    public Transaction(String sourceIBAN, String destinationIBAN, Double amount, String description, TransactionType type, User user) {
         this.sourceIBAN = sourceIBAN;
         this.destinationIBAN = destinationIBAN;
         this.amount = amount;
+        this.description = description;
         this.type = type;
-        this.timestamp = timestamp;
         this.user = user;
+        this.timestamp = System.currentTimeMillis();
     }
 }
