@@ -4,6 +4,7 @@
       <div class="col-md-8">
         <div class="card">
           <div class="card-body">
+            <router-link to="/myaccount" class="btn btn-secondary mt-3 w-100">Back to My Account</router-link>
             <h1 class="mb-4 text-center">Transfer</h1>
             <div class="mb-4">
               <label class="form-label">Select Your Account</label>
@@ -69,11 +70,13 @@
 import axiosInstance from '@/axios-instance';
 import { useStore } from '@/stores/store';
 import { ref, onMounted, computed } from 'vue';
+import { useRouter } from 'vue-router';
 
 export default {
   name: "TransferFunds",
   setup() {
     const store = useStore();
+    const router = useRouter();
     const accounts = ref([]);
     const selectedAccount = ref(null);
     const balance = ref(0);
@@ -117,8 +120,6 @@ export default {
 
       if (confirm("Are you sure you want to transfer €" + transferAmount.value + " to " + destinationAccount.value + "?")) {
         sendTransfer();
-      } else {
-        // User cancelled
       }
     };
 
@@ -142,7 +143,7 @@ export default {
               description.value = '';
               destinationAccount.value = '';
               getAccounts();
-            }, 3000);
+            }, 5000);
           })
           .catch((error) => {
             console.error("Transfer failed:", error);
@@ -152,7 +153,6 @@ export default {
     const filteredAccounts = computed(() => {
       return accounts.value.filter(account => account.iban !== selectedAccount.value?.iban);
     });
-
 
     onMounted(() => {
       getAccounts();
@@ -214,6 +214,11 @@ h1 {
 
 .btn-primary {
   background-color: #007bff;
+  border: none;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
   border: none;
 }
 
