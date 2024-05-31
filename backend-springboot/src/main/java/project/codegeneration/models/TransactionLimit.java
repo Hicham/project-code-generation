@@ -1,8 +1,6 @@
 package project.codegeneration.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,9 +10,11 @@ import lombok.NoArgsConstructor;
 @Data
 @Entity
 public class TransactionLimit {
-    //foreign key
     @Id
     private String IBAN;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    private Account account;
 
     private double dailyLimit;
 

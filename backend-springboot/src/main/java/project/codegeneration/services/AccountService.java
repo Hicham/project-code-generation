@@ -4,11 +4,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import project.codegeneration.models.Account;
-import project.codegeneration.models.AccountType;
-import project.codegeneration.models.TransactionType;
-import project.codegeneration.models.User;
+import project.codegeneration.models.*;
+import project.codegeneration.models.DTO.TransactionLimitDTO;
 import project.codegeneration.repositories.AccountRepository;
+import project.codegeneration.repositories.TransactionLimitRepository;
 import project.codegeneration.util.IBANGenerator;
 
 import java.util.List;
@@ -19,9 +18,11 @@ public class AccountService {
 
 
     private final AccountRepository accountRepository;
+    private final TransactionLimitRepository transactionLimitRepository;
 
-    public AccountService(AccountRepository accountRepository) {
+    public AccountService(AccountRepository accountRepository, TransactionLimitRepository transactionLimitRepository) {
         this.accountRepository = accountRepository;
+        this.transactionLimitRepository = transactionLimitRepository;
     }
 
     public Account getAccountById(int id) {
@@ -88,34 +89,71 @@ public class AccountService {
         account.setBalance(account.getBalance() - amount);
         accountRepository.flush();
     }
-    public void createAccountForApprovedUser(User user){
+    public void createAccountForApprovedUser(User user, TransactionLimitDTO transactionLimitDTO){
         if(user.isApproved()){
-            //Generate unique IBAN
+            // Generate unique IBAN
             String checkingIBAN = generateUniqueIBAN();
             String savingsIBAN = generateUniqueIBAN();
 
-            //Create checking account
+            // Create checking account
             Account checkingAccount = new Account();
             checkingAccount.setIBAN(checkingIBAN);
             checkingAccount.setAccountType(AccountType.CHECKING);
             checkingAccount.setBalance(0);
-
             checkingAccount.setActive(true);
-            checkingAccount.setAbsoluteLimit(1000);
+            checkingAccount.setAbsoluteLimit(0);
             checkingAccount.setUser(user);
 
-            //Create savings account
+            // Save checking account
+            accountRepository.save(checkingAccount);
+            accountRepository.flush();
+
+            // Create transaction limit for checking account
+            TransactionLimit transactionLimit = new TransactionLimit();
+            transactionLimit.setIBAN(checkingIBAN);
+            //transactionLimit.setAccount(checkingAccount);
+            transactionLimit.setDailyLimit(transactionLimitDTO.getDailyLimit());
+            transactionLimit.setWeeklyLimit(transactionLimitDTO.getWeeklyLimit());
+            transactionLimit.setMonthlyLimit(transactionLimitDTO.getMonthlyLimit());
+
+            // Save transaction limit for checking account
+            transactionLimitRepository.save(transactionLimit);
+            transactionLimitRepository.flush();
+
+            // Update checking account with transaction limit reference and save again
+            checkingAccount.setTransactionLimit(transactionLimit);
+            accountRepository.save(checkingAccount);
+            accountRepository.flush();
+
+            // Create savings account
             Account savingsAccount = new Account();
             savingsAccount.setIBAN(savingsIBAN);
             savingsAccount.setAccountType(AccountType.SAVINGS);
             savingsAccount.setBalance(0);
             savingsAccount.setActive(true);
-            savingsAccount.setAbsoluteLimit(1000);
+            savingsAccount.setAbsoluteLimit(0);
             savingsAccount.setUser(user);
 
-            //Save Accounts
-            accountRepository.save(checkingAccount);
+            // Save savings account
             accountRepository.save(savingsAccount);
+            accountRepository.flush();
+
+            // Create transaction limit for savings account
+            TransactionLimit transactionLimit2 = new TransactionLimit();
+            transactionLimit2.setIBAN(savingsIBAN);
+            //transactionLimit2.setAccount(savingsAccount);
+            transactionLimit2.setDailyLimit(transactionLimitDTO.getDailyLimit());
+            transactionLimit2.setWeeklyLimit(transactionLimitDTO.getWeeklyLimit());
+            transactionLimit2.setMonthlyLimit(transactionLimitDTO.getMonthlyLimit());
+
+            // Save transaction limit for savings account
+            transactionLimitRepository.save(transactionLimit2);
+            transactionLimitRepository.flush();
+
+            // Update savings account with transaction limit reference and save again
+            savingsAccount.setTransactionLimit(transactionLimit2);
+            accountRepository.save(savingsAccount);
+            accountRepository.flush();
         }
     }
 
@@ -132,7 +170,17 @@ public class AccountService {
         return accountRepository.findByIBAN(iban) != null;
     }
 
-    public int getRandomPinCode(){
-        return (int) (Math.random() * 10000);
+    //disable account
+    public void disableAccount(Account account){
+        account.setActive(false);
+        accountRepository.save(account);
     }
+
+    //enable account
+    public void enableAccount(Account account){
+        account.setActive(true);
+        accountRepository.save(account);
+    }
+
+
 }

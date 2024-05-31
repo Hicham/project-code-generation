@@ -1,10 +1,14 @@
 package project.codegeneration.controllers;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.ResponseEntity;
+import project.codegeneration.models.DTO.ApproveUserDTO;
 import project.codegeneration.models.DTO.UserDTO;
 import project.codegeneration.models.User;
 import project.codegeneration.services.AccountService;
@@ -25,10 +29,17 @@ public class UserController {
         this.accountService = accountService;
     }
 
-    @GetMapping("/users")
-    public List<UserDTO> getUsers() {
-        List<User> users = userService.getAllUsers();
-        return users.stream().map(user -> new UserDTO(
+    @GetMapping("/users" )
+    public ResponseEntity<Page<UserDTO>> getUsers(@RequestParam(required = false, defaultValue = "0") Integer pageNumber, @RequestParam(required = false, defaultValue = "") String email) {
+
+        Page<User> users;
+
+        Pageable pageable = PageRequest.of(pageNumber, 10);
+
+        users = userService.getUsers(pageable, email);
+
+
+        Page<UserDTO> userDTOpage = users.map(user -> new UserDTO(
                 user.getId(),
                 user.getRoles().toString(),
                 user.isApproved(),
@@ -38,7 +49,11 @@ public class UserController {
                 user.getLastName(),
                 user.getBSNNumber(),
                 user.getPhoneNumber()
-        )).toList();
+        ));
+
+        return ResponseEntity.ok(userDTOpage);
+
+
     }
 
     @GetMapping("/unapproved-users")
@@ -51,15 +66,15 @@ public class UserController {
     public String registerUser(@RequestBody UserDTO userDTO) {
         try {
             User user = new User(
-                    List.of(), // Set default roles or parse from DTO if necessary
-                    false, // Set default approval status or parse from DTO if necessary
+                    List.of(), // Assuming roles should be an empty list
+                    false, // Assuming approved status is false
                     userDTO.getEmail(),
                     userDTO.getPassword(),
                     userDTO.getFirstName(),
                     userDTO.getLastName(),
                     userDTO.getBSNNumber(),
                     userDTO.getPhoneNumber()
-                    );
+            );
 
             userService.create(user);
             return "User registered successfully";
@@ -67,13 +82,12 @@ public class UserController {
             return e.getMessage();
         }
     }
-
-
+    
     @PostMapping("/accounts")
-    public ResponseEntity<String> approveUser(@RequestParam("userId") int userId) {
+    public ResponseEntity<String> approveUser(@RequestBody ApproveUserDTO request) {
         try {
-            userService.approveUser(userId);
-            accountService.createAccountForApprovedUser(userService.getUserById(userId));
+            userService.approveUser(request.getUserId());
+            accountService.createAccountForApprovedUser(userService.getUserById(request.getUserId()), request.getTransactionLimit());
             return ResponseEntity.ok("User approved");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());

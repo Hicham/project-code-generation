@@ -1,5 +1,7 @@
 package project.codegeneration.services;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import project.codegeneration.models.Role;
@@ -22,9 +24,6 @@ public class UserService {
         this.jwtProvider = jwtProvider;
     }
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
 
     public Optional<User> findByEmail(String email){
         return userRepository.findByEmail(email);
@@ -51,18 +50,31 @@ public class UserService {
     }
 
     public List<User> getNotApprovedUsers() {
-        return userRepository.findNotApproved(Role.ROLE_USER);
+        return userRepository.findByIsApprovedAndRolesContains(false, Role.ROLE_USER);
     }
 
     public void approveUser(int userId) {
         User user = userRepository.findById((long) userId).orElseThrow();
         user.setApproved(true);
         userRepository.save(user);
+        userRepository.flush();
     }
 
     public User getUserById(int userId) {
         return userRepository.findById((long) userId).orElseThrow();
     }
 
+
+    public Page<User> getUsers(Pageable pageable, String email) {
+
+        if (email.isBlank())
+        {
+            return userRepository.findAll(pageable);
+        }
+        else
+        {
+            return userRepository.findByEmailContaining(pageable, email);
+        }
+    }
 
 }

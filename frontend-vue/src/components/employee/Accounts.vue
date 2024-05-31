@@ -24,6 +24,8 @@
             <p class="card-text">Account Type: {{ account.accountType }}</p>
             <p class="card-text">User: {{ account.user.email }}</p>
             <p class="card-text">Active: {{ account.active }}</p>
+            <button v-if="!account.active" @click="enableAccount(account)" class="btn btn-success">Enable</button>
+            <button v-else @click="disableAccount(account)" class="btn btn-danger">Disable</button>
           </div>
         </div>
       </div>
@@ -77,6 +79,29 @@ export default {
         this.currentPage++;
         this.fetchAccounts();
       }
+    },
+    enableAccount(account) {
+      axiosInstance.post(`/api/accounts/enable/${account.id}`, null, {
+        headers: { Authorization: 'Bearer ' + useStore().token }
+      })
+          .then(() => {
+            account.active = true;
+          })
+          .catch(error => {
+            console.error("Error enabling account:", error);
+          });
+    },
+
+    disableAccount(account) {
+      axiosInstance.post(`/api/accounts/disable/${account.id}`, null, {
+        headers: { Authorization: 'Bearer ' + useStore().token }
+      })
+          .then(() => {
+            account.active = false;
+          })
+          .catch(error => {
+            console.error("Error disabling account:", error);
+          });
     }
   }
 }
