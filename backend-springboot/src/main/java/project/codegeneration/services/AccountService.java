@@ -38,6 +38,10 @@ public class AccountService {
         return accountRepository.findAll(pageable);
     }
 
+    public List<Account> getAllAccounts() {
+        return accountRepository.findAll();
+    }
+
     public Account updateAccount(Account account) {
         return accountRepository.save(account);
     }

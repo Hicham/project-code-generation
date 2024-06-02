@@ -74,7 +74,8 @@ export default {
   name: "TransferFunds",
   setup() {
     const store = useStore();
-    const accounts = ref([]);
+    const userAccounts = ref([]);
+    const allAccounts = ref([]);
     const selectedAccount = ref(null);
     const balance = ref(0);
     const transferAmount = ref(0);
@@ -94,14 +95,24 @@ export default {
             },
           })
           .then((result) => {
-            accounts.value = result.data.content;
-            if (accounts.value.length > 0) {
-              selectedAccount.value = accounts.value[0];
+            userAccounts.value = result.data.content;
+            if (userAccounts.value.length > 0) {
+              selectedAccount.value = userAccounts.value[0];
               balance.value = selectedAccount.value.balance;
             }
           })
           .catch((error) => console.error("Error fetching accounts:", error));
     };
+
+    const getAllAccounts = () => {
+      axiosInstance
+          .get('/api/accounts/all')
+          .then((result) => {
+            allAccounts.value = result.data;
+          })
+          .catch((error) => console.error("Error fetching accounts:", error));
+    };
+
 
     const selectAccount = () => {
       if (selectedAccount.value) {
@@ -150,16 +161,17 @@ export default {
     };
 
     const filteredAccounts = computed(() => {
-      return accounts.value.filter(account => account.iban !== selectedAccount.value?.iban);
+      return allAccounts.value.filter(account => account.iban !== selectedAccount.value?.iban);
     });
 
 
     onMounted(() => {
       getAccounts();
+      getAllAccounts();
     });
 
     return {
-      accounts,
+      accounts: userAccounts,
       selectedAccount,
       balance,
       transferAmount,

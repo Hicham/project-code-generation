@@ -161,13 +161,27 @@ public class AccountController {
 //       Optional<Account> accounts = accountService.getAccountsByUserEmail(email);
 //       if (accounts.isPresent()) {
 //           Account account = accounts.get();
-//           return new AccountDTO(account.getIBAN(), account.getUser(), account.getAccountType(), account.getBalance());
+//           return new AccountDTO(account.getIBAN(), account.getUser(), account.getAccountType(), account.getBalance(), account.isActive(), account.getAbsoluteLimit());
 //       }
 //       else {
 //           return null;
 //       }
 //
 //   }
+
+    @GetMapping("/accounts/all")
+    public ResponseEntity<List<AccountDTO>> getAllAccounts() {
+        List<Account> accounts = accountService.getAllAccounts();
+        List<AccountDTO> accountDTOs = accounts.stream().map(account -> new AccountDTO(
+                account.getIBAN(),
+                account.getUser(),
+                account.getAccountType(),
+                account.getBalance(),
+                account.isActive(),
+                account.getAbsoluteLimit()
+        )).collect(Collectors.toList());
+        return ResponseEntity.ok(accountDTOs);
+    }
 
 
 }
