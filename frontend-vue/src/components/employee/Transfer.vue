@@ -40,12 +40,18 @@
               </div>
 
               <div class="mb-3">
-                <label class="form-label">Destination Account</label>
-                <select class="form-select" v-model="destinationAccount">
-                  <option v-for="account in filteredAccounts" :key="account.iban" :value="account.iban">
-                    {{ account.iban }}
-                  </option>
-                </select>
+                <label class="form-label">Search Destination Account</label>
+                <input type="text" class="form-control mb-2" v-model="searchFirstName" placeholder="First Name">
+                <input type="text" class="form-control mb-2" v-model="searchLastName" placeholder="Last Name">
+                <div class="account-list">
+                  <div v-for="account in filteredAccounts"
+                       :key="account.iban"
+                       class="account-item"
+                       :class="{ selected: account.iban === selectedAccountIBAN }"
+                       @click="selectDestinationAccount(account)">
+                    <strong>{{ account.user.firstName }} {{ account.user.lastName }}</strong> - {{ account.iban }}
+                  </div>
+                </div>
               </div>
 
               <button class="btn btn-primary w-100" @click="confirmTransfer">Send</button>
@@ -82,6 +88,9 @@ export default {
     const destinationAccount = ref('');
     const description = ref('');
     const confirmation = ref(false);
+    const searchFirstName = ref('');
+    const searchLastName = ref('');
+    const selectedAccountIBAN = ref('');
 
     const getAccounts = () => {
       axiosInstance
@@ -112,7 +121,6 @@ export default {
           })
           .catch((error) => console.error("Error fetching accounts:", error));
     };
-
 
     const selectAccount = () => {
       if (selectedAccount.value) {
@@ -152,8 +160,9 @@ export default {
               transferAmount.value = 0;
               description.value = '';
               destinationAccount.value = '';
+              selectedAccountIBAN.value = '';
               getAccounts();
-            }, 3000);
+            }, 10000);
           })
           .catch((error) => {
             console.error("Transfer failed:", error);
@@ -161,9 +170,17 @@ export default {
     };
 
     const filteredAccounts = computed(() => {
-      return allAccounts.value.filter(account => account.iban !== selectedAccount.value?.iban);
+      return allAccounts.value.filter(account => {
+        return account.iban !== selectedAccount.value?.iban &&
+            account.user.firstName.toLowerCase().includes(searchFirstName.value.toLowerCase()) &&
+            account.user.lastName.toLowerCase().includes(searchLastName.value.toLowerCase());
+      });
     });
 
+    const selectDestinationAccount = (account) => {
+      destinationAccount.value = account.iban;
+      selectedAccountIBAN.value = account.iban;
+    };
 
     onMounted(() => {
       getAccounts();
@@ -178,10 +195,14 @@ export default {
       description,
       destinationAccount,
       confirmation,
+      searchFirstName,
+      searchLastName,
+      selectedAccountIBAN,
       selectAccount,
       confirmTransfer,
       sendTransfer,
       filteredAccounts,
+      selectDestinationAccount,
     };
   },
 };
@@ -232,5 +253,28 @@ h1 {
 .alert-success {
   width: 100%;
   text-align: center;
+}
+
+.account-list {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  background-color: #f8f9fa;
+}
+
+.account-item {
+  padding: 5px;
+  cursor: pointer;
+}
+
+.account-item:hover {
+  background-color: #e2e6ea;
+}
+
+.account-item.selected {
+  background-color: #007bff;
+  color: #fff;
 }
 </style>
