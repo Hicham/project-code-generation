@@ -169,6 +169,7 @@ export default {
           });
     };
 
+
     const filteredAccounts = computed(() => {
       return allAccounts.value.filter(account => {
         return account.iban !== selectedAccount.value?.iban &&
