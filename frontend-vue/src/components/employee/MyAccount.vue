@@ -3,7 +3,7 @@
     <div class="row justify-content-center">
       <div class="col-md-8">
         <div class="card">
-          <div class="card-body">
+          <div class="card-body" v-if="isApproved">
             <h1 class="mb-4">Account Management</h1>
             <select class="form-select form-select-lg mb-3" v-model="selectedAccount" @change="selectAccount">
               <option v-for="account in accounts" :key="account.iban" :value="account">
@@ -49,6 +49,10 @@
               </div>
             </div>
           </div>
+          <div class="card-body" v-else>
+            <h1>Your account is not approved</h1>
+            <router-link to="/" class="btn btn-primary">Go Back</router-link>
+          </div>
         </div>
       </div>
     </div>
@@ -57,8 +61,8 @@
 
 <script>
 import axiosInstance from '@/axios-instance';
-import { useStore } from '@/stores/store';
-import { ref, onMounted } from 'vue';
+import {useStore} from '@/stores/store';
+import {ref, onMounted} from 'vue';
 
 export default {
   name: "AccountManagement",
@@ -68,6 +72,7 @@ export default {
     const selectedAccount = ref(null);
     const balance = ref(0);
     const transactions = ref([]);
+    const isApproved = ref(store.user.isApproved);
 
     const getAccounts = () => {
       axiosInstance
@@ -121,7 +126,9 @@ export default {
     };
 
     onMounted(() => {
-      getAccounts();
+      if (isApproved.value) {
+        getAccounts();
+      }
     });
 
     return {
@@ -131,6 +138,7 @@ export default {
       transactions,
       selectAccount,
       formatDate,
+      isApproved,
     };
   },
 };

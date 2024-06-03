@@ -9,7 +9,7 @@
               <label class="form-label">Select Your Account</label>
               <select class="form-select" v-model="selectedAccount" @change="selectAccount">
                 <option v-for="account in accounts" :key="account.iban" :value="account">
-                  {{ account.iban }}
+                  {{ account.iban }} ({{ account.accountType }})
                 </option>
               </select>
             </div>
@@ -171,11 +171,17 @@ export default {
 
 
     const filteredAccounts = computed(() => {
-      return allAccounts.value.filter(account => {
-        return account.iban !== selectedAccount.value?.iban &&
+      if (selectedAccount.value?.accountType === 'SAVINGS') {
+        return allAccounts.value.filter(account =>
+            account.user.id === store.user.id && account.accountType === 'CHECKING'
+        );
+      } else {
+        return allAccounts.value.filter(account =>
+            account.iban !== selectedAccount.value?.iban &&
             account.user.firstName.toLowerCase().includes(searchFirstName.value.toLowerCase()) &&
-            account.user.lastName.toLowerCase().includes(searchLastName.value.toLowerCase());
-      });
+            account.user.lastName.toLowerCase().includes(searchLastName.value.toLowerCase())
+        );
+      }
     });
 
     const selectDestinationAccount = (account) => {
