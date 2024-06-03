@@ -8,4 +8,5 @@ import lombok.Data;
 public class ApproveUserDTO {
     private int userId;
     private TransactionLimitDTO transactionLimit;
+    private double absoluteLimit;
 }

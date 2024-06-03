@@ -208,6 +208,7 @@ public class AccountController {
     public ResponseEntity<String> setTransactionLimits(
             @PathVariable String iban,
             @RequestBody TransactionLimitDTO transactionLimitDTO) {
+        accountService.setAbsoluteLimit(iban, transactionLimitDTO.getAbsoluteLimit());
         transactionLimitService.setTransactionLimit(
                 iban,
                 transactionLimitDTO.getDailyLimit(),
@@ -247,7 +248,8 @@ public class AccountController {
                 account.getAccountType(),
                 account.getBalance(),
                 account.isActive(),
-                account.getAbsoluteLimit()
+                account.getAbsoluteLimit(),
+                account.getTransactionLimit()
         )).collect(Collectors.toList());
         return ResponseEntity.ok(accountDTOs);
     }

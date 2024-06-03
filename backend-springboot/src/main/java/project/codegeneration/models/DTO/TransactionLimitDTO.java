@@ -10,5 +10,6 @@ public class TransactionLimitDTO {
     private double dailyLimit;
     private double weeklyLimit;
     private double monthlyLimit;
+    private double absoluteLimit;
 }
 

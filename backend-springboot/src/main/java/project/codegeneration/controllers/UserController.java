@@ -87,7 +87,7 @@ public class UserController {
     public ResponseEntity<String> approveUser(@RequestBody ApproveUserDTO request) {
         try {
             userService.approveUser(request.getUserId());
-            accountService.createAccountForApprovedUser(userService.getUserById(request.getUserId()), request.getTransactionLimit());
+            accountService.createAccountForApprovedUser(userService.getUserById(request.getUserId()), request);
             return ResponseEntity.ok("User approved");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());

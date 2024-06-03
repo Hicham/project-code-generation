@@ -19,6 +19,7 @@
           <li><router-link class="dropdown-item" to="/admin/accounts">Accounts</router-link></li>
           <li><router-link class="dropdown-item" to="/admin/transactions">Transactions</router-link></li>
           <li><router-link class="dropdown-item" to="/admin/users">Users</router-link></li>
+          <li><router-link class="dropdown-item" to="/admin/noaccounts">NoAccounts</router-link></li>
         </ul>
       </div>
 
