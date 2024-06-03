@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="row justify-content-center">
-      <div class="col-md-8">
+      <div class="col-md-12">
         <div class="card">
           <div class="card-body" v-if="isApproved">
             <h1 class="mb-4">Account Management</h1>
@@ -26,26 +26,48 @@
             <!-- Transaction list -->
             <div class="transaction-container">
               <h3>Transactions</h3>
+
+              <!-- Dropdown for selecting filter column -->
+              <div class="filter-controls">
+                <label for="filter-column">Filter By:</label>
+                <select id="filter-column" v-model="selectedFilterColumn" class="form-select">
+                  <option v-for="column in filterColumns" :key="column" :value="column">
+                    {{ column }}
+                  </option>
+                </select>
+                <label for="filter-input">Filter:</label>
+                <input id="filter-input" v-model="filterValue" class="form-control" @input="filterTransactions">
+              </div>
+
               <div class="transaction-list">
-                <ul>
-                  <li v-for="transaction in transactions" :key="transaction.id" class="transaction">
-                    <div>
-                      <span class="transaction-date">{{ formatDate(transaction.timestamp) }}</span>
-                      <span>{{ transaction.description }} </span>
-                    </div>
-                    <span :class="{ 'deposit': transaction.type === 'TRANSFER' && transaction.destinationIBAN === selectedAccount.iban, 'withdraw': transaction.type === 'TRANSFER' && transaction.sourceIBAN === selectedAccount.iban }">
+                <table class="table">
+                  <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Destination</th>
+                    <th>Amount</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr v-for="transaction in filteredTransactions" :key="transaction.id" class="transaction">
+                    <td>{{ formatDate(transaction.timestamp) }}</td>
+                    <td>{{ transaction.description }}</td>
+                    <td>{{ getDestinationName(transaction.destinationIBAN) }}</td>
+                    <td :class="{ 'deposit': transaction.type === 'TRANSFER' && transaction.destinationIBAN === selectedAccount.iban, 'withdraw': transaction.type === 'TRANSFER' && transaction.sourceIBAN === selectedAccount.iban }">
                       <span v-if="transaction.type === 'TRANSFER' && transaction.destinationIBAN === selectedAccount.iban" class="deposit">+ €{{ transaction.amount }}</span>
                       <span v-else-if="transaction.type === 'TRANSFER' && transaction.sourceIBAN === selectedAccount.iban" class="withdraw">- €{{ transaction.amount }}</span>
                       <span v-else-if="transaction.type !== 'TRANSFER'" :class="{ 'deposit': transaction.type === 'DEPOSIT', 'withdraw': transaction.type === 'WITHDRAW' }">
-                        <span v-if="transaction.type === 'DEPOSIT'" class="deposit">+ €{{ transaction.amount }}</span>
-                        <span v-else class="withdraw">- €{{ transaction.amount }}</span>
-                      </span>
-                    </span>
-                  </li>
-                </ul>
-              </div>
-              <div v-if="transactions.length === 0" class="no-transactions">
-                No transactions available.
+                          <span v-if="transaction.type === 'DEPOSIT'" class="deposit">+ €{{ transaction.amount }}</span>
+                          <span v-else class="withdraw">- €{{ transaction.amount }}</span>
+                        </span>
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
+                <div v-if="filteredTransactions.length === 0" class="no-transactions">
+                  No transactions available.
+                </div>
               </div>
             </div>
           </div>
@@ -59,10 +81,12 @@
   </div>
 </template>
 
+
+
 <script>
 import axiosInstance from '@/axios-instance';
-import {useStore} from '@/stores/store';
-import {ref, onMounted} from 'vue';
+import { useStore } from '@/stores/store';
+import { ref, onMounted, computed } from 'vue';
 
 export default {
   name: "AccountManagement",
@@ -73,6 +97,10 @@ export default {
     const balance = ref(0);
     const transactions = ref([]);
     const isApproved = ref(store.user.isApproved);
+    const selectedFilterColumn = ref('Description');
+    const filterValue = ref('');
+
+    const filterColumns = ['Date', 'Description', 'Destination', 'Amount'];
 
     const getAccounts = () => {
       axiosInstance
@@ -122,8 +150,35 @@ export default {
     // Function to format timestamp to date string
     const formatDate = (timestamp) => {
       const date = new Date(timestamp);
-      return date.toLocaleDateString();
+      return date.toLocaleString(); // Adjusted to include time
     };
+
+    const getDestinationName = (iban) => {
+      const account = accounts.value.find(account => account.iban === iban);
+      if (account && account.user) {
+        return `${account.user.firstName} ${account.user.lastName}`;
+      }
+      return iban;
+    };
+
+    const filterTransactions = () => {
+      if (!filterValue.value) {
+        return transactions.value;
+      }
+
+      return transactions.value.filter((transaction) => {
+        const columnValue = {
+          'Date': formatDate(transaction.timestamp),
+          'Description': transaction.description,
+          'Destination': getDestinationName(transaction.destinationIBAN),
+          'Amount': `€${transaction.amount}`,
+        }[selectedFilterColumn.value];
+
+        return columnValue && columnValue.toLowerCase().includes(filterValue.value.toLowerCase());
+      });
+    };
+
+    const filteredTransactions = computed(filterTransactions);
 
     onMounted(() => {
       if (isApproved.value) {
@@ -139,10 +194,18 @@ export default {
       selectAccount,
       formatDate,
       isApproved,
+      getDestinationName,
+      selectedFilterColumn,
+      filterValue,
+      filterColumns,
+      filteredTransactions,
+      filterTransactions,
     };
   },
 };
 </script>
+
+
 
 <style scoped>
 .container {
@@ -173,19 +236,31 @@ h1 {
   margin-top: 20px;
 }
 
-.transaction-date {
-  font-size: 12px;
-  color: #888;
-  margin-right: 30px;
+.filter-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 20px;
 }
 
-.transaction {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #ccc;
+.filter-controls label {
+  margin-right: 10px;
+  margin-top: 10px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th, .table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.table th {
+  background-color: #f2f2f2;
 }
 
 .deposit {
@@ -200,3 +275,5 @@ h1 {
   padding: 10px 0;
 }
 </style>
+
+

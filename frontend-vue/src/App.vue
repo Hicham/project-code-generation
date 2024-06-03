@@ -1,11 +1,13 @@
 <template>
   <navigation/>
   <router-view />
+  <footer/>
 </template>
 
 <script>
 import Navigation from './components/Navigation.vue'
 import { useStore } from './stores/store';
+import Footer from './components/Footer.vue'
 
 export default {
   name: "App",
@@ -14,7 +16,8 @@ export default {
     store.autoLogin();
   },
   components: {
-    Navigation
+    Navigation,
+    Footer
   }
 };
 </script>
