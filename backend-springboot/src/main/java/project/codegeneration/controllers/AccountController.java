@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.*;
 import project.codegeneration.models.Account;
 import project.codegeneration.models.DTO.AccountDTO;
 import project.codegeneration.models.DTO.ATMTransactionRequest;
+import project.codegeneration.models.DTO.TransactionLimitDTO;
 import project.codegeneration.models.Role;
 import project.codegeneration.models.TransactionType;
 import project.codegeneration.models.User;
 import project.codegeneration.services.AccountService;
+import project.codegeneration.services.TransactionLimitService;
 import project.codegeneration.services.TransactionService;
 import project.codegeneration.services.UserService;
 
@@ -32,10 +34,13 @@ public class AccountController {
     private final UserService userService;
     private final TransactionService transactionService;
 
-    public AccountController(final AccountService accountService, UserService userService, TransactionService transactionService) {
+    private final TransactionLimitService transactionLimitService;
+
+    public AccountController(final AccountService accountService, UserService userService, TransactionService transactionService, TransactionLimitService transactionLimitService) {
         this.accountService = accountService;
         this.userService = userService;
         this.transactionService = transactionService;
+        this.transactionLimitService = transactionLimitService;
     }
 
     @GetMapping("/accounts")
@@ -82,7 +87,8 @@ public class AccountController {
                     account.getAccountType(),
                     account.getBalance(),
                     account.isActive(),
-                    account.getAbsoluteLimit()
+                    account.getAbsoluteLimit(),
+                    account.getTransactionLimit()
             ));
 
             return ResponseEntity.ok(accountDTOPage);
@@ -107,7 +113,7 @@ public class AccountController {
         if (account == null) {
             return ResponseEntity.notFound().build();
         } else {
-            AccountDTO accountDTO = new AccountDTO(account.getIBAN(), account.getUser(), account.getAccountType(), account.getBalance(), account.isActive(), account.getAbsoluteLimit());
+            AccountDTO accountDTO = new AccountDTO(account.getIBAN(), account.getUser(), account.getAccountType(), account.getBalance(), account.isActive(), account.getAbsoluteLimit(), account.getTransactionLimit());
             return ResponseEntity.ok(accountDTO);
         }
     }
@@ -146,6 +152,69 @@ public class AccountController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account not found.");
         }
 
+    }
+
+    @PostMapping("/accounts/disable/{IBAN}")
+    public ResponseEntity<String> disableAccount(@PathVariable String IBAN) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
+        Optional<User> currentUser = userService.findByEmail(currentUsername);
+
+        if (currentUser.isPresent()) {
+            Account account = accountService.getAccountByIBAN(IBAN);
+            if (account != null) {
+                account.setActive(false);
+                accountService.updateAccount(account);
+                return ResponseEntity.ok("Account disabled successfully.");
+            }
+            else
+            {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account not found.");
+            }
+        }
+        else
+        {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account not found.");
+        }
+
+    }
+
+    @PostMapping("/accounts/enable/{IBAN}")
+    public ResponseEntity<String> enableAccount(@PathVariable String IBAN) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
+        Optional<User> currentUser = userService.findByEmail(currentUsername);
+
+        if (currentUser.isPresent()) {
+            Account account = accountService.getAccountByIBAN(IBAN);
+            if (account != null) {
+                account.setActive(true);
+                accountService.updateAccount(account);
+                return ResponseEntity.ok("Account enabled successfully.");
+            }
+            else
+            {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account not found.");
+            }
+        }
+        else
+        {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account not found.");
+        }
+
+    }
+
+    @PostMapping("/accounts/setLimits/{iban}")
+    public ResponseEntity<String> setTransactionLimits(
+            @PathVariable String iban,
+            @RequestBody TransactionLimitDTO transactionLimitDTO) {
+        transactionLimitService.setTransactionLimit(
+                iban,
+                transactionLimitDTO.getDailyLimit(),
+                transactionLimitDTO.getWeeklyLimit(),
+                transactionLimitDTO.getMonthlyLimit()
+        );
+        return ResponseEntity.ok("Transaction limits updated successfully");
     }
 
 
