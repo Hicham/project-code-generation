@@ -18,9 +18,15 @@
                   <router-link to="/register" class="btn btn-outline-primary btn-lg ms-2">Register</router-link>
                 </template>
 
-                <template v-else-if="isLoggedIn && isUserApproved">
+                <template v-else-if="isUserApproved === true">
                   <p class="text-success">Your account is approved.</p>
                   <router-link to="/myaccount" class="btn btn-success btn-lg">Go to My Account</router-link>
+                  <button @click="logout" class="btn btn-primary btn-lg ms-2">Logout</button>
+                </template>
+
+                <template v-else-if ="isAdministrator">
+                  <p class="text-success">You are logged in as an ADMINISTRATOR.</p>
+                  <router-link to="/admin/accounts" class="btn btn-success btn-lg">Go to Admin Accounts Panel</router-link>
                   <button @click="logout" class="btn btn-primary btn-lg ms-2">Logout</button>
                 </template>
 
@@ -28,6 +34,9 @@
                   <p class="text-warning">Your account is not approved yet.</p>
                   <button @click="logout" class="btn btn-primary btn-lg">Logout</button>
                 </template>
+
+
+
               </div>
             </div>
           </div>
@@ -51,6 +60,7 @@ export default {
     const isLoggedIn = computed(() => store.isLoggedIn);
     const userEmail = computed(() => store.user.email);
     const isUserApproved = ref(null);
+    const isAdministrator = computed(() => store.user.roles.includes('ROLE_ADMIN'));
 
     const fetchUser = async () => {
       if (!userEmail.value) {
@@ -85,7 +95,8 @@ export default {
     return {
       isLoggedIn,
       isUserApproved,
-      logout
+      logout,
+      isAdministrator
     };
   }
 };
