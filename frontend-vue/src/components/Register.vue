@@ -12,7 +12,6 @@
             {{ successMessage }} go to <router-link to="/login">LOGIN!</router-link>
           </div>
 
-
           <div class="card rounded-3">
             <div class="row g-0">
               <div class="col-md-4">
@@ -29,27 +28,27 @@
                     <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Create an account</h5>
                     <div class="mb-4">
                       <label class="form-label" for="email">Email address</label>
-                      <input type="email" id="email" class="form-control form-control-lg" v-model="email" />
+                      <input type="email" id="email" class="form-control form-control-lg" v-model="email" required />
                     </div>
                     <div class="mb-4">
                       <label class="form-label" for="password">Password</label>
-                      <input type="password" id="password" class="form-control form-control-lg" v-model="password" />
+                      <input type="password" id="password" class="form-control form-control-lg" v-model="password" required />
                     </div>
                     <div class="mb-4">
                       <label class="form-label" for="firstName">First Name</label>
-                      <input type="text" id="firstName" class="form-control form-control-lg" v-model="firstName" />
+                      <input type="text" id="firstName" class="form-control form-control-lg" v-model="firstName" required />
                     </div>
                     <div class="mb-4">
                       <label class="form-label" for="lastName">Last Name</label>
-                      <input type="text" id="lastName" class="form-control form-control-lg" v-model="lastName" />
+                      <input type="text" id="lastName" class="form-control form-control-lg" v-model="lastName" required />
                     </div>
                     <div class="mb-4">
                       <label class="form-label" for="bsn">BSN Number</label>
-                      <input type="text" id="bsn" class="form-control form-control-lg" v-model="bsn" />
+                      <input type="text" id="bsn" class="form-control form-control-lg" v-model="bsn" required />
                     </div>
                     <div class="mb-4">
                       <label class="form-label" for="phone">Phone Number</label>
-                      <input type="tel" id="phone" class="form-control form-control-lg" v-model="phoneNumber" />
+                      <input type="tel" id="phone" class="form-control form-control-lg" v-model="phoneNumber" required />
                     </div>
                     <div class="row mb-4">
                       <div class="col">
@@ -66,6 +65,7 @@
               </div>
             </div>
           </div>
+
         </div>
       </div>
     </div>
@@ -90,6 +90,17 @@ const register = async () => {
   errorMessage.value = '';
   successMessage.value = '';
 
+  // Check if password meets complexity requirements
+  if (!isPasswordValid(password.value)) {
+    errorMessage.value = 'Password must be at least 6 characters long and contain at least one uppercase letter, one lowercase letter, and one number.';
+    return;
+  }
+
+  if (!email.value || !firstName.value || !lastName.value || !bsn.value || !phoneNumber.value) {
+    errorMessage.value = 'All fields are required. Please fill in all the details.';
+    return;
+  }
+
   try {
     const response = await axios.post('/api/register', {
       email: email.value,
@@ -111,8 +122,14 @@ const register = async () => {
     errorMessage.value = 'Er was een probleem bij het registreren van de gebruiker';
   }
 };
+
+const isPasswordValid = (password) => {
+  // Password must be at least 6 characters long and contain at least one uppercase letter, one lowercase letter, and one number
+  const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[a-zA-Z\d]{6,}$/;
+  return passwordRegex.test(password);
+};
 </script>
 
 <style scoped>
-/* Add your custom styles hier */
+
 </style>
