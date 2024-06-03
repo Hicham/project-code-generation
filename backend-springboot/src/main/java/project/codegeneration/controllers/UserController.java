@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.ResponseEntity;
 import project.codegeneration.models.DTO.ApproveUserDTO;
 import project.codegeneration.models.DTO.UserDTO;
+import project.codegeneration.models.Role;
 import project.codegeneration.models.User;
 import project.codegeneration.services.AccountService;
 import project.codegeneration.services.UserService;
@@ -66,7 +67,7 @@ public class UserController {
     public String registerUser(@RequestBody UserDTO userDTO) {
         try {
             User user = new User(
-                    List.of(), // Assuming roles should be an empty list
+                    List.of(Role.ROLE_USER), // Assuming roles should be an empty list
                     false, // Assuming approved status is false
                     userDTO.getEmail(),
                     userDTO.getPassword(),
