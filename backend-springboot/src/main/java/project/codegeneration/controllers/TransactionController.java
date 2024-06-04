@@ -24,7 +24,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
-public class TransactionController {
+public class TransactionController extends Controller{
 
 
     private final TransactionService transactionService;
@@ -33,6 +33,7 @@ public class TransactionController {
 
 
     public TransactionController(TransactionService transactionService, AccountService accountService, UserService userService) {
+        super(userService);
         this.transactionService = transactionService;
         this.accountService = accountService;
         this.userService = userService;
@@ -132,12 +133,10 @@ public class TransactionController {
     @PostMapping("/accounts/{IBAN}/deposit")
     public ResponseEntity<String> deposit(@PathVariable String IBAN, @RequestBody ATMTransactionRequest ATMTransactionRequest
     ) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = authentication.getName();
-        Optional<User> currentUser = userService.findByEmail(currentUsername);
+        Optional<User> user = getCurrentUser(SecurityContextHolder.getContext().getAuthentication());
 
-        if (currentUser.isPresent()) {
-            transactionService.ATMTransaction(null, IBAN, ATMTransactionRequest.getAmount(), ATMTransactionRequest.getDescription(), TransactionType.DEPOSIT, currentUser.get());
+        if (user.isPresent()) {
+            transactionService.ATMTransaction(null, IBAN, ATMTransactionRequest.getAmount(), ATMTransactionRequest.getDescription(), TransactionType.DEPOSIT, user.get());
             return ResponseEntity.ok("Money deposited successfully.");
         }
         else
@@ -149,12 +148,11 @@ public class TransactionController {
 
     @PostMapping("/accounts/{IBAN}/withdraw")
     public ResponseEntity<String> withdraw(@PathVariable String IBAN, @RequestBody ATMTransactionRequest ATMTransactionRequest) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = authentication.getName();
-        Optional<User> currentUser = userService.findByEmail(currentUsername);
 
-        if (currentUser.isPresent()) {
-            transactionService.ATMTransaction(IBAN, null, ATMTransactionRequest.getAmount(), ATMTransactionRequest.getDescription(), TransactionType.DEPOSIT, currentUser.get());
+        Optional<User> user = getCurrentUser(SecurityContextHolder.getContext().getAuthentication());
+
+        if (user.isPresent()) {
+            transactionService.ATMTransaction(IBAN, null, ATMTransactionRequest.getAmount(), ATMTransactionRequest.getDescription(), TransactionType.DEPOSIT, user.get());
             return ResponseEntity.ok("Money deposited successfully.");
         }
         else

@@ -11,7 +11,7 @@
         {{ firstName }}
       </router-link>
 
-      <div class="nav-item dropdown">
+      <div  v-if="isAdmin" class="nav-item dropdown">
         <a class="navbar-brand dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
           Admin
         </a>
@@ -49,6 +49,8 @@ export default {
 
     const isLoggedIn = computed(() => store.isLoggedIn);
     const firstName = computed(() => store.user.firstName);
+    const isAdmin = computed(() => store.user.roles?.includes('ROLE_ADMIN') ?? false);
+
 
     const logout = () => {
       store.logout();
@@ -58,6 +60,7 @@ export default {
     return {
       isLoggedIn,
       firstName,
+      isAdmin,
       logout
     };
   }

@@ -17,7 +17,7 @@ export const useStore = defineStore('counter', {
         loginType: 0
     }),
     getters: {
-        isLoggedIn: (state) => state.token != ''
+        isLoggedIn: (state) => state.token != '',
     },
     actions: {
         login(email, password, isAtm) {

@@ -104,14 +104,11 @@ export default {
 
     const getAccounts = () => {
       axiosInstance
-          .get('/api/accounts', {
+          .get(`/api/users/${store.user.id}/accounts`, {
             headers: {
               Authorization: 'Bearer ' + store.token,
             },
-            params: {
-              userId: store.user.id,
-              isChecking: false,
-            },
+
           })
           .then((result) => {
             accounts.value = result.data.content;

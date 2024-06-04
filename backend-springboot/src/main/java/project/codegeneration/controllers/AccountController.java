@@ -24,28 +24,39 @@ import project.codegeneration.services.TransactionLimitService;
 import project.codegeneration.services.TransactionService;
 import project.codegeneration.services.UserService;
 
+import java.nio.file.attribute.UserPrincipal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
-public class AccountController {
+public class AccountController extends Controller {
 
     private final AccountService accountService;
     private final UserService userService;
-
     private final TransactionLimitService transactionLimitService;
 
-    public AccountController(final AccountService accountService, UserService userService, TransactionLimitService transactionLimitService) {
-        this.accountService = accountService;
+    public AccountController(AccountService accountService, UserService userService, TransactionLimitService transactionLimitService) {
+        super(userService);
         this.userService = userService;
+        this.accountService = accountService;
         this.transactionLimitService = transactionLimitService;
     }
+
 
     @GetMapping("/users/{userId}/accounts/checking")
     public ResponseEntity<Page<AccountDTO>> getAccountsChecking(@PathVariable Integer userId){
         try {
+
+            Optional<User> user = getCurrentUser(SecurityContextHolder.getContext().getAuthentication());
+
+            if (user.get().getId() != userId || user.get().getRoles().contains(Role.ROLE_ADMIN))
+            {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
+
             Page<Account> accounts = null;
             Pageable pageable = PageRequest.of(0, 10);
             accounts = accountService.getCheckingAccountsByUserId(pageable, userId);
@@ -69,8 +80,16 @@ public class AccountController {
 
 
     @GetMapping("/users/{userId}/accounts")
-    public ResponseEntity<Page<AccountDTO>> getAccountsByUser(@RequestParam(required = false, defaultValue = "0") Integer pageNumber, @RequestParam Integer userId){
+    public ResponseEntity<Page<AccountDTO>> getAccountsByUser(@RequestParam(required = false, defaultValue = "0") Integer pageNumber, @PathVariable Integer userId){
         try {
+
+            Optional<User> user = getCurrentUser(SecurityContextHolder.getContext().getAuthentication());
+
+            if (user.get().getId() != userId || user.get().getRoles().contains(Role.ROLE_ADMIN))
+            {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
             Page<Account> accounts = null;
             Pageable pageable = PageRequest.of(pageNumber, 10);
             accounts = accountService.getAccountsByUserId(pageable, userId);
