@@ -13,20 +13,36 @@
         <button @click="fetchUsers" class="btn btn-primary">Search</button>
       </div>
     </div>
-    <div class="row">
-      <div v-for="user in users" :key="user.userId" class="col-12">
-        <div class="card mb-2">
-          <div class="card-body">
-            <h5 class="card-title">User ID: {{ user.userId }}</h5>
-            <p class="card-text">Role: {{ user.roleName }}</p>
-            <p class="card-text">Email: {{ user.email }}</p>
-            <p class="card-text">Name: {{ user.firstName + " " +  user.lastName}}</p>
-            <p class="card-text">Phone Number: {{ user.phoneNumber }}</p>
-            <p class="card-text">BSN Number: {{ user.bsnnumber }}</p>
-            <p class="card-text">Approved: {{ user.approved }}</p>
-            <button type="button" class="btn btn-primary" @click="this.$router.push('/admin/users/' + user.userId + '/Transactions/')" >See transactions </button>
-          </div>
-        </div>
+    <div class="row mt-3">
+      <div class="col-12">
+        <table class="table table-bordered table-striped">
+          <thead>
+          <tr>
+            <th>User ID</th>
+            <th>Role</th>
+            <th>Email</th>
+            <th>Name</th>
+            <th>Phone Number</th>
+            <th>BSN Number</th>
+            <th>Approved</th>
+            <th>Actions</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr v-for="user in users" :key="user.userId">
+            <td>{{ user.userId }}</td>
+            <td>{{ user.roleName }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.firstName + " " + user.lastName }}</td>
+            <td>{{ user.phoneNumber }}</td>
+            <td>{{ user.bsnnumber }}</td>
+            <td>{{ user.approved }}</td>
+            <td>
+              <button type="button" class="btn btn-primary" @click="this.$router.push('/admin/users/' + user.userId + '/Transactions/')">See transactions</button>
+            </td>
+          </tr>
+          </tbody>
+        </table>
       </div>
     </div>
     <div class="row">
@@ -46,7 +62,6 @@
     </div>
   </div>
 </template>
-
 
 <script>
 import axiosInstance from '@/axios-instance';
@@ -107,7 +122,6 @@ export default {
     }
   }
 }
-
 </script>
 
 <style scoped>

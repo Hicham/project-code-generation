@@ -1,5 +1,6 @@
 package project.codegeneration.services;
 
+import jakarta.security.auth.message.AuthException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,15 +22,30 @@ public class TransactionService {
         this.accountService = accountService;
     }
 
+    @Transactional
+    public void transferTransaction(String sourceIBAN, String destinationIBAN, Double amount, String description, TransactionType type, User user)
+    {
+        Transaction transaction = new Transaction(sourceIBAN, destinationIBAN, amount, description, type, user);
+        transactionRepository.saveAndFlush(transaction);
+
+        Account sourceAccount = accountService.getAccountByIBAN(sourceIBAN);
+        Account destinationAccount = accountService.getAccountByIBAN(destinationIBAN);
+
+        if (user.getRoles().contains(Role.ROLE_ADMIN) ||  user.getId() == sourceAccount.getUser().getId()) {
+            accountService.withdraw(sourceAccount, amount);
+            accountService.deposit(destinationAccount, amount);
+        } else {
+            //ex
+        }
+    }
 
     @Transactional
-    public void createTransaction(String sourceIBAN, String destinationIBAN, Double amount, String description, TransactionType type, User user) {
+    public void ATMTransaction(String sourceIBAN, String destinationIBAN, Double amount, String description, TransactionType type, User user) {
 
         Transaction transaction = new Transaction(sourceIBAN, destinationIBAN, amount, description, type, user);
-        transactionRepository.save(transaction);
-        transactionRepository.flush();
+        transactionRepository.saveAndFlush(transaction);
 
-        if (type == TransactionType.WITHDRAW || type == TransactionType.TRANSFER) {
+        if (type == TransactionType.WITHDRAW) {
             Account sourceAccount = accountService.getAccountByIBAN(sourceIBAN);
 
             if (user.getRoles().contains(Role.ROLE_ADMIN) ||  user.getId() == sourceAccount.getUser().getId()) {
@@ -39,7 +55,7 @@ public class TransactionService {
             }
         }
 
-        if (type == TransactionType.DEPOSIT || type == TransactionType.TRANSFER) {
+        if (type == TransactionType.DEPOSIT) {
             Account destinationAccount = accountService.getAccountByIBAN(destinationIBAN);
 
             if (user.getRoles().contains(Role.ROLE_ADMIN) || user.getId() == destinationAccount.getUser().getId()) {
@@ -49,6 +65,9 @@ public class TransactionService {
             }
         }
     }
+
+
+
 
 
 

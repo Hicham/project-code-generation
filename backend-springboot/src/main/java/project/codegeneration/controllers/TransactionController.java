@@ -112,7 +112,7 @@ public class TransactionController {
             TransactionType type = TransactionType.TRANSFER;
 
             // Perform the transaction
-            transactionService.createTransaction(
+            transactionService.transferTransaction(
                     transactionRequest.getSourceIBAN(),
                     transactionRequest.getDestinationIBAN(),
                     transactionRequest.getAmount(),
@@ -137,7 +137,7 @@ public class TransactionController {
         Optional<User> currentUser = userService.findByEmail(currentUsername);
 
         if (currentUser.isPresent()) {
-            transactionService.createTransaction(null, IBAN, ATMTransactionRequest.getAmount(), ATMTransactionRequest.getDescription(), TransactionType.DEPOSIT, currentUser.get());
+            transactionService.ATMTransaction(null, IBAN, ATMTransactionRequest.getAmount(), ATMTransactionRequest.getDescription(), TransactionType.DEPOSIT, currentUser.get());
             return ResponseEntity.ok("Money deposited successfully.");
         }
         else
@@ -154,7 +154,7 @@ public class TransactionController {
         Optional<User> currentUser = userService.findByEmail(currentUsername);
 
         if (currentUser.isPresent()) {
-            transactionService.createTransaction(IBAN, null, ATMTransactionRequest.getAmount(), ATMTransactionRequest.getDescription(), TransactionType.DEPOSIT, currentUser.get());
+            transactionService.ATMTransaction(IBAN, null, ATMTransactionRequest.getAmount(), ATMTransactionRequest.getDescription(), TransactionType.DEPOSIT, currentUser.get());
             return ResponseEntity.ok("Money deposited successfully.");
         }
         else

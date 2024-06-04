@@ -1,21 +1,6 @@
 <template>
   <div class="container">
     <div class="row">
-      <nav aria-label="Page navigation">
-        <ul class="pagination justify-content-center">
-          <li class="page-item" :class="{ 'disabled': currentPage === 1 }">
-            <button class="page-link" @click.prevent="prevPage">&laquo;</button>
-          </li>
-          <li class="page-item" v-for="page in totalPages" :key="page" :class="{ 'active': page === currentPage } ">
-            <button class="page-link" @click.prevent="goToPage(page)">{{ page }}</button>
-          </li>
-          <li class="page-item" :class="{ 'disabled': currentPage === totalPages }">
-            <button class="page-link" @click.prevent="nextPage">&raquo;</button>
-          </li>
-        </ul>
-      </nav>
-    </div>
-    <div class="row">
       <div class="col-12">
         <table class="table table-striped">
           <thead>
@@ -44,6 +29,21 @@
           </tbody>
         </table>
       </div>
+    </div>
+    <div class="row">
+      <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+          <li class="page-item" :class="{ 'disabled': currentPage === 1 }">
+            <button class="page-link" @click.prevent="prevPage">&laquo;</button>
+          </li>
+          <li class="page-item" v-for="page in totalPages" :key="page" :class="{ 'active': page === currentPage } ">
+            <button class="page-link" @click.prevent="goToPage(page)">{{ page }}</button>
+          </li>
+          <li class="page-item" :class="{ 'disabled': currentPage === totalPages }">
+            <button class="page-link" @click.prevent="nextPage">&raquo;</button>
+          </li>
+        </ul>
+      </nav>
     </div>
     <div v-if="showLimitModal" class="modal fade show" style="display: block;" tabindex="-1" role="dialog">
       <div class="modal-dialog modal-dialog-centered" role="document">

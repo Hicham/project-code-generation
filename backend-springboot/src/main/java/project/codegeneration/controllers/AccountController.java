@@ -43,7 +43,7 @@ public class AccountController {
         this.transactionLimitService = transactionLimitService;
     }
 
-    @GetMapping("/user/{userId}/accounts/checking")
+    @GetMapping("/users/{userId}/accounts/checking")
     public ResponseEntity<Page<AccountDTO>> getAccountsChecking(@PathVariable Integer userId){
         try {
             Page<Account> accounts = null;
@@ -68,7 +68,7 @@ public class AccountController {
     }
 
 
-    @GetMapping("/user/{userId}/accounts")
+    @GetMapping("/users/{userId}/accounts")
     public ResponseEntity<Page<AccountDTO>> getAccountsByUser(@RequestParam(required = false, defaultValue = "0") Integer pageNumber, @RequestParam Integer userId){
         try {
             Page<Account> accounts = null;

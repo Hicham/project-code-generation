@@ -5,9 +5,9 @@
         <p class="text-danger">{{ error }}</p>
       </div>
     </div>
-    <div class="row">
-      <div class="col-md-8">
-        search func
+    <div class="row mb-2">
+      <div class="col-md-4">
+        <input type="text" class="form-control" placeholder="Search for user">
       </div>
     </div>
     <div class="row">

@@ -53,14 +53,11 @@ export default {
   methods: {
     getAccounts() {
       axiosInstance
-          .get('/api/accounts', {
+          .get(`/api/users/${useStore().user.id}/accounts/checking`, {
             headers: {
               Authorization: 'Bearer ' + useStore().token,
             },
-            params: {
-              userId: useStore().user.id,
-              isChecking: false,
-            },
+
           })
           .then((result) => {
             this.accounts = result.data.content;
