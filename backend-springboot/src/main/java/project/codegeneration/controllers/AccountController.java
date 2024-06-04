@@ -34,14 +34,12 @@ public class AccountController {
 
     private final AccountService accountService;
     private final UserService userService;
-    private final TransactionService transactionService;
 
     private final TransactionLimitService transactionLimitService;
 
-    public AccountController(final AccountService accountService, UserService userService, TransactionService transactionService, TransactionLimitService transactionLimitService) {
+    public AccountController(final AccountService accountService, UserService userService, TransactionLimitService transactionLimitService) {
         this.accountService = accountService;
         this.userService = userService;
-        this.transactionService = transactionService;
         this.transactionLimitService = transactionLimitService;
     }
 
@@ -71,10 +69,10 @@ public class AccountController {
 
 
     @GetMapping("/user/{userId}/accounts")
-    public ResponseEntity<Page<AccountDTO>> getAccountsByUser(@RequestParam Integer userId){
+    public ResponseEntity<Page<AccountDTO>> getAccountsByUser(@RequestParam(required = false, defaultValue = "0") Integer pageNumber, @RequestParam Integer userId){
         try {
             Page<Account> accounts = null;
-            Pageable pageable = PageRequest.of(0, 10);
+            Pageable pageable = PageRequest.of(pageNumber, 10);
             accounts = accountService.getAccountsByUserId(pageable, userId);
 
             Page<AccountDTO> accountDTOPage = accounts.map(account -> new AccountDTO(
@@ -95,7 +93,7 @@ public class AccountController {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @GetMapping("/admin/accounts")
+    @GetMapping("/accounts")
     public ResponseEntity<Page<AccountDTO>> getAccounts(@RequestParam(required = false, defaultValue = "0") Integer pageNumber) {
 
         try {
@@ -140,40 +138,6 @@ public class AccountController {
     }
 
 
-    @PostMapping("/accounts/{IBAN}/deposit")
-    public ResponseEntity<String> deposit(@PathVariable String IBAN, @RequestBody ATMTransactionRequest ATMTransactionRequest
-    ) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = authentication.getName();
-        Optional<User> currentUser = userService.findByEmail(currentUsername);
-
-        if (currentUser.isPresent()) {
-            transactionService.createTransaction(null, IBAN, ATMTransactionRequest.getAmount(), ATMTransactionRequest.getDescription(), TransactionType.DEPOSIT, currentUser.get());
-            return ResponseEntity.ok("Money deposited successfully.");
-        }
-        else
-        {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account not found.");
-        }
-
-    }
-
-    @PostMapping("/accounts/{IBAN}/withdraw")
-    public ResponseEntity<String> withdraw(@PathVariable String IBAN, @RequestBody ATMTransactionRequest ATMTransactionRequest) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = authentication.getName();
-        Optional<User> currentUser = userService.findByEmail(currentUsername);
-
-        if (currentUser.isPresent()) {
-            transactionService.createTransaction(IBAN, null, ATMTransactionRequest.getAmount(), ATMTransactionRequest.getDescription(), TransactionType.WITHDRAW, currentUser.get());
-            return ResponseEntity.ok("Money withdrawn successfully.");
-        }
-        else
-        {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account not found.");
-        }
-
-    }
 
     @PostMapping("/accounts/disable/{IBAN}")
     public ResponseEntity<String> disableAccount(@PathVariable String IBAN) {
