@@ -6,10 +6,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.thymeleaf.util.CharArrayWrapperSequence;
 import project.codegeneration.models.Account;
 import project.codegeneration.models.DTO.AccountDTO;
 import project.codegeneration.models.DTO.ATMTransactionRequest;
@@ -43,46 +45,15 @@ public class AccountController {
         this.transactionLimitService = transactionLimitService;
     }
 
-    @GetMapping("/accounts")
-    public ResponseEntity<Page<AccountDTO>> getAccounts(@RequestParam(required = false) Integer userId, @RequestParam(required = false) Boolean isChecking, @RequestParam(required = false, defaultValue = "0") Integer pageNumber) {
-
+    @GetMapping("/user/{userId}/accounts/checking")
+    public ResponseEntity<Page<AccountDTO>> getAccountsChecking(@PathVariable Integer userId){
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication == null || !authentication.isAuthenticated()) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            }
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            boolean isAdmin = userDetails.getAuthorities().stream()
-                    .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(Role.ROLE_ADMIN.toString()));
-
-            Optional<User> currentUser = userService.findByEmail(userDetails.getUsername());
-
             Page<Account> accounts = null;
-
-            if (userId != null) {
-
-                Pageable pageable = PageRequest.of(pageNumber, Integer.MAX_VALUE);
-
-                if (isAdmin || currentUser.isPresent() && currentUser.get().getId() == userId) {
-                    if (isChecking) {
-                        accounts = accountService.getCheckingAccountsByUserId(pageable, userId);
-                    } else {
-                        accounts = accountService.getAccountsByUserId(pageable, userId);
-                    }
-                }
-            } else {
-                if (isAdmin) {
-                    Pageable pageable = PageRequest.of(pageNumber, 10);
-                    accounts = accountService.getAllAccounts(pageable);
-                }
-                else
-                {
-                    return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-                }
-            }
+            Pageable pageable = PageRequest.of(0, 10);
+            accounts = accountService.getCheckingAccountsByUserId(pageable, userId);
 
             Page<AccountDTO> accountDTOPage = accounts.map(account -> new AccountDTO(
-                    account.getIBAN(),  
+                    account.getIBAN(),
                     account.getUser(),
                     account.getAccountType(),
                     account.getBalance(),
@@ -99,9 +70,59 @@ public class AccountController {
     }
 
 
+    @GetMapping("/user/{userId}/accounts")
+    public ResponseEntity<Page<AccountDTO>> getAccountsByUser(@RequestParam Integer userId){
+        try {
+            Page<Account> accounts = null;
+            Pageable pageable = PageRequest.of(0, 10);
+            accounts = accountService.getAccountsByUserId(pageable, userId);
+
+            Page<AccountDTO> accountDTOPage = accounts.map(account -> new AccountDTO(
+                    account.getIBAN(),
+                    account.getUser(),
+                    account.getAccountType(),
+                    account.getBalance(),
+                    account.isActive(),
+                    account.getAbsoluteLimit(),
+                    account.getTransactionLimit()
+            ));
+
+            return ResponseEntity.ok(accountDTOPage);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping("/admin/accounts")
+    public ResponseEntity<Page<AccountDTO>> getAccounts(@RequestParam(required = false, defaultValue = "0") Integer pageNumber) {
+
+        try {
+
+            Page<Account> accounts = null;
+            Pageable pageable = PageRequest.of(pageNumber, 10);
+            accounts = accountService.getAllAccounts(pageable);
+
+            Page<AccountDTO> accountDTOPage = accounts.map(account -> new AccountDTO(
+                    account.getIBAN(),
+                    account.getUser(),
+                    account.getAccountType(),
+                    account.getBalance(),
+                    account.isActive(),
+                    account.getAbsoluteLimit(),
+                    account.getTransactionLimit()
+            ));
+
+            return ResponseEntity.ok(accountDTOPage);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
     @GetMapping("/accounts/{IBAN}")
-    public ResponseEntity<AccountDTO> getAccountByIBAN(@PathVariable String IBAN, HttpServletRequest request) {
+    public ResponseEntity<AccountDTO> getAccountByIBAN(@PathVariable String IBAN) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
