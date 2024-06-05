@@ -17,10 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import project.codegeneration.models.*;
 import project.codegeneration.repositories.TransactionRepository;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,6 +45,15 @@ public class TransactionService {
         Account sourceAccount = accountService.getAccountByIBAN(sourceIBAN);
         Account destinationAccount = accountService.getAccountByIBAN(destinationIBAN);
 
+        double totalDailyTransactions = calculateTotalDailyTransactions(sourceIBAN);
+        if (totalDailyTransactions + amount > sourceAccount.getTransactionLimit().getDailyLimit()) {
+            throw new IllegalArgumentException("Daily transaction limit exceeded.");
+        }
+
+        if (sourceAccount.getBalance() - amount < sourceAccount.getAbsoluteLimit()) {
+            throw new IllegalArgumentException("Cannot withdraw below the absolute limit.");
+        }
+
         if (user.getRoles().contains(Role.ROLE_ADMIN) ||  user.getId() == sourceAccount.getUser().getId()) {
             accountService.withdraw(sourceAccount, amount);
             accountService.deposit(destinationAccount, amount);
@@ -64,12 +70,21 @@ public class TransactionService {
 
         if (type == TransactionType.WITHDRAW) {
             Account sourceAccount = accountService.getAccountByIBAN(sourceIBAN);
+            double totalDailyTransactions = calculateTotalDailyTransactions(sourceIBAN);
+            if (totalDailyTransactions + amount > sourceAccount.getTransactionLimit().getDailyLimit()) {
+                throw new IllegalArgumentException("Daily transaction limit exceeded.");
+            }
 
+            if (sourceAccount.getBalance() - amount < sourceAccount.getAbsoluteLimit()) {
+                throw new IllegalArgumentException("Cannot withdraw below the absolute limit.");
+            }
             if (user.getRoles().contains(Role.ROLE_ADMIN) ||  user.getId() == sourceAccount.getUser().getId()) {
                 accountService.withdraw(sourceAccount, amount);
             } else {
                 throw new AccessDeniedException("Not Authorized to perform this action.");
             }
+
+
         }
 
         if (type == TransactionType.DEPOSIT) {
@@ -83,7 +98,22 @@ public class TransactionService {
         }
     }
 
-    
+    public double calculateTotalDailyTransactions(String iban) {
+        LocalDate today = LocalDate.now();
+        LocalDateTime startOfDay = today.atStartOfDay();
+        LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
+
+        List<Transaction> dailyTransactions = transactionRepository.findBySourceIBANAndTimestampBetween(
+                iban,
+                startOfDay,
+                endOfDay
+        );
+
+        return dailyTransactions.stream()
+                .mapToDouble(Transaction::getAmount)
+                .sum();
+    }
+
 
     public Page<Transaction> getTransactions(Pageable pageable) {
         return transactionRepository.findAll(pageable);
