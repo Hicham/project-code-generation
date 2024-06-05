@@ -75,6 +75,7 @@
 import axiosInstance from '@/axios-instance';
 import { useStore } from '@/stores/store';
 import { ref, onMounted, computed } from 'vue';
+import axios from "axios";
 
 export default {
   name: "TransferFunds",
@@ -94,13 +95,9 @@ export default {
 
     const getAccounts = () => {
       axiosInstance
-          .get('/api/accounts', {
+          .get(`/api/users/${store.user.id}/accounts`, {
             headers: {
               Authorization: 'Bearer ' + store.token,
-            },
-            params: {
-              userId: store.user.id,
-              isChecking: false,
             },
           })
           .then((result) => {
@@ -129,20 +126,8 @@ export default {
     };
 
     const confirmTransfer = () => {
-      if (transferAmount.value <= 0 || transferAmount.value > balance.value || !destinationAccount.value) {
+      if (transferAmount.value <= 0 || !destinationAccount.value) {
         alert("Invalid transfer details");
-        return;
-      }
-
-      const remainingBalance = balance.value - selectedAccount.value.absoluteLimit;
-      if (transferAmount.value > remainingBalance) {
-        alert("Transfer amount exceeds your the absolute limit of your account.");
-        return;
-      }
-
-      const totalDailyTransactions = calculateTotalDailyTransactions();
-      if (totalDailyTransactions + transferAmount.value > selectedAccount.value.dailyLimit) {
-        alert("Transfer amount exceeds your daily limit.");
         return;
       }
 
@@ -179,24 +164,6 @@ export default {
           .catch((error) => {
             console.error("Transfer failed:", error);
           });
-    };
-
-    const calculateTotalDailyTransactions = () => {
-      const currentDate = new Date();
-      const currentDay = currentDate.getDate();
-      const currentMonth = currentDate.getMonth() + 1;
-      const currentYear = currentDate.getFullYear();
-
-      const dailyTransactions = selectedAccount.value.transactions.filter(transaction => {
-        const transactionDate = new Date(transaction.timestamp);
-        const transactionDay = transactionDate.getDate();
-        const transactionMonth = transactionDate.getMonth() + 1;
-        const transactionYear = transactionDate.getFullYear();
-
-        return transactionDay === currentDay && transactionMonth === currentMonth && transactionYear === currentYear;
-      });
-
-      return dailyTransactions.reduce((total, transaction) => total + transaction.amount, 0);
     };
 
     const filteredAccounts = computed(() => {
