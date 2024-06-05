@@ -4,48 +4,44 @@
       No Users to approve
     </div>
     <div v-else>
-    <h2 class="mb-4">Unapproved Users</h2>
-    <table class="table">
-      <thead>
-      <tr>
-        <th scope="col">First Name</th>
-        <th scope="col">Last Name</th>
-        <th scope="col">BSN Number</th>
-        <th scope="col">Phone Number</th>
-        <th scope="col">Email</th>
-        <th scope="col"></th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr v-for="user in users" :key="user.userId">
-        <td>{{ user.firstName }}</td>
-        <td>{{ user.lastName }}</td>
-        <td>{{ user.bsnnumber }}</td>
-        <td>{{ user.phoneNumber }}</td>
-        <td>{{ user.email }}</td>
-        <td>
-          <button class="btn btn-primary" @click="openApproveModal(user.userId)">Approve</button>
-        </td>
-      </tr>
-      </tbody>
-    </table>
+      <h2 class="mb-4">Unapproved Users</h2>
+      <table class="table">
+        <thead>
+        <tr>
+          <th scope="col">First Name</th>
+          <th scope="col">Last Name</th>
+          <th scope="col">BSN Number</th>
+          <th scope="col">Phone Number</th>
+          <th scope="col">Email</th>
+          <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="user in users" :key="user.userId">
+          <td>{{ user.firstName }}</td>
+          <td>{{ user.lastName }}</td>
+          <td>{{ user.bsnnumber }}</td>
+          <td>{{ user.phoneNumber }}</td>
+          <td>{{ user.email }}</td>
+          <td>
+            <button class="btn btn-primary" @click="openApproveModal(user)">Approve</button>
+          </td>
+        </tr>
+        </tbody>
+      </table>
     </div>
     <div v-if="showModal" class="modal fade show" style="display: block;" tabindex="-1" role="dialog">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-body">
-            <p>Set transaction limits for user ID: {{ selectedUserId }}</p>
+            <p>Set transaction limits for user ID: {{ selectedUser.email }}</p>
             <div class="form-group">
               <label for="dailyLimit">Daily Limit</label>
-              <input type="number" class="form-control" id="dailyLimit" v-model="transactionLimit.dailyLimit">
+              <input type="number" class="form-control" id="dailyLimit" v-model="limits.dailyLimit">
             </div>
             <div class="form-group">
-              <label for="weeklyLimit">Weekly Limit</label>
-              <input type="number" class="form-control" id="weeklyLimit" v-model="transactionLimit.weeklyLimit">
-            </div>
-            <div class="form-group">
-              <label for="monthlyLimit">Monthly Limit</label>
-              <input type="number" class="form-control" id="monthlyLimit" v-model="transactionLimit.monthlyLimit">
+              <label for="absoluteLimit">Absolute Limit</label>
+              <input type="number" class="form-control" id="absoluteLimit" v-model="limits.absoluteLimit">
             </div>
           </div>
           <div class="modal-footer">
@@ -80,16 +76,14 @@ export default {
     const users = ref([]);
     const showModal = ref(false);
     const showPopup = ref(false);
-    const selectedUserId = ref(null);
-    const transactionLimit = ref({
-      IBAN: "",
-      dailyLimit: 1000,
-      weeklyLimit: 5000,
-      monthlyLimit: 20000
+    const selectedUser = ref(null);
+    const limits = ref({
+      dailyLimit: 0,
+      absoluteLimit: 0,
     });
 
-    const openApproveModal = (userId) => {
-      selectedUserId.value = userId;
+    const openApproveModal = (user) => {
+      selectedUser.value = user;
       showModal.value = true;
     };
 
@@ -97,15 +91,15 @@ export default {
       showModal.value = false;
     };
     const approveUser = async () => {
-      const userId = selectedUserId.value;
-      console.log(userId);
       try {
-        await axiosInstance.post(`/api/accounts`, {
-          userId: userId,
-          transactionLimit: transactionLimit.value
+        await axiosInstance.post(`/api/accounts/approve`, {
+          userId: selectedUser.value.userId,
+          transactionLimit: {
+            dailyLimit: limits.value.dailyLimit,
+          },
+          absoluteLimit: limits.value.absoluteLimit,
         });
-        console.log(transactionLimit.value);
-        users.value = users.value.filter(user => user.userId !== userId);
+        users.value = users.value.filter(user => user.userId !== selectedUser.value.userId);
         showModal.value = false;
         showPopup.value = true;
       } catch (error) {
@@ -129,13 +123,13 @@ export default {
     return {
       users,
       showModal,
+      selectedUser,
+      limits,
       openApproveModal,
       closeModal,
+      approveUser,
       showPopup,
       closePopup,
-      approveUser,
-      selectedUserId,
-      transactionLimit,
     };
   },
 };

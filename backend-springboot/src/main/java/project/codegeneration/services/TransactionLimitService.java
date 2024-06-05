@@ -11,11 +11,9 @@ public class TransactionLimitService{
     public TransactionLimitService(TransactionLimitRepository transactionLimitRepository){
         this.transactionLimitRepository = transactionLimitRepository;
     }
-    public void setTransactionLimit(String IBAN, double dailyLimit, double weeklyLimit, double monthlyLimit){
+    public void setTransactionLimit(String IBAN, double dailyLimit){
         TransactionLimit transactionLimit = transactionLimitRepository.findByIBAN(IBAN);
         transactionLimit.setDailyLimit(dailyLimit);
-        transactionLimit.setWeeklyLimit(weeklyLimit);
-        transactionLimit.setMonthlyLimit(monthlyLimit);
         transactionLimitRepository.save(transactionLimit);
     }
 }
