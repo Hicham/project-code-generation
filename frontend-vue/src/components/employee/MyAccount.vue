@@ -174,28 +174,29 @@ export default {
     };
 
     const getTransactions = (iban) => {
-      axiosInstance
-          .get(`/api/accounts/${iban}/transactions`, {
-            headers: {
-              Authorization: 'Bearer ' + store.token,
-            },
-            params: {
-              startDate: startDate.value,
-              endDate: endDate.value,
-              amount: amount.value,
-              amountCondition: amountCondition.value,
-              ibanFilter: ibanFilter.value,
-              ibanType: ibanType.value,
-            },
-          })
+
+      const params = new URLSearchParams({
+        startDate: startDate.value,
+        endDate: endDate.value,
+        amount: amount.value,
+        amountCondition: amountCondition.value,
+        ibanFilter: ibanFilter.value,
+        ibanType: ibanType.value,
+      }).toString();
+
+      axiosInstance.get(`/api/accounts/${iban}/transactions?${params}`, {
+        headers: {
+          Authorization: 'Bearer ' + store.token,
+        },
+      })
           .then((response) => {
-
             transactions.value = response.data.content;
-
           })
           .catch((error) => {
             console.error("Error fetching transactions:", error);
           });
+
+
     };
 
     const formatDate = (timestamp) => {

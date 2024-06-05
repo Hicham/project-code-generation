@@ -94,6 +94,7 @@ export default {
     const selectedAccountIBAN = ref('');
 
     const getAccounts = () => {
+
       axiosInstance
           .get(`/api/users/${store.user.id}/accounts`, {
             headers: {
@@ -112,7 +113,11 @@ export default {
 
     const getAllAccounts = () => {
       axiosInstance
-          .get('/api/accounts/all')
+          .get('/api/accounts/all', {
+            headers: {
+              Authorization: 'Bearer ' + store.token,
+            },
+          })
           .then((result) => {
             allAccounts.value = result.data;
           })
@@ -126,6 +131,8 @@ export default {
     };
 
     const confirmTransfer = () => {
+
+      console.log('confirmed');
       if (transferAmount.value <= 0 || !destinationAccount.value) {
         alert("Invalid transfer details");
         return;
@@ -139,6 +146,7 @@ export default {
     };
 
     const sendTransfer = () => {
+      console.log('senmd');
       axiosInstance
           .post('/api/transactions', {
             sourceIBAN: selectedAccount.value.iban,

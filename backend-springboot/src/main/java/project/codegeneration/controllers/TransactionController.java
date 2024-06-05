@@ -59,9 +59,9 @@ public class TransactionController extends Controller{
 
 
 
-    @PreAuthorize("hasRole('ROLE_ADMIN') or @accountService.isAccountOwner(principal.username, #IBAN)")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or @accountService.isAccountOwner(principal.username, #iban)")
     @GetMapping("/accounts/{iban}/transactions")
-    public ResponseEntity<Page<Transaction>> getAccountTransactions(@PathVariable String iban,
+    public ResponseEntity<?> getAccountTransactions(@PathVariable String iban,
                                                                     @RequestParam(required = false, defaultValue = "0") Integer pageNumber,
                                                                     @RequestParam(required = false) String startDate,
                                                                     @RequestParam(required = false) String endDate,
@@ -92,7 +92,7 @@ public class TransactionController extends Controller{
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
@@ -132,7 +132,7 @@ public class TransactionController extends Controller{
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 

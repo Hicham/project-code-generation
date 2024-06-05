@@ -39,10 +39,10 @@ public class AccountService {
 
         Account account = accountRepository.findByIBAN(IBAN);
 
-        if(account == null)
-        {
-            throw new ResourceNotFoundException("Account not found");
-        }
+//        if(account == null)
+//        {
+//            throw new ResourceNotFoundException("Account not found");
+//        }
 
         return account;
     }

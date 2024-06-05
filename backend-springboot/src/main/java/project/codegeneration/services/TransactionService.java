@@ -134,16 +134,16 @@ public class TransactionService {
         List<Predicate> predicates = new ArrayList<>();
 
 
-        if (!startDate.isBlank()) {
+        if (startDate != null) {
 
             predicates.add(cb.greaterThanOrEqualTo(transaction.get("timestamp"), convertDateToTimestamp(startDate)));
         }
-        if (!endDate.isBlank()) {
+        if (endDate != null) {
 
             predicates.add(cb.lessThanOrEqualTo(transaction.get("timestamp"), convertDateToTimestamp(endDate)));
         }
 
-        if (amount != null && !amountCondition.isBlank()) {
+        if (amount != null && !amountCondition.isEmpty()) {
             switch (amountCondition) {
                 case "greaterThan":
                     predicates.add(cb.greaterThan(transaction.get("amount"), amount));
@@ -164,7 +164,7 @@ public class TransactionService {
         predicates.add(ownIbanPredicate);
 
 
-        if (!ibanFilter.isBlank() && !ibanType.isBlank()) {
+        if (ibanFilter != null && ibanType != null) {
             switch (ibanType) {
                 case "source":
                     predicates.add(cb.equal(transaction.get("sourceIBAN"), ibanFilter));

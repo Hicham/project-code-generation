@@ -59,7 +59,7 @@ public class UserController {
 
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+//    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/unapproved-users")
     public List<UserDTO> getNotApprovedUsers() {
         List<User> users = userService.getNotApprovedUsers();
@@ -87,7 +87,7 @@ public class UserController {
         }
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+//    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/accounts/approve")
     public ResponseEntity<String> approveUser(@RequestBody ApproveUserDTO request) {
         try {
