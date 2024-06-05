@@ -216,9 +216,7 @@ public class AccountController extends Controller {
         accountService.setAbsoluteLimit(iban, transactionLimitDTO.getAbsoluteLimit());
         transactionLimitService.setTransactionLimit(
                 iban,
-                transactionLimitDTO.getDailyLimit(),
-                transactionLimitDTO.getWeeklyLimit(),
-                transactionLimitDTO.getMonthlyLimit()
+                transactionLimitDTO.getDailyLimit()
         );
         return ResponseEntity.ok("Transaction limits updated successfully");
     }

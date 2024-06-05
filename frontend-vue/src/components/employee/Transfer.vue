@@ -134,6 +134,18 @@ export default {
         return;
       }
 
+      const remainingBalance = balance.value - selectedAccount.value.absoluteLimit;
+      if (transferAmount.value > remainingBalance) {
+        alert("Transfer amount exceeds your the absolute limit of your account.");
+        return;
+      }
+
+      const totalDailyTransactions = calculateTotalDailyTransactions();
+      if (totalDailyTransactions + transferAmount.value > selectedAccount.value.dailyLimit) {
+        alert("Transfer amount exceeds your daily limit.");
+        return;
+      }
+
       if (confirm("Are you sure you want to transfer €" + transferAmount.value + " to " + destinationAccount.value + "?")) {
         sendTransfer();
       } else {
@@ -169,6 +181,23 @@ export default {
           });
     };
 
+    const calculateTotalDailyTransactions = () => {
+      const currentDate = new Date();
+      const currentDay = currentDate.getDate();
+      const currentMonth = currentDate.getMonth() + 1;
+      const currentYear = currentDate.getFullYear();
+
+      const dailyTransactions = selectedAccount.value.transactions.filter(transaction => {
+        const transactionDate = new Date(transaction.timestamp);
+        const transactionDay = transactionDate.getDate();
+        const transactionMonth = transactionDate.getMonth() + 1;
+        const transactionYear = transactionDate.getFullYear();
+
+        return transactionDay === currentDay && transactionMonth === currentMonth && transactionYear === currentYear;
+      });
+
+      return dailyTransactions.reduce((total, transaction) => total + transaction.amount, 0);
+    };
 
     const filteredAccounts = computed(() => {
       if (selectedAccount.value?.accountType === 'SAVINGS') {

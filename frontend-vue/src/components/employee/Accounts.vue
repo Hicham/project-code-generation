@@ -61,14 +61,6 @@
                 <input type="number" v-model="limits.dailyLimit" class="form-control" id="dailyLimit" required>
               </div>
               <div class="form-group">
-                <label for="weeklyLimit">Weekly Limit</label>
-                <input type="number" v-model="limits.weeklyLimit" class="form-control" id="weeklyLimit" required>
-              </div>
-              <div class="form-group">
-                <label for="monthlyLimit">Monthly Limit</label>
-                <input type="number" v-model="limits.monthlyLimit" class="form-control" id="monthlyLimit" required>
-              </div>
-              <div class="form-group">
                 <label for="absoluteLimit">Absolute Limit</label>
                 <input type="number" v-model="limits.absoluteLimit" class="form-control" id="absoluteLimit" required>
               </div>
@@ -96,8 +88,6 @@ export default {
       selectedAccount: null,
       limits: {
         dailyLimit: 0,
-        weeklyLimit: 0,
-        monthlyLimit: 0,
         absoluteLimit: 0
       }
     };
@@ -165,8 +155,6 @@ export default {
       console.log(account);
       this.selectedAccount = account;
       this.limits.dailyLimit = account.transactionLimit.dailyLimit;
-      this.limits.weeklyLimit = account.transactionLimit.weeklyLimit;
-      this.limits.monthlyLimit = account.transactionLimit.monthlyLimit;
       this.limits.absoluteLimit = account.absoluteLimit;
       this.showLimitModal = true;
     },
@@ -175,8 +163,6 @@ export default {
       this.selectedAccount = null;
       this.limits = {
         dailyLimit: 0,
-        weeklyLimit: 0,
-        monthlyLimit: 0,
         absoluteLimit: 0
       };
     },
@@ -186,8 +172,6 @@ export default {
       })
           .then(() => {
             this.selectedAccount.transactionLimit.dailyLimit = this.limits.dailyLimit;
-            this.selectedAccount.transactionLimit.weeklyLimit = this.limits.weeklyLimit;
-            this.selectedAccount.transactionLimit.monthlyLimit = this.limits.monthlyLimit;
             this.selectedAccount.absoluteLimit = this.limits.absoluteLimit;
             this.closeLimitModal();
           })

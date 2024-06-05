@@ -84,7 +84,7 @@ public class UserController {
         }
     }
     
-    @PostMapping("/accounts")
+    @PostMapping("/accounts/approve")
     public ResponseEntity<String> approveUser(@RequestBody ApproveUserDTO request) {
         try {
             userService.approveUser(request.getUserId());

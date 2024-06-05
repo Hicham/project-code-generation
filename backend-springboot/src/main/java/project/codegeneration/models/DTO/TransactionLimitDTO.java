@@ -8,8 +8,6 @@ import lombok.Data;
 public class TransactionLimitDTO {
     private String IBAN;
     private double dailyLimit;
-    private double weeklyLimit;
-    private double monthlyLimit;
     private double absoluteLimit;
 }
 
