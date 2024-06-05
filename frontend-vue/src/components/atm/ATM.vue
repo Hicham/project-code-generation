@@ -56,7 +56,7 @@ export default {
           .get(`/api/users/${useStore().user.id}/accounts/checking`, {
             headers: {
               Authorization: 'Bearer ' + useStore().token,
-            },
+            }
 
           })
           .then((result) => {

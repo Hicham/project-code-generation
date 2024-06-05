@@ -20,6 +20,9 @@ import project.codegeneration.services.TransactionService;
 import project.codegeneration.services.UserService;
 import project.codegeneration.models.TransactionType;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Optional;
 
 @RestController
@@ -58,7 +61,18 @@ public class TransactionController extends Controller{
 
     @GetMapping("/accounts/{iban}/transactions")
     public ResponseEntity<Page<Transaction>> getAccountTransactions(@PathVariable String iban,
-                                                                    @RequestParam(required = false, defaultValue = "0") Integer pageNumber) {
+                                                                    @RequestParam(required = false, defaultValue = "0") Integer pageNumber,
+                                                                    @RequestParam(required = false) String startDate,
+                                                                    @RequestParam(required = false) String endDate,
+                                                                    @RequestParam(required = false) Double amount,
+                                                                    @RequestParam(required = false) String amountCondition,
+                                                                    @RequestParam(required = false) String ibanFilter,
+                                                                    @RequestParam(required = false) String ibanType) {
+
+
+
+
+
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || !authentication.isAuthenticated()) {
@@ -76,7 +90,7 @@ public class TransactionController extends Controller{
 
             if (isAdmin || userDetails.getUsername().equals(optionalAccount.get().getUser().getEmail())) {
                 Pageable pageable = PageRequest.of(pageNumber, 10);
-                Page<Transaction> transactions = transactionService.getAccountTransactions(iban, pageable);
+                Page<Transaction> transactions = transactionService.getAccountTransactions(iban, startDate, endDate, amount, amountCondition, ibanFilter, ibanType, pageable);
                 return ResponseEntity.ok(transactions);
             } else {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();

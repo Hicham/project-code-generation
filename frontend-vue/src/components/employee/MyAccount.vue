@@ -39,6 +39,46 @@
                 <input id="filter-input" v-model="filterValue" class="form-control" @input="filterTransactions">
               </div>
 
+              <div class="container mt-5">
+                <form class="row g-3">
+                  <div class="col-md-6">
+                    <label for="startDate" class="form-label">Start Date:</label>
+                    <input type="date" class="form-control" id="startDate" v-model="startDate" name="startDate" @change="applyFilters">
+                  </div>
+                  <div class="col-md-6">
+                    <label for="endDate" class="form-label">End Date:</label>
+                    <input type="date" class="form-control" id="endDate" v-model="endDate" name="endDate" @change="applyFilters">
+                  </div>
+                  <div class="col-md-6">
+                    <label for="amount" class="form-label">Amount:</label>
+                    <input type="number" step="0.01" class="form-control" id="amount" v-model="amount" name="amount" @input="applyFilters">
+                  </div>
+                  <div class="col-md-6">
+                    <label for="amountCondition" class="form-label">Amount Condition:</label>
+                    <select class="form-control" id="amountCondition" v-model="amountCondition" name="amountCondition" @change="applyFilters">
+                      <option value="">Select Condition</option>
+                      <option value="greaterThan">Greater Than</option>
+                      <option value="lessThan">Less Than</option>
+                      <option value="equalTo">Equal To</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="ibanFilter" class="form-label">IBAN Filter:</label>
+                    <input type="text" class="form-control" id="ibanFilter" v-model="ibanFilter" name="ibanFilter" @input="applyFilters">
+                  </div>
+                  <div class="col-md-6">
+                    <label for="ibanType" class="form-label">IBAN Type:</label>
+                    <select class="form-control" id="ibanType" v-model="ibanType" name="ibanType" @change="applyFilters">
+                      <option value="source">Source</option>
+                      <option value="destination">Destination</option>
+                    </select>
+                  </div>
+                  <div class="col-12">
+                    <button type="button" class="btn btn-primary" @click="applyFilters">Apply Filters</button>
+                  </div>
+                </form>
+              </div>
+
               <div class="transaction-list">
                 <table class="table">
                   <thead>
@@ -81,8 +121,6 @@
   </div>
 </template>
 
-
-
 <script>
 import axiosInstance from '@/axios-instance';
 import { useStore } from '@/stores/store';
@@ -100,6 +138,13 @@ export default {
     const selectedFilterColumn = ref('Description');
     const filterValue = ref('');
 
+    const startDate = ref('');
+    const endDate = ref('');
+    const amount = ref('');
+    const amountCondition = ref('');
+    const ibanType = ref('');
+    const ibanFilter = ref('');
+
     const filterColumns = ['Date', 'Description', 'Destination', 'Amount'];
 
     const getAccounts = () => {
@@ -108,7 +153,6 @@ export default {
             headers: {
               Authorization: 'Bearer ' + store.token,
             },
-
           })
           .then((result) => {
             accounts.value = result.data.content;
@@ -135,16 +179,25 @@ export default {
             headers: {
               Authorization: 'Bearer ' + store.token,
             },
+            params: {
+              startDate: startDate.value,
+              endDate: endDate.value,
+              amount: amount.value,
+              amountCondition: amountCondition.value,
+              ibanFilter: ibanFilter.value,
+              ibanType: ibanType.value,
+            },
           })
           .then((response) => {
-            transactions.value = response.data.content; // Assuming transactions are stored in the 'content' property
+
+            transactions.value = response.data.content;
+
           })
           .catch((error) => {
             console.error("Error fetching transactions:", error);
           });
     };
 
-    // Function to format timestamp to date string
     const formatDate = (timestamp) => {
       const date = new Date(timestamp);
       return date.toLocaleString(); // Adjusted to include time
@@ -175,6 +228,13 @@ export default {
       });
     };
 
+    const applyFilters = () => {
+      if (selectedAccount.value) {
+        getTransactions(selectedAccount.value.iban);
+      }
+
+    };
+
     const filteredTransactions = computed(filterTransactions);
 
     onMounted(() => {
@@ -197,12 +257,17 @@ export default {
       filterColumns,
       filteredTransactions,
       filterTransactions,
+      startDate,
+      endDate,
+      amount,
+      amountCondition,
+      ibanFilter,
+      ibanType,
+      applyFilters,
     };
   },
 };
 </script>
-
-
 
 <style scoped>
 .container {
@@ -272,5 +337,3 @@ h1 {
   padding: 10px 0;
 }
 </style>
-
-

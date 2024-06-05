@@ -46,14 +46,15 @@ public class AccountController extends Controller {
 
 
     @GetMapping("/users/{userId}/accounts/checking")
-    public ResponseEntity<Page<AccountDTO>> getAccountsChecking(@PathVariable Integer userId){
+    public ResponseEntity<?> getAccountsChecking(@PathVariable Integer userId){
         try {
 
             Optional<User> user = getCurrentUser(SecurityContextHolder.getContext().getAuthentication());
 
-            if (user.get().getId() != userId || user.get().getRoles().contains(Role.ROLE_ADMIN))
+
+            if (user.get().getId() != userId && !user.get().getRoles().contains(Role.ROLE_ADMIN))
             {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not authorized to access this resource");
             }
 
 
@@ -74,7 +75,7 @@ public class AccountController extends Controller {
             return ResponseEntity.ok(accountDTOPage);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
@@ -85,7 +86,7 @@ public class AccountController extends Controller {
 
             Optional<User> user = getCurrentUser(SecurityContextHolder.getContext().getAuthentication());
 
-            if (user.get().getId() != userId || user.get().getRoles().contains(Role.ROLE_ADMIN))
+            if (user.get().getId() != userId && !user.get().getRoles().contains(Role.ROLE_ADMIN))
             {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not authorized to access this resource");
             }
