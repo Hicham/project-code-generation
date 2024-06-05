@@ -2,6 +2,7 @@ package project.codegeneration.services;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import project.codegeneration.exceptions.ResourceNotFoundException;
 import project.codegeneration.models.*;
@@ -21,10 +22,15 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final TransactionLimitRepository transactionLimitRepository;
 
+    private final UserService userService;
 
-    public AccountService(AccountRepository accountRepository, TransactionLimitRepository transactionLimitRepository) {
+
+
+
+    public AccountService(AccountRepository accountRepository, TransactionLimitRepository transactionLimitRepository, UserService userService) {
         this.accountRepository = accountRepository;
         this.transactionLimitRepository = transactionLimitRepository;
+        this.userService = userService;
 
     }
 
@@ -85,12 +91,14 @@ public class AccountService {
 
     public void withdraw(Account account, double amount) {
 
+
+
         if (amount <= 0) {
             throw new IllegalArgumentException("Withdraw amount must be positive");
         }
 
-        if (account.getBalance() < amount) {
-            throw new IllegalArgumentException("Insufficient funds");
+        if (account.getBalance() - amount < account.getAbsoluteLimit()) {
+            throw new IllegalArgumentException("Insufficient funds, can't go below absolute limit");
         }
 
         account.setBalance(account.getBalance() - amount);
