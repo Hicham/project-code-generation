@@ -9,5 +9,6 @@ public class TransactionLimitDTO {
     private String IBAN;
     private double dailyLimit;
     private double absoluteLimit;
+    
 }
 
