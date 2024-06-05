@@ -21,12 +21,15 @@ export const useStore = defineStore('counter', {
     },
     actions: {
         login(email, password, isAtm) {
+
             return new Promise((resolve, reject) => {
                 axiosInstance.post("/login", {
                     email: email,
                     password: password
                 })
                     .then((res) => {
+
+                        console.log(res);
                         axios.defaults.headers.common['Authorization'] = 'Bearer ' + res.data.token;
                         this.token = res.data.token;
 
@@ -53,7 +56,11 @@ export const useStore = defineStore('counter', {
             });
         },
         fetchUserDetails(email) {
-            return axiosInstance.get(`/api/users/${email}`)
+            return axiosInstance.get(`/api/users/${email}`, {
+                headers: {
+                    Authorization: 'Bearer ' + this.token,
+                }
+            })
                 .then((res) => {
                     const userData = res.data;
                     this.user.id = userData.userId;
@@ -69,6 +76,7 @@ export const useStore = defineStore('counter', {
                     throw error;
                 });
         },
+
         logout() {
             this.token = '';
             this.user = {
