@@ -3,12 +3,12 @@ package project.codegeneration.services;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import project.codegeneration.exceptions.ResourceNotFoundException;
 import project.codegeneration.models.*;
 import project.codegeneration.models.DTO.ApproveUserDTO;
-import project.codegeneration.models.DTO.TransactionLimitDTO;
 import project.codegeneration.repositories.AccountRepository;
 import project.codegeneration.repositories.TransactionLimitRepository;
+import project.codegeneration.repositories.UserRepository;
 import project.codegeneration.util.IBANGenerator;
 
 import java.util.List;
@@ -21,9 +21,11 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final TransactionLimitRepository transactionLimitRepository;
 
+
     public AccountService(AccountRepository accountRepository, TransactionLimitRepository transactionLimitRepository) {
         this.accountRepository = accountRepository;
         this.transactionLimitRepository = transactionLimitRepository;
+
     }
 
     public Account getAccountById(int id) {
@@ -56,6 +58,7 @@ public class AccountService {
     }
 
     public Page<Account> getAccountsByUserId(Pageable pageable, int userId) {
+
         return accountRepository.findByUserId(pageable, userId);
     }
 
@@ -76,8 +79,7 @@ public class AccountService {
         }
 
         account.setBalance(account.getBalance() + amount);
-        accountRepository.save(account);
-        accountRepository.flush();
+        accountRepository.saveAndFlush(account);
     }
 
 
@@ -92,7 +94,7 @@ public class AccountService {
         }
 
         account.setBalance(account.getBalance() - amount);
-        accountRepository.flush();
+        accountRepository.saveAndFlush(account);
     }
     public void createAccountForApprovedUser(User user, ApproveUserDTO approveUserDTO) {
         if (user.isApproved()) {

@@ -80,14 +80,14 @@ public class AccountController extends Controller {
 
 
     @GetMapping("/users/{userId}/accounts")
-    public ResponseEntity<Page<AccountDTO>> getAccountsByUser(@RequestParam(required = false, defaultValue = "0") Integer pageNumber, @PathVariable Integer userId){
+    public ResponseEntity<?> getAccountsByUser(@RequestParam(required = false, defaultValue = "0") Integer pageNumber, @PathVariable Integer userId) {
         try {
 
             Optional<User> user = getCurrentUser(SecurityContextHolder.getContext().getAuthentication());
 
             if (user.get().getId() != userId || user.get().getRoles().contains(Role.ROLE_ADMIN))
             {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not authorized to access this resource");
             }
 
             Page<Account> accounts = null;
@@ -107,13 +107,13 @@ public class AccountController extends Controller {
             return ResponseEntity.ok(accountDTOPage);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/accounts")
-    public ResponseEntity<Page<AccountDTO>> getAccounts(@RequestParam(required = false, defaultValue = "0") Integer pageNumber) {
+    public ResponseEntity<?> getAccounts(@RequestParam(required = false, defaultValue = "0") Integer pageNumber) {
 
         try {
 
@@ -134,7 +134,7 @@ public class AccountController extends Controller {
             return ResponseEntity.ok(accountDTOPage);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
@@ -223,25 +223,6 @@ public class AccountController extends Controller {
     }
 
 
-//    private boolean isAdmin(Authentication authentication) {
-//        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-//        return userDetails.getAuthorities().stream()
-//                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(Role.ROLE_ADMIN.toString()));
-//    }
-
-
-//   @GetMapping("/accounts/users/{email}")
-//   public AccountDTO getAccountsByUserEmail(@PathVariable String email) {
-//       Optional<Account> accounts = accountService.getAccountsByUserEmail(email);
-//       if (accounts.isPresent()) {
-//           Account account = accounts.get();
-//           return new AccountDTO(account.getIBAN(), account.getUser(), account.getAccountType(), account.getBalance(), account.isActive(), account.getAbsoluteLimit());
-//       }
-//       else {
-//           return null;
-//       }
-//
-//   }
 
     @GetMapping("/accounts/all")
     public ResponseEntity<List<AccountDTO>> getAllAccounts() {

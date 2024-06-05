@@ -3,6 +3,7 @@ package project.codegeneration.services;
 import jakarta.security.auth.message.AuthException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.codegeneration.models.*;
@@ -35,7 +36,7 @@ public class TransactionService {
             accountService.withdraw(sourceAccount, amount);
             accountService.deposit(destinationAccount, amount);
         } else {
-            //ex
+            throw new AccessDeniedException("Not Authorized to perform this action.");
         }
     }
 
@@ -51,7 +52,7 @@ public class TransactionService {
             if (user.getRoles().contains(Role.ROLE_ADMIN) ||  user.getId() == sourceAccount.getUser().getId()) {
                 accountService.withdraw(sourceAccount, amount);
             } else {
-                //ex
+                throw new AccessDeniedException("Not Authorized to perform this action.");
             }
         }
 
@@ -61,7 +62,7 @@ public class TransactionService {
             if (user.getRoles().contains(Role.ROLE_ADMIN) || user.getId() == destinationAccount.getUser().getId()) {
                 accountService.deposit(destinationAccount, amount);
             } else {
-                //exx
+                throw new AccessDeniedException("Not Authorized to perform this action.");
             }
         }
     }
