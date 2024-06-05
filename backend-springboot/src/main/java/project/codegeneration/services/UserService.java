@@ -60,8 +60,8 @@ public class UserService {
         userRepository.flush();
     }
 
-    public User getUserById(int userId) {
-        return userRepository.findById((long) userId).orElseThrow();
+    public Optional<User> getUserById(int userId) {
+        return userRepository.findById((long) userId);
     }
 
     public User getUserByEmail(String email) {

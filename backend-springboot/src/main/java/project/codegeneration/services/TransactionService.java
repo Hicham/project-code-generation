@@ -48,6 +48,16 @@ public class TransactionService {
         Account sourceAccount = accountService.getAccountByIBAN(sourceIBAN);
         Account destinationAccount = accountService.getAccountByIBAN(destinationIBAN);
 
+        if (sourceAccount == null)
+        {
+            throw new IllegalArgumentException("Cant find sourceaccount");
+        }
+
+        if (destinationAccount == null)
+        {
+            throw new IllegalArgumentException("cant find destinationaccount");
+        }
+
         if (user.getRoles().contains(Role.ROLE_ADMIN) ||  user.getId() == sourceAccount.getUser().getId()) {
             accountService.withdraw(sourceAccount, amount);
             accountService.deposit(destinationAccount, amount);
@@ -65,21 +75,24 @@ public class TransactionService {
         if (type == TransactionType.WITHDRAW) {
             Account sourceAccount = accountService.getAccountByIBAN(sourceIBAN);
 
-            if (user.getRoles().contains(Role.ROLE_ADMIN) ||  user.getId() == sourceAccount.getUser().getId()) {
-                accountService.withdraw(sourceAccount, amount);
-            } else {
-                throw new AccessDeniedException("Not Authorized to perform this action.");
+            if (sourceAccount == null)
+            {
+                throw new IllegalArgumentException("Cant find account");
             }
+
+            accountService.withdraw(sourceAccount, amount);
         }
 
         if (type == TransactionType.DEPOSIT) {
             Account destinationAccount = accountService.getAccountByIBAN(destinationIBAN);
 
-            if (user.getRoles().contains(Role.ROLE_ADMIN) || user.getId() == destinationAccount.getUser().getId()) {
-                accountService.deposit(destinationAccount, amount);
-            } else {
-                throw new AccessDeniedException("Not Authorized to perform this action.");
+            if (destinationAccount == null)
+            {
+                throw new IllegalArgumentException("Cant find account");
             }
+
+            accountService.deposit(destinationAccount, amount);
+
         }
     }
 
@@ -89,10 +102,6 @@ public class TransactionService {
         return transactionRepository.findAll(pageable);
 
     }
-
-//    public Page<Transaction> getAccountTransactions(String iban, Pageable pageable) {
-//        return transactionRepository.findBySourceIBANOrDestinationIBANOrderByTimestampDesc(iban, iban, pageable);
-//    }
 
     public Page<Transaction> getAccountTransactions(String ownIban, String startDate, String endDate, Double amount, String amountCondition, String ibanFilter, String ibanType, Pageable pageable) {
 
@@ -161,9 +170,7 @@ public class TransactionService {
 
         LocalDate localDate = LocalDate.parse(dateString);
 
-
         Instant instant = localDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
-
 
         return instant.toEpochMilli();
     }

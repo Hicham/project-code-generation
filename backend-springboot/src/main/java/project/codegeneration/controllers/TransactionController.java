@@ -59,6 +59,7 @@ public class TransactionController extends Controller{
 
 
 
+    @PreAuthorize("hasRole('ROLE_ADMIN') or @accountService.isAccountOwner(principal.username, #IBAN)")
     @GetMapping("/accounts/{iban}/transactions")
     public ResponseEntity<Page<Transaction>> getAccountTransactions(@PathVariable String iban,
                                                                     @RequestParam(required = false, defaultValue = "0") Integer pageNumber,
@@ -69,15 +70,9 @@ public class TransactionController extends Controller{
                                                                     @RequestParam(required = false) String ibanFilter,
                                                                     @RequestParam(required = false) String ibanType) {
 
-
-
-
-
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication == null || !authentication.isAuthenticated()) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            }
+
 
             Optional<Account> optionalAccount = Optional.ofNullable(accountService.getAccountByIBAN(iban));
             if (optionalAccount.isEmpty()) {
@@ -101,14 +96,12 @@ public class TransactionController extends Controller{
         }
     }
 
+
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     @PostMapping("/transactions")
     public ResponseEntity<?> createTransaction(@RequestBody TransactionRequestDTO transactionRequest) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication == null || !authentication.isAuthenticated()) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            }
-
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
             // Assuming the user is always present in the authentication details
@@ -144,6 +137,7 @@ public class TransactionController extends Controller{
     }
 
 
+    @PreAuthorize("hasRole('ROLE_ADMIN') or @accountService.isAccountOwner(principal.username, #IBAN)")
     @PostMapping("/accounts/{IBAN}/deposit")
     public ResponseEntity<String> deposit(@PathVariable String IBAN, @RequestBody ATMTransactionRequest ATMTransactionRequest
     ) {
@@ -167,6 +161,7 @@ public class TransactionController extends Controller{
 
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN') or @accountService.isAccountOwner(principal.username, #IBAN)")
     @PostMapping("/accounts/{IBAN}/withdraw")
     public ResponseEntity<String> withdraw(@PathVariable String IBAN, @RequestBody ATMTransactionRequest ATMTransactionRequest) {
 
