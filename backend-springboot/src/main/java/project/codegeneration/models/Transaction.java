@@ -25,7 +25,6 @@ public class Transaction {
     private TransactionType type;
 
     private Long timestamp;
-
 //    @ManyToOne(fetch = FetchType.LAZY)
     @ManyToOne(fetch = FetchType.EAGER)
     private User user;
