@@ -17,4 +17,8 @@ public class TransactionLimit {
     private Account account;
 
     private double dailyLimit;
+
+    private double weeklyLimit;
+
+    private double monthlyLimit;
 }
