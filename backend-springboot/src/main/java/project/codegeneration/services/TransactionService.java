@@ -50,9 +50,6 @@ public class TransactionService {
             throw new IllegalArgumentException("Daily transaction limit exceeded.");
         }
 
-        if (sourceAccount.getBalance() - amount < sourceAccount.getAbsoluteLimit()) {
-            throw new IllegalArgumentException("Cannot withdraw below the absolute limit.");
-        }
         
         if (sourceAccount == null)
         {
@@ -86,10 +83,6 @@ public class TransactionService {
                 throw new IllegalArgumentException("Daily transaction limit exceeded.");
             }
 
-            if (sourceAccount.getBalance() - amount < sourceAccount.getAbsoluteLimit()) {
-                throw new IllegalArgumentException("Cannot withdraw below the absolute limit.");
-            }
-
             if (sourceAccount == null)
             {
                 throw new IllegalArgumentException("Cant find account");
@@ -113,8 +106,8 @@ public class TransactionService {
 
     public double calculateTotalDailyTransactions(String iban) {
         LocalDate today = LocalDate.now();
-        LocalDateTime startOfDay = today.atStartOfDay();
-        LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
+        Long startOfDay = today.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        Long endOfDay = today.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
         List<Transaction> dailyTransactions = transactionRepository.findBySourceIBANAndTimestampBetween(
                 iban,

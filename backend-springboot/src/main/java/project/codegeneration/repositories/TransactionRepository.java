@@ -14,5 +14,5 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
 
     Page findBySourceIBANOrDestinationIBANOrderByTimestampDesc(String sourceIBAN, String destinationIBAN, Pageable pageable);
 
-    List<Transaction> findBySourceIBANAndTimestampBetween(String sourceIBAN, LocalDateTime startDate, LocalDateTime endDate);
+    List<Transaction> findBySourceIBANAndTimestampBetween(String sourceIBAN, Long startDate, Long endDate);
 }
