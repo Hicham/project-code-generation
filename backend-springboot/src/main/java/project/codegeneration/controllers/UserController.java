@@ -99,7 +99,7 @@ public class UserController {
         }
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("#email == principal.username or hasRole('ROLE_ADMIN')")
     @GetMapping("/users/{email}")
     public UserDTO getUserByEmail(@PathVariable String email) {
         Optional<User> userOptional = userService.findByEmail(email);

@@ -206,7 +206,7 @@ public class AccountController extends Controller {
 
 
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping("/accounts/all")
     public ResponseEntity<List<AccountDTO>> getAllAccounts() {
         List<Account> accounts = accountService.getAllAccounts();
