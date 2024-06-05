@@ -75,6 +75,7 @@
 import axiosInstance from '@/axios-instance';
 import { useStore } from '@/stores/store';
 import { ref, onMounted, computed } from 'vue';
+import axios from "axios";
 
 export default {
   name: "TransferFunds",
@@ -94,13 +95,9 @@ export default {
 
     const getAccounts = () => {
       axiosInstance
-          .get('/api/accounts', {
+          .get(`/api/users/${store.user.id}/accounts`, {
             headers: {
               Authorization: 'Bearer ' + store.token,
-            },
-            params: {
-              userId: store.user.id,
-              isChecking: false,
             },
           })
           .then((result) => {
@@ -129,7 +126,7 @@ export default {
     };
 
     const confirmTransfer = () => {
-      if (transferAmount.value <= 0 || transferAmount.value > balance.value || !destinationAccount.value) {
+      if (transferAmount.value <= 0 || !destinationAccount.value) {
         alert("Invalid transfer details");
         return;
       }
@@ -168,7 +165,6 @@ export default {
             console.error("Transfer failed:", error);
           });
     };
-
 
     const filteredAccounts = computed(() => {
       if (selectedAccount.value?.accountType === 'SAVINGS') {
