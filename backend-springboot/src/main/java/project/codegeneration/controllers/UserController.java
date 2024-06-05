@@ -3,6 +3,7 @@ package project.codegeneration.controllers;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +31,7 @@ public class UserController {
         this.accountService = accountService;
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/users" )
     public ResponseEntity<Page<UserDTO>> getUsers(@RequestParam(required = false, defaultValue = "0") Integer pageNumber, @RequestParam(required = false, defaultValue = "") String email) {
 
@@ -57,6 +59,7 @@ public class UserController {
 
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/unapproved-users")
     public List<UserDTO> getNotApprovedUsers() {
         List<User> users = userService.getNotApprovedUsers();
@@ -83,18 +86,20 @@ public class UserController {
             return e.getMessage();
         }
     }
-    
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/accounts/approve")
     public ResponseEntity<String> approveUser(@RequestBody ApproveUserDTO request) {
         try {
             userService.approveUser(request.getUserId());
-            accountService.createAccountForApprovedUser(userService.getUserById(request.getUserId()), request);
+            accountService.createAccountForApprovedUser(userService.getUserById(request.getUserId()).get(), request);
             return ResponseEntity.ok("User approved");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/users/{email}")
     public UserDTO getUserByEmail(@PathVariable String email) {
         Optional<User> userOptional = userService.findByEmail(email);

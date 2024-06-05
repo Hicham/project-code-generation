@@ -28,16 +28,16 @@
               <h3>Transactions</h3>
 
               <!-- Dropdown for selecting filter column -->
-              <div class="filter-controls">
-                <label for="filter-column">Filter By:</label>
-                <select id="filter-column" v-model="selectedFilterColumn" class="form-select">
-                  <option v-for="column in filterColumns" :key="column" :value="column">
-                    {{ column }}
-                  </option>
-                </select>
-                <label for="filter-input">Filter:</label>
-                <input id="filter-input" v-model="filterValue" class="form-control" @input="filterTransactions">
-              </div>
+<!--              <div class="filter-controls">-->
+<!--                <label for="filter-column">Filter By:</label>-->
+<!--                <select id="filter-column" v-model="selectedFilterColumn" class="form-select">-->
+<!--                  <option v-for="column in filterColumns" :key="column" :value="column">-->
+<!--                    {{ column }}-->
+<!--                  </option>-->
+<!--                </select>-->
+<!--                <label for="filter-input">Filter:</label>-->
+<!--                <input id="filter-input" v-model="filterValue" class="form-control" @input="filterTransactions">-->
+<!--              </div>-->
 
               <div class="container mt-5">
                 <form class="row g-3">

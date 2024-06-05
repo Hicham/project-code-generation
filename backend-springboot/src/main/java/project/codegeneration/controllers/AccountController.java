@@ -45,19 +45,10 @@ public class AccountController extends Controller {
     }
 
 
+    @PreAuthorize("#userId == principal.id or hasRole('ROLE_ADMIN')")
     @GetMapping("/users/{userId}/accounts/checking")
     public ResponseEntity<?> getAccountsChecking(@PathVariable Integer userId){
         try {
-
-            Optional<User> user = getCurrentUser(SecurityContextHolder.getContext().getAuthentication());
-
-
-            if (user.get().getId() != userId && !user.get().getRoles().contains(Role.ROLE_ADMIN))
-            {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not authorized to access this resource");
-            }
-
-
 
             Page<Account> accounts = null;
             Pageable pageable = PageRequest.of(0, 10);
@@ -80,17 +71,10 @@ public class AccountController extends Controller {
         }
     }
 
-
+    @PreAuthorize("#userId == principal.id or hasRole('ROLE_ADMIN')")
     @GetMapping("/users/{userId}/accounts")
     public ResponseEntity<?> getAccountsByUser(@RequestParam(required = false, defaultValue = "0") Integer pageNumber, @PathVariable Integer userId) {
         try {
-
-            Optional<User> user = getCurrentUser(SecurityContextHolder.getContext().getAuthentication());
-
-            if (user.get().getId() != userId && !user.get().getRoles().contains(Role.ROLE_ADMIN))
-            {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not authorized to access this resource");
-            }
 
             Page<Account> accounts = null;
             Pageable pageable = PageRequest.of(pageNumber, 10);
@@ -140,13 +124,9 @@ public class AccountController extends Controller {
         }
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN') or @accountService.isAccountOwner(principal.username, #IBAN)")
     @GetMapping("/accounts/{IBAN}")
     public ResponseEntity<AccountDTO> getAccountByIBAN(@PathVariable String IBAN) {
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
 
         Account account = accountService.getAccountByIBAN(IBAN);
 
@@ -159,7 +139,7 @@ public class AccountController extends Controller {
     }
 
 
-
+    @PreAuthorize("hasRole('ROLE_ADMIN') or @accountService.isAccountOwner(principal.username, #IBAN)")
     @PostMapping("/accounts/disable/{IBAN}")
     public ResponseEntity<String> disableAccount(@PathVariable String IBAN) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -185,6 +165,7 @@ public class AccountController extends Controller {
 
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN') or @accountService.isAccountOwner(principal.username, #IBAN)")
     @PostMapping("/accounts/enable/{IBAN}")
     public ResponseEntity<String> enableAccount(@PathVariable String IBAN) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -210,6 +191,7 @@ public class AccountController extends Controller {
 
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN') or @accountService.isAccountOwner(principal.username, #IBAN)")
     @PostMapping("/accounts/setLimits/{iban}")
     public ResponseEntity<String> setTransactionLimits(
             @PathVariable String iban,
@@ -224,6 +206,7 @@ public class AccountController extends Controller {
 
 
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/accounts/all")
     public ResponseEntity<List<AccountDTO>> getAllAccounts() {
         List<Account> accounts = accountService.getAllAccounts();

@@ -22,12 +22,11 @@ public class JwtProvider {
 
     private JwtKeyProvider keyProvider;
     private MyUserDetailsServices userDetailsService;
-    private AccountService accountService;
 
-    public JwtProvider(JwtKeyProvider keyProvider, MyUserDetailsServices userDetailsService, AccountService accountService) {
+    public JwtProvider(JwtKeyProvider keyProvider, MyUserDetailsServices userDetailsService) {
         this.keyProvider = keyProvider;
         this.userDetailsService = userDetailsService;
-        this.accountService = accountService;
+
     }
 
 

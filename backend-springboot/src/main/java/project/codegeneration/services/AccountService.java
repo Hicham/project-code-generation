@@ -24,9 +24,6 @@ public class AccountService {
 
     private final UserService userService;
 
-
-
-
     public AccountService(AccountRepository accountRepository, TransactionLimitRepository transactionLimitRepository, UserService userService) {
         this.accountRepository = accountRepository;
         this.transactionLimitRepository = transactionLimitRepository;
@@ -39,7 +36,15 @@ public class AccountService {
     }
 
     public Account getAccountByIBAN(String IBAN) {
-        return accountRepository.findByIBAN(IBAN);
+
+        Account account = accountRepository.findByIBAN(IBAN);
+
+        if(account == null)
+        {
+            throw new ResourceNotFoundException("Account not found");
+        }
+
+        return account;
     }
 
 
@@ -65,6 +70,10 @@ public class AccountService {
 
     public Page<Account> getAccountsByUserId(Pageable pageable, int userId) {
 
+        if (userService.getUserById(userId).isEmpty()) {
+            throw new ResourceNotFoundException("Resource not found");
+        }
+
         return accountRepository.findByUserId(pageable, userId);
     }
 
@@ -81,7 +90,7 @@ public class AccountService {
     public void deposit(Account account, double amount) {
 
         if (amount <= 0) {
-            throw new IllegalArgumentException("Withdraw amount must be positive");
+            throw new IllegalArgumentException("Deposit amount must be positive");
         }
 
         account.setBalance(account.getBalance() + amount);
@@ -90,8 +99,6 @@ public class AccountService {
 
 
     public void withdraw(Account account, double amount) {
-
-
 
         if (amount <= 0) {
             throw new IllegalArgumentException("Withdraw amount must be positive");
@@ -104,6 +111,7 @@ public class AccountService {
         account.setBalance(account.getBalance() - amount);
         accountRepository.saveAndFlush(account);
     }
+
     public void createAccountForApprovedUser(User user, ApproveUserDTO approveUserDTO) {
         if (user.isApproved()) {
             String checkingIBAN = generateUniqueIBAN();
@@ -116,6 +124,7 @@ public class AccountService {
             createAndAssignTransactionLimit(savingsAccount, approveUserDTO.getTransactionLimit().getDailyLimit());
         }
     }
+
     private Account createAccount(User user, String IBAN, AccountType accountType, double absoluteLimit) {
         Account account = new Account();
         account.setIBAN(IBAN);
@@ -167,5 +176,10 @@ public class AccountService {
         Account account = accountRepository.findByIBAN(iban);
         account.setAbsoluteLimit(limit);
         accountRepository.save(account);
+    }
+
+    public boolean isAccountOwner(String email, String IBAN) {
+        Account account = getAccountByIBAN(IBAN);
+        return account != null && account.getUser().getEmail().equals(email);
     }
 }
