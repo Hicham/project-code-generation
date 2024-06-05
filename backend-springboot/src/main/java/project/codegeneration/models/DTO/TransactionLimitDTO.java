@@ -11,5 +11,6 @@ public class TransactionLimitDTO {
     private double weeklyLimit;
     private double monthlyLimit;
     private double absoluteLimit;
+    
 }
 
