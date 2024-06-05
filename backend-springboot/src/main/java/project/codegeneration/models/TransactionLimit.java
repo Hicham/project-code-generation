@@ -1,5 +1,6 @@
 package project.codegeneration.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,6 +14,7 @@ public class TransactionLimit {
     @Id
     private String IBAN;
 
+    @JsonBackReference
     @OneToOne(fetch = FetchType.LAZY)
     private Account account;
 
