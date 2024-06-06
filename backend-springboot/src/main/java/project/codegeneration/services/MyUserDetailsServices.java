@@ -19,7 +19,18 @@ public class MyUserDetailsServices implements UserDetailsService {
     }
 
 
-//    @Override
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException(email));
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found");
+        }
+        return new CustomUserDetails((long) user.getId(), user.getEmail(), user.getPassword(), user.getRoles());
+    }
+
+
+    //    @Override
 //    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 //
 //        User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException(email));
@@ -32,13 +43,4 @@ public class MyUserDetailsServices implements UserDetailsService {
 //
 //        return userDetails;
 //    }
-
-    @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException(email));
-        if (user == null) {
-            throw new UsernameNotFoundException("User not found");
-        }
-        return new CustomUserDetails((long) user.getId(), user.getEmail(), user.getPassword(), user.getRoles());
-    }
 }
