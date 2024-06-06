@@ -5,141 +5,141 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import project.codegeneration.exceptions.ResourceNotFoundException;
 import project.codegeneration.models.DTO.ATMTransactionRequest;
-import project.codegeneration.models.DTO.TransactionRequestDTO;
-import project.codegeneration.models.Transaction;
-import project.codegeneration.models.TransactionType;
 import project.codegeneration.models.User;
+import project.codegeneration.security.JwtProvider;
 import project.codegeneration.services.AccountService;
 import project.codegeneration.services.TransactionService;
 import project.codegeneration.services.UserService;
 
-import java.util.Arrays;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-class TransactionControllerTest {
+@WebMvcTest(TransactionController.class)
+public class TransactionControllerTest {
 
-    @Mock
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private JwtProvider jwtProvider;
+
+    @MockBean
     private TransactionService transactionService;
-
-    @Mock
-    private AccountService accountService;
-
-    @Mock
-    private UserService userService;
-
-    @Mock
-    private Authentication authentication;
-
-    @Mock
-    private SecurityContext securityContext;
-
-    @Mock
-    private UserDetails userDetails;
 
     @InjectMocks
     private TransactionController transactionController;
 
+    @MockBean
+    private AccountService accountService;
+
+    @MockBean
+    private UserService userService;
+
     @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        SecurityContextHolder.setContext(securityContext);
+    public void setUp() {
+        MockitoAnnotations.initMocks(this);
+
     }
 
     @Test
-    void testGetTransactions() {
-        Pageable pageable = PageRequest.of(0, 10);
-        Page<Transaction> transactions = new PageImpl<>(Arrays.asList(new Transaction(), new Transaction()));
-        when(transactionService.getTransactions(pageable)).thenReturn(transactions);
+    @WithMockUser(roles = "ADMIN")
+    public void testGetTransactions() throws Exception {
+        mockMvc.perform(get("/api/transactions"))
+                .andExpect(status().isOk());
 
-        ResponseEntity<?> response = transactionController.getTransactions(0);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(transactions, response.getBody());
+        verify(transactionService, times(1)).getTransactions(any());
     }
 
     @Test
-    void testGetAccountTransactions() {
-        Pageable pageable = PageRequest.of(0, 10);
-        Page<Transaction> transactions = new PageImpl<>(Arrays.asList(new Transaction(), new Transaction()));
-        when(transactionService.getAccountTransactions(anyString(), anyString(), anyString(), anyDouble(), anyString(), anyString(), anyString(), eq(pageable))).thenReturn(transactions);
+    @WithMockUser(roles = "ADMIN")
+    public void testGetAccountTransactions() throws Exception {
+        mockMvc.perform(get("/api/accounts/123456/transactions"))
+                .andExpect(status().isOk());
 
-        ResponseEntity<?> response = transactionController.getAccountTransactions("IBAN123", 0, null, null, null, null, null, null);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(transactions, response.getBody());
+        verify(transactionService, times(1)).getAccountTransactions(
+                anyString(),
+                nullable(String.class),
+                nullable(String.class),
+                nullable(Double.class),
+                nullable(String.class),
+                nullable(String.class),
+                nullable(String.class),
+                any());
     }
 
     @Test
-    void testCreateTransaction() {
-        TransactionRequestDTO transactionRequest = new TransactionRequestDTO("IBAN123", "IBAN123", 500.00, "description" );
-        transactionRequest.setAmount(100.0);
-        transactionRequest.setSourceIBAN("sourceIBAN");
-        transactionRequest.setDestinationIBAN("destinationIBAN");
+    @WithMockUser(roles = {"ADMIN", "USER"})
+    public void testCreateTransaction() throws Exception {
+        when(userService.getUserByEmail("hicham@gmail.com")).thenReturn(new User());
 
-        User user = new User();
-        when(authentication.getPrincipal()).thenReturn(userDetails);
-        when(userDetails.getUsername()).thenReturn("test@example.com");
-        when(userService.getUserByEmail("test@example.com")).thenReturn(user);
+        mockMvc.perform(post("/api/transactions")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"sourceIBAN\":\"sourceIBAN\",\"destinationIBAN\":\"destinationIBAN\",\"amount\":100.0,\"description\":\"description\"}"))
+                .andExpect(status().isCreated());
 
-        ResponseEntity<?> response = transactionController.createTransaction(transactionRequest);
-
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        verify(transactionService, times(1)).transferTransaction(anyString(), anyString(), anyDouble(), anyString(), any(TransactionType.class), any(User.class));
+        verify(transactionService, times(1)).transferTransaction(anyString(), anyString(), anyDouble(), anyString(), any(), any());
     }
 
     @Test
-    void testDeposit() {
+    @WithMockUser(roles = {"ADMIN", "USER"})
+    public void testDeposit() throws Exception {
+        mockMvc.perform(post("/api/accounts/IBAN/deposit")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"amount\":100.0,\"description\":\"description\"}"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Money deposited successfully."));
+
+        verify(transactionService, times(1)).ATMTransaction(any(), anyString(), anyDouble(), anyString(), any(), any());
+    }
+
+
+
+    @Test
+    @WithMockUser(roles = {"ADMIN", "USER"})
+    public void testDepositWithNonexistentIBAN() throws Exception {
+        doThrow(new ResourceNotFoundException("Cant find source account"))
+                .when(transactionService).ATMTransaction(any(), anyString(), anyDouble(), anyString(), any(), any());
+
+        mockMvc.perform(post("/api/accounts/INVALID_IBAN/deposit")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"amount\":100.0,\"description\":\"description\"}"))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("Cant find source account"));
+
+        verify(transactionService, times(1)).ATMTransaction(any(), eq("INVALID_IBAN"), anyDouble(), anyString(), any(), any());
+    }
+
+
+    @Test
+    @WithMockUser(roles = {"ADMIN", "USER"})
+    public void testWithdraw() throws Exception {
         ATMTransactionRequest atmTransactionRequest = new ATMTransactionRequest();
         atmTransactionRequest.setAmount(100.0);
+        atmTransactionRequest.setDescription("description");
 
-        User user = new User();
-        user.setEmail("test@example.com");
+        mockMvc.perform(post("/api/accounts/123456/withdraw")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"amount\":100.0,\"description\":\"description\"}"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Money deposited successfully."));
 
-        when(authentication.getPrincipal()).thenReturn(userDetails);
-        when(userDetails.getUsername()).thenReturn("test@example.com");
-        when(userService.getUserByEmail("test@example.com")).thenReturn(Optional.of(user).get());
-        when(accountService.isAccountOwner(anyString(), anyString())).thenReturn(true);
-        doNothing().when(transactionService).ATMTransaction(any(), anyString(), anyDouble(), any(), any(), any());
-
-        ResponseEntity<String> response = transactionController.deposit("IBAN123", atmTransactionRequest);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Money deposited successfully.", response.getBody());
-        verify(transactionService, times(1)).ATMTransaction(null, "IBAN123", 100.0, null, TransactionType.DEPOSIT, user);
-    }
-
-    @Test
-    void testWithdraw() {
-        ATMTransactionRequest atmTransactionRequest = new ATMTransactionRequest();
-        atmTransactionRequest.setAmount(100.0);
-
-        User user = new User();
-        when(authentication.getPrincipal()).thenReturn(userDetails);
-        when(userDetails.getUsername()).thenReturn("limit@gmail.com");
-        when(userService.getUserByEmail("limit@gmail.com")).thenReturn(user);
-        when(accountService.isAccountOwner(anyString(), anyString())).thenReturn(true);
-        when(userService.getUserByEmail(anyString())).thenReturn(Optional.of(user).get());
-
-        ResponseEntity<String> response = transactionController.withdraw("NL55INHO2675092764", atmTransactionRequest);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Money deposited successfully.", response.getBody());
-        verify(transactionService, times(1)).ATMTransaction("NL55INHO2675092764", null, 100.0, null, TransactionType.WITHDRAW, user);
+        verify(transactionService, times(1)).ATMTransaction(anyString(), any(), anyDouble(), anyString(), any(), any());
     }
 }

@@ -22,4 +22,11 @@ public class TransactionLimit {
     private Account account;
 
     private double dailyLimit;
+
+    public TransactionLimit(String iban, double dailyLimit) {
+        this.IBAN = iban;
+        this.dailyLimit = dailyLimit;
+    }
+
+
 }

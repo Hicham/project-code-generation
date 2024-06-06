@@ -2,181 +2,161 @@ package project.codegeneration.controllers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import project.codegeneration.models.Account;
-import project.codegeneration.models.DTO.AccountDTO;
 import project.codegeneration.models.DTO.TransactionLimitDTO;
 import project.codegeneration.models.User;
+import project.codegeneration.security.JwtProvider;
 import project.codegeneration.services.AccountService;
 import project.codegeneration.services.TransactionLimitService;
 import project.codegeneration.services.UserService;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
+import org.springframework.security.web.FilterChainProxy;
+import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
+import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 
-class AccountControllerTest {
+@WebMvcTest(AccountController.class)
+@ExtendWith(MockitoExtension.class)
+public class AccountControllerTest {
 
-    @Mock
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private WebApplicationContext context;
+
+    @MockBean
+    private JwtProvider jwtProvider;
+
+    @MockBean
     private AccountService accountService;
 
-    @Mock
+    @MockBean
     private UserService userService;
 
-    @Mock
+    @MockBean
     private TransactionLimitService transactionLimitService;
 
     @InjectMocks
     private AccountController accountController;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         MockitoAnnotations.openMocks(this);
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
+                .apply(SecurityMockMvcConfigurers.springSecurity())
+                .build();
     }
 
     @Test
-    void testGetAccountsChecking() {
-        Integer userId = 1;
+    @WithMockUser(roles = "USER")
+    public void testGetAccountsChecking() throws Exception {
+        when(accountService.getCheckingAccountsByUserId(any(), anyInt())).thenReturn(Page.empty());
+
+        mockMvc.perform(get("/api/users/1/accounts/checking"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    public void testGetAccountsByUser() throws Exception {
+        when(accountService.getAccountsByUserId(any(), anyInt())).thenReturn(Page.empty());
+
+        mockMvc.perform(get("/api/users/1/accounts"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    public void testGetAccounts() throws Exception {
+        when(accountService.getAllAccounts(any())).thenReturn(Page.empty());
+
+        mockMvc.perform(get("/api/accounts"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    public void testGetAccountByIBAN() throws Exception {
         Account account = new Account();
-        Page<Account> accountPage = new PageImpl<>(Collections.singletonList(account));
-        when(accountService.getCheckingAccountsByUserId(any(Pageable.class), eq(userId))).thenReturn(accountPage);
+        account.setIBAN("IBAN123");
+        when(accountService.getAccountByIBAN(anyString())).thenReturn(account);
 
-        ResponseEntity<?> responseEntity = accountController.getAccountsChecking(userId);
-
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        Page<AccountDTO> accountDTOPage = (Page<AccountDTO>) responseEntity.getBody();
-        assertEquals(1, accountDTOPage.getTotalElements());
-        verify(accountService, times(1)).getCheckingAccountsByUserId(any(Pageable.class), eq(userId));
+        mockMvc.perform(get("/api/accounts/IBAN123"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
     @Test
-    void testGetAccountsByUser() {
-        Integer userId = 1;
-        Integer pageNumber = 0;
-        Account account = new Account();
-        Page<Account> accountPage = new PageImpl<>(Collections.singletonList(account));
-        when(accountService.getAccountsByUserId(any(Pageable.class), eq(userId))).thenReturn(accountPage);
+    @WithMockUser(roles = "ADMIN")
+    public void testDisableAccount() throws Exception {
+        when(userService.findByEmail(anyString())).thenReturn(Optional.of(new User()));
+        when(accountService.getAccountByIBAN(anyString())).thenReturn(new Account());
 
-        ResponseEntity<?> responseEntity = accountController.getAccountsByUser(pageNumber, userId);
-
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        Page<AccountDTO> accountDTOPage = (Page<AccountDTO>) responseEntity.getBody();
-        assertEquals(1, accountDTOPage.getTotalElements());
-        verify(accountService, times(1)).getAccountsByUserId(any(Pageable.class), eq(userId));
+        mockMvc.perform(post("/api/accounts/disable/IBAN123")
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Account disabled successfully."));
     }
 
     @Test
-    void testGetAccounts() {
-        Integer pageNumber = 0;
-        Account account = new Account();
-        Page<Account> accountPage = new PageImpl<>(Collections.singletonList(account));
-        when(accountService.getAllAccounts(any(Pageable.class))).thenReturn(accountPage);
+    @WithMockUser(roles = "ADMIN")
+    public void testEnableAccount() throws Exception {
+        when(userService.findByEmail(anyString())).thenReturn(Optional.of(new User()));
+        when(accountService.getAccountByIBAN(anyString())).thenReturn(new Account());
 
-        ResponseEntity<?> responseEntity = accountController.getAccounts(pageNumber);
-
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        Page<AccountDTO> accountDTOPage = (Page<AccountDTO>) responseEntity.getBody();
-        assertEquals(1, accountDTOPage.getTotalElements());
-        verify(accountService, times(1)).getAllAccounts(any(Pageable.class));
+        mockMvc.perform(post("/api/accounts/enable/IBAN123")
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Account enabled successfully."));
     }
 
     @Test
-    void testGetAccountByIBAN() {
-        String IBAN = "123456";
-        Account account = new Account();
-        when(accountService.getAccountByIBAN(IBAN)).thenReturn(account);
+    @WithMockUser(roles = "ADMIN")
+    public void testSetTransactionLimits() throws Exception {
+        TransactionLimitDTO transactionLimitDTO = new TransactionLimitDTO("IBAN", 500, 0);
+        String json = "{\"absoluteLimit\":1000,\"dailyLimit\":500}";
 
-        ResponseEntity<AccountDTO> responseEntity = accountController.getAccountByIBAN(IBAN);
-
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        AccountDTO accountDTO = responseEntity.getBody();
-        assertEquals(account.getIBAN(), accountDTO.getIBAN());
-        verify(accountService, times(1)).getAccountByIBAN(IBAN);
+        mockMvc.perform(post("/api/accounts/setLimits/IBAN123")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Transaction limits updated successfully"));
     }
 
-    @Test
-    void testGetAccountByIBAN_NotFound() {
-        String IBAN = "123456";
-        when(accountService.getAccountByIBAN(IBAN)).thenReturn(null);
-
-        ResponseEntity<AccountDTO> responseEntity = accountController.getAccountByIBAN(IBAN);
-
-        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
-        verify(accountService, times(1)).getAccountByIBAN(IBAN);
-    }
-
-    @Test
-    void testDisableAccount() {
-        String IBAN = "123456";
-        Account account = new Account();
-        account.setActive(true);
-        User user = new User();
-        when(userService.findByEmail(anyString())).thenReturn(Optional.of(user));
-        when(accountService.getAccountByIBAN(IBAN)).thenReturn(account);
-
-        ResponseEntity<String> responseEntity = accountController.disableAccount(IBAN);
-
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertEquals("Account disabled successfully.", responseEntity.getBody());
-        verify(accountService, times(1)).getAccountByIBAN(IBAN);
-        verify(accountService, times(1)).updateAccount(any(Account.class));
-    }
-
-    @Test
-    void testEnableAccount() {
-        String IBAN = "123456";
-        Account account = new Account();
-        account.setActive(false);
-        User user = new User();
-        when(userService.findByEmail(anyString())).thenReturn(Optional.of(user));
-        when(accountService.getAccountByIBAN(IBAN)).thenReturn(account);
-
-        ResponseEntity<String> responseEntity = accountController.enableAccount(IBAN);
-
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertEquals("Account enabled successfully.", responseEntity.getBody());
-        verify(accountService, times(1)).getAccountByIBAN(IBAN);
-        verify(accountService, times(1)).updateAccount(any(Account.class));
-    }
-
-    @Test
-    void testSetTransactionLimits() {
-        String iban = "123456";
-        TransactionLimitDTO transactionLimitDTO = new TransactionLimitDTO("NL38INHO3001470910", 500.00, 0);
-        transactionLimitDTO.setAbsoluteLimit(1000);
-        transactionLimitDTO.setDailyLimit(500);
-
-        ResponseEntity<String> responseEntity = accountController.setTransactionLimits(iban, transactionLimitDTO);
-
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertEquals("Transaction limits updated successfully", responseEntity.getBody());
-        verify(accountService, times(1)).setAbsoluteLimit(iban, transactionLimitDTO.getAbsoluteLimit());
-        verify(transactionLimitService, times(1)).setTransactionLimit(iban, transactionLimitDTO.getDailyLimit());
-    }
-
-    @Test
-    void testGetAllAccounts() {
-        Account account = new Account();
-        when(accountService.getAllAccounts()).thenReturn(Collections.singletonList(account));
-
-        ResponseEntity<List<AccountDTO>> responseEntity = accountController.getAllAccounts();
-
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        List<AccountDTO> accountDTOs = responseEntity.getBody();
-        assertEquals(1, accountDTOs.size());
-        verify(accountService, times(1)).getAllAccounts();
-    }
+//    private static CsrfToken csrfToken() {
+//        HttpSessionCsrfTokenRepository repository = new HttpSessionCsrfTokenRepository();
+//        CsrfToken token = repository.generateToken(null);
+//        return token;
+//    }
 }

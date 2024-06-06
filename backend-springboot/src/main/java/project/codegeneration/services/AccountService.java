@@ -85,6 +85,12 @@ public class AccountService {
 
 
     public Page<Account> getCheckingAccountsByUserId(Pageable pageable, Integer userId) {
+
+        if (!userService.getUserById(userId).isPresent())
+        {
+            throw new ResourceNotFoundException("User not found");
+        }
+
         return accountRepository.findByUserIdAndAccountType(pageable, userId, AccountType.CHECKING);
     }
 

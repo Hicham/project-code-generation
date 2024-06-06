@@ -125,17 +125,6 @@ public class TransactionService {
         Long startOfDay = today.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
         Long endOfDay = today.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
-//        List<Transaction> dailyTransactions = transactionRepository.findBySourceIBANAndTimestampBetween(
-//                iban,
-//                startOfDay,
-//                endOfDay
-//        );
-//
-//
-//
-//        return dailyTransactions.stream()
-//                .mapToDouble(Transaction::getAmount)
-//                .sum();
 
         return transactionRepository.findSumBySourceIBANAndTimestampBetween(
                 iban,

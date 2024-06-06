@@ -109,14 +109,12 @@ public class TransactionController extends Controller {
     @PostMapping("/accounts/{IBAN}/deposit")
     public ResponseEntity<String> deposit(@PathVariable String IBAN, @RequestBody ATMTransactionRequest ATMTransactionRequest
     ) {
-        Optional<User> user = getCurrentUser(SecurityContextHolder.getContext().getAuthentication());
 
-        if (user.isPresent()) {
-            transactionService.ATMTransaction(null, IBAN, ATMTransactionRequest.getAmount(), ATMTransactionRequest.getDescription(), TransactionType.DEPOSIT, user.get());
-            return ResponseEntity.ok("Money deposited successfully.");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account not found.");
-        }
+        User user = getCurrentUser(SecurityContextHolder.getContext().getAuthentication());
+
+        transactionService.ATMTransaction(null, IBAN, ATMTransactionRequest.getAmount(), ATMTransactionRequest.getDescription(), TransactionType.DEPOSIT, user);
+        return ResponseEntity.ok("Money deposited successfully.");
+//        return ResponseEntity.ok(Double.toString(ATMTransactionRequest.getAmount()));
 
     }
 
@@ -124,14 +122,10 @@ public class TransactionController extends Controller {
     @PostMapping("/accounts/{IBAN}/withdraw")
     public ResponseEntity<String> withdraw(@PathVariable String IBAN, @RequestBody ATMTransactionRequest ATMTransactionRequest) {
 
-        Optional<User> user = getCurrentUser(SecurityContextHolder.getContext().getAuthentication());
+        User user = getCurrentUser(SecurityContextHolder.getContext().getAuthentication());
 
-        if (user.isPresent()) {
-            transactionService.ATMTransaction(IBAN, null, ATMTransactionRequest.getAmount(), ATMTransactionRequest.getDescription(), TransactionType.WITHDRAW, user.get());
-            return ResponseEntity.ok("Money deposited successfully.");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account not found.");
-        }
+        transactionService.ATMTransaction(IBAN, null, ATMTransactionRequest.getAmount(), ATMTransactionRequest.getDescription(), TransactionType.WITHDRAW, user);
+        return ResponseEntity.ok("Money deposited successfully.");
     }
 
 

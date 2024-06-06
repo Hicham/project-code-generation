@@ -37,6 +37,7 @@ public class AccountController extends Controller {
     }
 
 
+
     @PreAuthorize("#userId == principal.id or hasRole('ROLE_ADMIN')")
     @GetMapping("/users/{userId}/accounts/checking")
     public ResponseEntity<?> getAccountsChecking(@PathVariable Integer userId) {
