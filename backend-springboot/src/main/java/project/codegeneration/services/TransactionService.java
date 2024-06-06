@@ -7,6 +7,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -56,14 +57,9 @@ public class TransactionService {
     public void transferTransaction(String sourceIBAN, String destinationIBAN, Double amount, String description, TransactionType type, User user) {
 
 
+
         Account sourceAccount = accountService.getAccountByIBAN(sourceIBAN);
         Account destinationAccount = accountService.getAccountByIBAN(destinationIBAN);
-
-        double totalDailyTransactions = calculateTotalDailyTransactions(sourceIBAN);
-        if (totalDailyTransactions + amount > sourceAccount.getTransactionLimit().getDailyLimit()) {
-            throw new IllegalArgumentException("Daily transaction limit exceeded.");
-        }
-
 
         if (sourceAccount == null) {
             throw new ResourceNotFoundException("Cant find source account");
@@ -72,6 +68,12 @@ public class TransactionService {
         if (destinationAccount == null) {
             throw new ResourceNotFoundException("Cant find destination account");
         }
+
+        double totalDailyTransactions = calculateTotalDailyTransactions(sourceIBAN);
+        if (totalDailyTransactions + amount > sourceAccount.getTransactionLimit().getDailyLimit()) {
+            throw new IllegalArgumentException("Daily transaction limit exceeded.");
+        }
+
 
         if (user.getRoles().contains(Role.ROLE_ADMIN) || user.getId() == sourceAccount.getUser().getId()) {
             accountService.withdraw(sourceAccount, amount);

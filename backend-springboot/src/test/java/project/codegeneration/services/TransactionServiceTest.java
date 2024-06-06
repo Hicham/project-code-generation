@@ -48,7 +48,7 @@ public class TransactionServiceTest {
 
     @BeforeEach
     public void setup() {
-        user = new User(List.of(Role.ROLE_ADMIN), false, "wouter123@gmail.com", "test", "test", "test", "3652574", "06352615");
+        user = new User(List.of(Role.ROLE_USER), false, "wouter123@gmail.com", "test", "test", "test", "3652574", "06352615");
         user.setId(1);
 
         sourceAccount = new Account();
@@ -79,7 +79,7 @@ public class TransactionServiceTest {
 
     @Test
     public void testTransferTransaction_DailyLimitExceeded() {
-        double amount = 6000.0;
+        double amount = 600.0;
 
         when(transactionRepository.findSumBySourceIBANAndTimestampBetween(anyString(), anyLong(), anyLong()))
                 .thenReturn(0.0);
@@ -123,23 +123,19 @@ public class TransactionServiceTest {
         transactions.add(transaction);
         Page<Transaction> page = new PageImpl<>(transactions, pageable, 1);
 
-        // Mock the EntityManager and related objects
         CriteriaBuilder criteriaBuilder = mock(CriteriaBuilder.class);
         CriteriaQuery<Transaction> criteriaQuery = mock(CriteriaQuery.class);
         Root<Transaction> root = mock(Root.class);
         TypedQuery<Transaction> typedQuery = mock(TypedQuery.class);
 
-        // Setup mock behavior
         when(entityManager.getCriteriaBuilder()).thenReturn(criteriaBuilder);
         when(criteriaBuilder.createQuery(Transaction.class)).thenReturn(criteriaQuery);
         when(criteriaQuery.from(Transaction.class)).thenReturn(root);
         when(entityManager.createQuery(criteriaQuery)).thenReturn(typedQuery);
         when(typedQuery.getResultList()).thenReturn(transactions);
 
-        // Call the service method
         Page<Transaction> result = transactionService.getAccountTransactions("SOURCE_IBAN", null, null, null, null, null, null, pageable);
 
-        // Assertions
         assertEquals(page.getTotalElements(), result.getTotalElements());
         assertEquals(page.getContent().size(), result.getContent().size());
         verify(entityManager).createQuery(criteriaQuery);
