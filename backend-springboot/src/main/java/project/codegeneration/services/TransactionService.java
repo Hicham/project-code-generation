@@ -7,28 +7,30 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-import jakarta.security.auth.message.AuthException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import project.codegeneration.exceptions.ResourceNotFoundException;
 import project.codegeneration.models.*;
 import project.codegeneration.repositories.TransactionRepository;
 
-import java.time.*;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class TransactionService {
 
-    @PersistenceContext
-    private EntityManager entityManager;
-
     private final TransactionRepository transactionRepository;
     private final AccountService accountService;
+    @PersistenceContext
+    private EntityManager entityManager;
 
 
     public TransactionService(TransactionRepository transactionRepository, AccountService accountService) {
@@ -36,11 +38,23 @@ public class TransactionService {
         this.accountService = accountService;
     }
 
+    public static long convertDateToTimestamp(String dateString) {
+
+        try {
+            LocalDate localDate = LocalDate.parse(dateString);
+
+            Instant instant = localDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
+
+            return instant.toEpochMilli();
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Can't parse date");
+        }
+
+    }
+
     @Transactional
-    public void transferTransaction(String sourceIBAN, String destinationIBAN, Double amount, String description, TransactionType type, User user)
-    {
-        Transaction transaction = new Transaction(sourceIBAN, destinationIBAN, amount, description, type, user);
-        transactionRepository.saveAndFlush(transaction);
+    public void transferTransaction(String sourceIBAN, String destinationIBAN, Double amount, String description, TransactionType type, User user) {
+
 
         Account sourceAccount = accountService.getAccountByIBAN(sourceIBAN);
         Account destinationAccount = accountService.getAccountByIBAN(destinationIBAN);
@@ -50,20 +64,21 @@ public class TransactionService {
             throw new IllegalArgumentException("Daily transaction limit exceeded.");
         }
 
-        
-        if (sourceAccount == null)
-        {
-            throw new IllegalArgumentException("Cant find sourceaccount");
+
+        if (sourceAccount == null) {
+            throw new ResourceNotFoundException("Cant find source account");
         }
 
-        if (destinationAccount == null)
-        {
-            throw new IllegalArgumentException("cant find destinationaccount");
+        if (destinationAccount == null) {
+            throw new ResourceNotFoundException("Cant find destination account");
         }
 
-        if (user.getRoles().contains(Role.ROLE_ADMIN) ||  user.getId() == sourceAccount.getUser().getId()) {
+        if (user.getRoles().contains(Role.ROLE_ADMIN) || user.getId() == sourceAccount.getUser().getId()) {
             accountService.withdraw(sourceAccount, amount);
             accountService.deposit(destinationAccount, amount);
+
+            Transaction transaction = new Transaction(sourceIBAN, destinationIBAN, amount, description, type, user);
+            transactionRepository.saveAndFlush(transaction);
         } else {
             throw new AccessDeniedException("Not Authorized to perform this action.");
         }
@@ -72,36 +87,37 @@ public class TransactionService {
     @Transactional
     public void ATMTransaction(String sourceIBAN, String destinationIBAN, Double amount, String description, TransactionType type, User user) {
 
-        Transaction transaction = new Transaction(sourceIBAN, destinationIBAN, amount, description, type, user);
-        transactionRepository.saveAndFlush(transaction);
 
         if (type == TransactionType.WITHDRAW) {
 
             Account sourceAccount = accountService.getAccountByIBAN(sourceIBAN);
+
             double totalDailyTransactions = calculateTotalDailyTransactions(sourceIBAN);
+
             if (totalDailyTransactions + amount > sourceAccount.getTransactionLimit().getDailyLimit()) {
                 throw new IllegalArgumentException("Daily transaction limit exceeded.");
             }
 
-            if (sourceAccount == null)
-            {
-                throw new IllegalArgumentException("Cant find account");
+            if (sourceAccount == null) {
+                throw new ResourceNotFoundException("Cant find source account");
             }
 
             accountService.withdraw(sourceAccount, amount);
+
         }
 
         if (type == TransactionType.DEPOSIT) {
             Account destinationAccount = accountService.getAccountByIBAN(destinationIBAN);
 
-            if (destinationAccount == null)
-            {
-                throw new IllegalArgumentException("Cant find account");
+            if (destinationAccount == null) {
+                throw new ResourceNotFoundException("Cant find destination account");
             }
 
             accountService.deposit(destinationAccount, amount);
 
         }
+        Transaction transaction = new Transaction(sourceIBAN, destinationIBAN, amount, description, type, user);
+        transactionRepository.saveAndFlush(transaction);
     }
 
     public double calculateTotalDailyTransactions(String iban) {
@@ -109,17 +125,24 @@ public class TransactionService {
         Long startOfDay = today.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
         Long endOfDay = today.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
-        List<Transaction> dailyTransactions = transactionRepository.findBySourceIBANAndTimestampBetween(
+//        List<Transaction> dailyTransactions = transactionRepository.findBySourceIBANAndTimestampBetween(
+//                iban,
+//                startOfDay,
+//                endOfDay
+//        );
+//
+//
+//
+//        return dailyTransactions.stream()
+//                .mapToDouble(Transaction::getAmount)
+//                .sum();
+
+        return transactionRepository.findSumBySourceIBANAndTimestampBetween(
                 iban,
                 startOfDay,
                 endOfDay
         );
-
-        return dailyTransactions.stream()
-                .mapToDouble(Transaction::getAmount)
-                .sum();
     }
-
 
     public Page<Transaction> getTransactions(Pageable pageable) {
         return transactionRepository.findAll(pageable);
@@ -143,7 +166,7 @@ public class TransactionService {
             predicates.add(cb.lessThanOrEqualTo(transaction.get("timestamp"), convertDateToTimestamp(endDate)));
         }
 
-        if (amount != null && !amountCondition.isEmpty()) {
+        if (amount != null && amountCondition != null) {
             switch (amountCondition) {
                 case "greaterThan":
                     predicates.add(cb.greaterThan(transaction.get("amount"), amount));
@@ -154,6 +177,8 @@ public class TransactionService {
                 case "equalTo":
                     predicates.add(cb.equal(transaction.get("amount"), amount));
                     break;
+                default:
+                    throw new IllegalArgumentException("Invalid amountCondition: " + amountCondition);
             }
         }
 
@@ -172,6 +197,8 @@ public class TransactionService {
                 case "destination":
                     predicates.add(cb.equal(transaction.get("destinationIBAN"), ibanFilter));
                     break;
+                default:
+                    throw new IllegalArgumentException("Invalid ibanType: " + ibanType);
             }
         }
 
@@ -187,14 +214,5 @@ public class TransactionService {
         List<Transaction> transactionList = typedQuery.getResultList();
 
         return new PageImpl<>(transactionList, pageable, totalRows);
-    }
-
-    public static long convertDateToTimestamp(String dateString) {
-
-        LocalDate localDate = LocalDate.parse(dateString);
-
-        Instant instant = localDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
-
-        return instant.toEpochMilli();
     }
 }

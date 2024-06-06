@@ -33,11 +33,10 @@ public class WebSecurityConfiguration {
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
 
-
         http.headers((headers) ->
-                        headers
-                                .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
-                );
+                headers
+                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
+        );
 
         http.authorizeHttpRequests(requests -> requests.requestMatchers("/login").permitAll());
         http.authorizeHttpRequests(requests -> requests.requestMatchers("/atm/login").permitAll());

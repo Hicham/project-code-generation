@@ -1,6 +1,5 @@
 package project.codegeneration.controllers;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,20 +13,15 @@ import org.springframework.web.bind.annotation.*;
 import project.codegeneration.models.*;
 import project.codegeneration.models.DTO.ATMTransactionRequest;
 import project.codegeneration.models.DTO.TransactionRequestDTO;
-import project.codegeneration.models.DTO.AccountDTO;
 import project.codegeneration.services.AccountService;
 import project.codegeneration.services.TransactionService;
 import project.codegeneration.services.UserService;
-import project.codegeneration.models.TransactionType;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
-public class TransactionController extends Controller{
+public class TransactionController extends Controller {
 
 
     private final TransactionService transactionService;
@@ -43,57 +37,31 @@ public class TransactionController extends Controller{
     }
 
 
+
+
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/transactions")
     public ResponseEntity<?> getTransactions(@RequestParam(required = false, defaultValue = "0") Integer pageNumber) {
 
-        try {
-            Pageable pageable = PageRequest.of(pageNumber, 10);
-            return ResponseEntity.ok(transactionService.getTransactions(pageable));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+        Pageable pageable = PageRequest.of(pageNumber, 10);
+        return ResponseEntity.ok(transactionService.getTransactions(pageable));
     }
-
 
 
     @PreAuthorize("hasRole('ROLE_ADMIN') or @accountService.isAccountOwner(principal.username, #iban)")
     @GetMapping("/accounts/{iban}/transactions")
     public ResponseEntity<?> getAccountTransactions(@PathVariable String iban,
-                                                                    @RequestParam(required = false, defaultValue = "0") Integer pageNumber,
-                                                                    @RequestParam(required = false) String startDate,
-                                                                    @RequestParam(required = false) String endDate,
-                                                                    @RequestParam(required = false) Double amount,
-                                                                    @RequestParam(required = false) String amountCondition,
-                                                                    @RequestParam(required = false) String ibanFilter,
-                                                                    @RequestParam(required = false) String ibanType) {
+                                                    @RequestParam(required = false, defaultValue = "0") Integer pageNumber,
+                                                    @RequestParam(required = false) String startDate,
+                                                    @RequestParam(required = false) String endDate,
+                                                    @RequestParam(required = false) Double amount,
+                                                    @RequestParam(required = false) String amountCondition,
+                                                    @RequestParam(required = false) String ibanFilter,
+                                                    @RequestParam(required = false) String ibanType) {
 
-        try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-
-            Optional<Account> optionalAccount = Optional.ofNullable(accountService.getAccountByIBAN(iban));
-            if (optionalAccount.isEmpty()) {
-                return ResponseEntity.notFound().build();
-            }
-
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            boolean isAdmin = userDetails.getAuthorities().stream()
-                    .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(Role.ROLE_ADMIN.toString()));
-
-            if (isAdmin || userDetails.getUsername().equals(optionalAccount.get().getUser().getEmail())) {
-                Pageable pageable = PageRequest.of(pageNumber, 10);
-                Page<Transaction> transactions = transactionService.getAccountTransactions(iban, startDate, endDate, amount, amountCondition, ibanFilter, ibanType, pageable);
-                return ResponseEntity.ok(transactions);
-            } else {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+        Pageable pageable = PageRequest.of(pageNumber, 10);
+        Page<Transaction> transactions = transactionService.getAccountTransactions(iban, startDate, endDate, amount, amountCondition, ibanFilter, ibanType, pageable);
+        return ResponseEntity.ok(transactions);
     }
 
 
@@ -141,22 +109,13 @@ public class TransactionController extends Controller{
     @PostMapping("/accounts/{IBAN}/deposit")
     public ResponseEntity<String> deposit(@PathVariable String IBAN, @RequestBody ATMTransactionRequest ATMTransactionRequest
     ) {
-        try
-        {
-            Optional<User> user = getCurrentUser(SecurityContextHolder.getContext().getAuthentication());
+        Optional<User> user = getCurrentUser(SecurityContextHolder.getContext().getAuthentication());
 
-            if (user.isPresent()) {
-                transactionService.ATMTransaction(null, IBAN, ATMTransactionRequest.getAmount(), ATMTransactionRequest.getDescription(), TransactionType.DEPOSIT, user.get());
-                return ResponseEntity.ok("Money deposited successfully.");
-            }
-            else
-            {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account not found.");
-            }
-
-        }catch (Exception e)
-        {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        if (user.isPresent()) {
+            transactionService.ATMTransaction(null, IBAN, ATMTransactionRequest.getAmount(), ATMTransactionRequest.getDescription(), TransactionType.DEPOSIT, user.get());
+            return ResponseEntity.ok("Money deposited successfully.");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account not found.");
         }
 
     }
@@ -165,25 +124,15 @@ public class TransactionController extends Controller{
     @PostMapping("/accounts/{IBAN}/withdraw")
     public ResponseEntity<String> withdraw(@PathVariable String IBAN, @RequestBody ATMTransactionRequest ATMTransactionRequest) {
 
-        try
-        {
-            Optional<User> user = getCurrentUser(SecurityContextHolder.getContext().getAuthentication());
+        Optional<User> user = getCurrentUser(SecurityContextHolder.getContext().getAuthentication());
 
-            if (user.isPresent()) {
-                transactionService.ATMTransaction(IBAN, null, ATMTransactionRequest.getAmount(), ATMTransactionRequest.getDescription(), TransactionType.WITHDRAW, user.get());
-                return ResponseEntity.ok("Money deposited successfully.");
-            }
-            else
-            {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account not found.");
-            }
-
-        }catch (Exception e)
-        {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        if (user.isPresent()) {
+            transactionService.ATMTransaction(IBAN, null, ATMTransactionRequest.getAmount(), ATMTransactionRequest.getDescription(), TransactionType.WITHDRAW, user.get());
+            return ResponseEntity.ok("Money deposited successfully.");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account not found.");
         }
     }
-
 
 
 }

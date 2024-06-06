@@ -15,6 +15,10 @@
               <h3>Balance: €{{ balance }}</h3>
             </div>
 
+            <div class="alert alert-danger" v-if="errorMessage">
+              {{ errorMessage }}
+            </div>
+
             <div class="mb-3">
               <div class="input-group mb-2">
                 <input type="number" class="form-control" placeholder="Enter amount" v-model="withdrawAmount">
@@ -44,7 +48,8 @@ export default {
       selectedAccount: null,
       balance: 0,
       withdrawAmount: 0,
-      depositAmount: 0
+      depositAmount: 0,
+      errorMessage: ""
     };
   },
   mounted() {
@@ -57,7 +62,6 @@ export default {
             headers: {
               Authorization: 'Bearer ' + useStore().token,
             }
-
           })
           .then((result) => {
             this.accounts = result.data.content;
@@ -76,11 +80,6 @@ export default {
       }
     },
     withdraw() {
-      if (this.withdrawAmount <= 0 || this.withdrawAmount > this.balance) {
-        alert("Invalid withdrawal amount");
-        return;
-      }
-
       axiosInstance
           .post(`/api/accounts/${this.selectedAccount.iban}/withdraw`, {
             amount: this.withdrawAmount,
@@ -91,10 +90,12 @@ export default {
           })
           .then((response) => {
             this.withdrawAmount = 0;
-            this.getAccounts(); 
+            this.getAccounts();
+            this.errorMessage = ""; // Clear the error message on success
           })
           .catch((error) => {
-            console.error("Withdrawal failed:", error);
+            this.errorMessage = error.response.data;
+            console.error("Withdrawal failed:", error.response.data);
           });
     },
     deposit() {

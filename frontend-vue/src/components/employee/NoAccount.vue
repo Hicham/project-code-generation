@@ -69,6 +69,7 @@
 <script>
 import axiosInstance from "../../axios-instance";
 import { ref, onMounted } from "vue";
+import {useStore} from "@/stores/store";
 
 export default {
   name: "NoAccount",
@@ -113,7 +114,11 @@ export default {
 
     onMounted(async () => {
       try {
-        const userResponse = await axiosInstance.get('/api/unapproved-users');
+        const userResponse = await axiosInstance.get('/api/unapproved-users', {
+          headers: {
+            Authorization: 'Bearer ' + useStore().token,
+          },
+        });
         users.value = userResponse.data;
       } catch (error) {
         console.error(error);

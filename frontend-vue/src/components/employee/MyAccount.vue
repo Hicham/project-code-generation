@@ -175,16 +175,16 @@ export default {
 
     const getTransactions = (iban) => {
 
-      const params = new URLSearchParams({
-        startDate: startDate.value,
-        endDate: endDate.value,
-        amount: amount.value,
-        amountCondition: amountCondition.value,
-        ibanFilter: ibanFilter.value,
-        ibanType: ibanType.value,
-      }).toString();
+      const params = new URLSearchParams();
 
-      axiosInstance.get(`/api/accounts/${iban}/transactions?${params}`, {
+      if (startDate.value) params.append('startDate', startDate.value);
+      if (endDate.value) params.append('endDate', endDate.value);
+      if (amount.value) params.append('amount', amount.value);
+      if (amountCondition.value) params.append('amountCondition', amountCondition.value);
+      if (ibanFilter.value) params.append('ibanFilter', ibanFilter.value);
+      if (ibanType.value) params.append('ibanType', ibanType.value);
+
+      axiosInstance.get(`/api/accounts/${iban}/transactions?${params.toString()}`, {
         headers: {
           Authorization: 'Bearer ' + store.token,
         },

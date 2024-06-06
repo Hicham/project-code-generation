@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import project.codegeneration.exceptions.ResourceNotFoundException;
 import project.codegeneration.models.Role;
 import project.codegeneration.models.User;
 import project.codegeneration.repositories.UserRepository;
@@ -25,8 +26,15 @@ public class UserService {
     }
 
 
-    public Optional<User> findByEmail(String email){
-        return userRepository.findByEmail(email);
+    public Optional<User> findByEmail(String email) {
+        Optional<User> user = userRepository.findByEmail(email);
+
+        if (user.isEmpty())
+        {
+            throw new ResourceNotFoundException("User not found");
+        }
+
+        return user;
     }
 
     public User create(User user) {
@@ -39,7 +47,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public String login(String email, String password){
+    public String login(String email, String password) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         if (!bCryptPasswordEncoder.matches(password, user.getPassword())) {
@@ -71,12 +79,9 @@ public class UserService {
 
     public Page<User> getUsers(Pageable pageable, String email) {
 
-        if (email.isBlank())
-        {
+        if (email.isBlank()) {
             return userRepository.findAll(pageable);
-        }
-        else
-        {
+        } else {
             return userRepository.findByEmailContaining(pageable, email);
         }
     }

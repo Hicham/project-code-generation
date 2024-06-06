@@ -1,7 +1,6 @@
 package project.codegeneration.util;
 
 import java.math.BigInteger;
-import java.util.Random;
 import java.util.UUID;
 
 public class IBANGenerator {

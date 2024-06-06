@@ -3,13 +3,10 @@ package project.codegeneration.config;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
-import project.codegeneration.models.*;
 import project.codegeneration.repositories.AccountRepository;
 import project.codegeneration.repositories.UserRepository;
 import project.codegeneration.services.AccountService;
 import project.codegeneration.services.UserService;
-
-import java.util.List;
 
 
 @Component

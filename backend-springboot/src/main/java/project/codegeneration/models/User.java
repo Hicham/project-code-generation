@@ -42,8 +42,6 @@ public class User {
 //    private List<Transaction> transactions = new ArrayList<>();
 
 
-
-
     public User(List<Role> roles, boolean isApproved, String email, String password, String firstName, String lastName, String BSNNumber, String phoneNumber) {
         this.roles = roles;
         this.isApproved = isApproved;
@@ -54,7 +52,6 @@ public class User {
         this.BSNNumber = BSNNumber;
         this.phoneNumber = phoneNumber;
     }
-
 
 
 }

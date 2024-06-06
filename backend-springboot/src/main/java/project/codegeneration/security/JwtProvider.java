@@ -1,21 +1,18 @@
 package project.codegeneration.security;
 
-import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import project.codegeneration.models.Account;
 import project.codegeneration.models.Role;
 import project.codegeneration.models.User;
-import project.codegeneration.services.AccountService;
 import project.codegeneration.services.MyUserDetailsServices;
 
 import java.security.Key;
 import java.security.PublicKey;
 import java.util.Date;
-import java.util.List;
 
 @Component
 public class JwtProvider {

@@ -2,14 +2,16 @@ package project.codegeneration.services;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import project.codegeneration.exceptions.InsufficientFundsException;
 import project.codegeneration.exceptions.ResourceNotFoundException;
-import project.codegeneration.models.*;
+import project.codegeneration.models.Account;
+import project.codegeneration.models.AccountType;
 import project.codegeneration.models.DTO.ApproveUserDTO;
+import project.codegeneration.models.TransactionLimit;
+import project.codegeneration.models.User;
 import project.codegeneration.repositories.AccountRepository;
 import project.codegeneration.repositories.TransactionLimitRepository;
-import project.codegeneration.repositories.UserRepository;
 import project.codegeneration.util.IBANGenerator;
 
 import java.util.List;
@@ -39,10 +41,10 @@ public class AccountService {
 
         Account account = accountRepository.findByIBAN(IBAN);
 
-//        if(account == null)
-//        {
-//            throw new ResourceNotFoundException("Account not found");
-//        }
+        if(account == null)
+        {
+            throw new ResourceNotFoundException("Account not found");
+        }
 
         return account;
     }
@@ -71,7 +73,7 @@ public class AccountService {
     public Page<Account> getAccountsByUserId(Pageable pageable, int userId) {
 
         if (userService.getUserById(userId).isEmpty()) {
-            throw new ResourceNotFoundException("Resource not found");
+            throw new ResourceNotFoundException("User not found");
         }
 
         return accountRepository.findByUserId(pageable, userId);
@@ -105,7 +107,7 @@ public class AccountService {
         }
 
         if (account.getBalance() - amount < account.getAbsoluteLimit()) {
-            throw new IllegalArgumentException("Insufficient funds, can't go below absolute limit");
+           throw new InsufficientFundsException();
         }
 
         account.setBalance(account.getBalance() - amount);
@@ -149,7 +151,7 @@ public class AccountService {
     }
 
 
-    private String generateUniqueIBAN(){
+    private String generateUniqueIBAN() {
         String iban;
         do {
             iban = IBANGenerator.generateUniqueIBAN();
@@ -162,12 +164,12 @@ public class AccountService {
         return accountRepository.findByIBAN(iban) != null;
     }
 
-    public void disableAccount(Account account){
+    public void disableAccount(Account account) {
         account.setActive(false);
         accountRepository.save(account);
     }
 
-    public void enableAccount(Account account){
+    public void enableAccount(Account account) {
         account.setActive(true);
         accountRepository.save(account);
     }

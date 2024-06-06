@@ -3,12 +3,9 @@ package project.codegeneration.controllers;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.http.ResponseEntity;
 import project.codegeneration.models.DTO.ApproveUserDTO;
 import project.codegeneration.models.DTO.UserDTO;
 import project.codegeneration.models.Role;
@@ -32,7 +29,7 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @GetMapping("/users" )
+    @GetMapping("/users")
     public ResponseEntity<Page<UserDTO>> getUsers(@RequestParam(required = false, defaultValue = "0") Integer pageNumber, @RequestParam(required = false, defaultValue = "") String email) {
 
         Page<User> users;
@@ -59,7 +56,7 @@ public class UserController {
 
     }
 
-//    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/unapproved-users")
     public List<UserDTO> getNotApprovedUsers() {
         List<User> users = userService.getNotApprovedUsers();
@@ -87,7 +84,7 @@ public class UserController {
         }
     }
 
-//    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/accounts/approve")
     public ResponseEntity<String> approveUser(@RequestBody ApproveUserDTO request) {
         try {

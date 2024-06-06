@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -25,7 +23,7 @@ public class Transaction {
     private TransactionType type;
 
     private Long timestamp;
-//    @ManyToOne(fetch = FetchType.LAZY)
+    //    @ManyToOne(fetch = FetchType.LAZY)
     @ManyToOne(fetch = FetchType.EAGER)
     private User user;
 

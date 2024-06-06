@@ -13,8 +13,7 @@ public class Controller {
         this.userService = userService;
     }
 
-    public Optional<User> getCurrentUser(Authentication authentication)
-    {
+    public Optional<User> getCurrentUser(Authentication authentication) {
         String currentUsername = authentication.getName();
         return userService.findByEmail(currentUsername);
     }
