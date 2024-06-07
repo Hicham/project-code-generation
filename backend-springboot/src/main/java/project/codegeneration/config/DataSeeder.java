@@ -37,6 +37,11 @@ public class DataSeeder implements ApplicationRunner {
         System.out.println("DataSeeder is running...");
         userRepository.findAll().forEach(System.out::println);
 
+        User user = new User(List.of(Role.ROLE_ADMIN), true, "hicham@gmail.com", "Test123", "test", "test", "3652584", "06352615");
+        userService.create(user);
+
+        userRepository.findAll().forEach(System.out::println);
+
 //                User user = userService.findByEmail("hicham@gmail.com").get();
 //
 //        Random random = new Random();
@@ -48,8 +53,6 @@ public class DataSeeder implements ApplicationRunner {
 //            accountRepository.save(account);
 //        }
 
-//        User user = new User(List.of(Role.ROLE_ADMIN), true, "hicham@gmail.com", "Test123", "test", "test", "3652584", "06352615");
-//        userService.create(user);
 ////
 //
 //////
