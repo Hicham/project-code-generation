@@ -39,8 +39,7 @@ public class UserService {
 
     public User create(User user) {
 
-//        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-        if (!userRepository.findByEmail(user.getEmail()).isEmpty()) {
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Email already exists");
         }
 
