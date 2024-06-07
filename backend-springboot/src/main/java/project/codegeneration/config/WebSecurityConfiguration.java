@@ -62,7 +62,7 @@ public class WebSecurityConfiguration {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedOrigin("http://localhost:5173");
-        configuration.addAllowedOrigin("https://hicham.github.io/project-code-generation/");
+        configuration.addAllowedOrigin("https://hicham.github.io/project-code-generation");
         configuration.addAllowedMethod("*");
         configuration.addAllowedHeader("*");
         configuration.setAllowCredentials(true);
