@@ -5,7 +5,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import project.codegeneration.exceptions.ResourceNotFoundException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -27,6 +26,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InsufficientFundsException.class)
     public ResponseEntity<String> handleInsufficientFundsException(InsufficientFundsException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(DailyTransactionLimitException.class)
+    public ResponseEntity<String> handleDailyTransactionLimitException(DailyTransactionLimitException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }
