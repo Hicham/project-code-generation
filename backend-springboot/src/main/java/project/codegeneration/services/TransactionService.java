@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import project.codegeneration.exceptions.DailyTransactionLimitException;
 import project.codegeneration.exceptions.ResourceNotFoundException;
 import project.codegeneration.models.*;
 import project.codegeneration.repositories.TransactionRepository;
@@ -24,6 +25,7 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TransactionService {
@@ -71,7 +73,7 @@ public class TransactionService {
 
         double totalDailyTransactions = calculateTotalDailyTransactions(sourceIBAN);
         if (totalDailyTransactions + amount > sourceAccount.getTransactionLimit().getDailyLimit()) {
-            throw new IllegalArgumentException("Daily transaction limit exceeded.");
+            throw new DailyTransactionLimitException();
         }
 
 
@@ -96,13 +98,14 @@ public class TransactionService {
 
             double totalDailyTransactions = calculateTotalDailyTransactions(sourceIBAN);
 
-            if (totalDailyTransactions + amount > sourceAccount.getTransactionLimit().getDailyLimit()) {
-                throw new IllegalArgumentException("Daily transaction limit exceeded.");
-            }
-
             if (sourceAccount == null) {
                 throw new ResourceNotFoundException("Cant find source account");
             }
+
+            if (totalDailyTransactions + amount > sourceAccount.getTransactionLimit().getDailyLimit()) {
+                throw new DailyTransactionLimitException();
+            }
+
 
             accountService.withdraw(sourceAccount, amount);
 
@@ -127,12 +130,14 @@ public class TransactionService {
         Long startOfDay = today.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
         Long endOfDay = today.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
-
-        return transactionRepository.findSumBySourceIBANAndTimestampBetween(
+        Optional<Double> sum = transactionRepository.findSumBySourceIBANAndTimestampBetween(
                 iban,
                 startOfDay,
                 endOfDay
         );
+
+       return sum.orElse(0.0);
+
     }
 
     public Page<Transaction> getTransactions(Pageable pageable) {

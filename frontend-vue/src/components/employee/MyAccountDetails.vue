@@ -58,7 +58,11 @@ export default {
 
     const fetchUser = async () => {
       try {
-        const response = await axiosInstance.get(`/api/users/${userObject.value.email}`);
+        const response = await axiosInstance.get(`/api/users/${userObject.value.email}`, {
+          headers: {
+            'Authorization': 'Bearer ' + store.token
+          }
+        });
         const user = response.data;
 
         // Update the userObject with fetched user data including BSN number and phone number
@@ -79,13 +83,9 @@ export default {
 
     const fetchUserAccounts = () => {
       axiosInstance
-          .get('/api/accounts', {
+          .get(`/api/users/${store.user.id}/accounts`, {
             headers: {
               Authorization: 'Bearer ' + store.token,
-            },
-            params: {
-              userId: store.user.id,
-              isChecking: false,
             },
           })
           .then((result) => {

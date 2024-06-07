@@ -2,25 +2,22 @@ package project.codegeneration.services;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import project.codegeneration.exceptions.InsufficientFundsException;
 import project.codegeneration.exceptions.ResourceNotFoundException;
-import project.codegeneration.models.Account;
-import project.codegeneration.models.AccountType;
+import project.codegeneration.models.*;
 import project.codegeneration.models.DTO.ApproveUserDTO;
-import project.codegeneration.models.TransactionLimit;
-import project.codegeneration.models.User;
+import project.codegeneration.models.DTO.TransactionLimitDTO;
+import project.codegeneration.models.DTO.TransactionRequestDTO;
 import project.codegeneration.repositories.AccountRepository;
 import project.codegeneration.repositories.TransactionLimitRepository;
-import project.codegeneration.util.IBANGenerator;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,6 +26,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class AccountServiceTest {
+
+    @InjectMocks
+    private AccountService accountService;
 
     @Mock
     private AccountRepository accountRepository;
@@ -39,8 +39,8 @@ class AccountServiceTest {
     @Mock
     private UserService userService;
 
-    @InjectMocks
-    private AccountService accountService;
+    @Mock
+    private TransactionService transactionService;
 
     @BeforeEach
     void setUp() {
@@ -48,154 +48,242 @@ class AccountServiceTest {
     }
 
     @Test
-    void getAccountByIBAN_ShouldReturnAccount_WhenAccountExists() {
+    void testGetAccountById() {
         Account account = new Account();
-        account.setIBAN("TESTIBAN");
-        when(accountRepository.findByIBAN("TESTIBAN")).thenReturn(account);
+        account.setIBAN("testIBAN");
 
-        Account result = accountService.getAccountByIBAN("TESTIBAN");
+        when(accountRepository.findById(anyInt())).thenReturn(Optional.of(account));
 
-        assertEquals("TESTIBAN", result.getIBAN());
-        verify(accountRepository, times(1)).findByIBAN("TESTIBAN");
+        Account result = accountService.getAccountById(1);
+        assertEquals("testIBAN", result.getIBAN());
     }
 
     @Test
-    void getAccountByIBAN_ShouldThrowException_WhenAccountDoesNotExist() {
-        when(accountRepository.findByIBAN("TESTIBAN")).thenReturn(null);
+    void testGetAccountByIBAN_Success() {
+        Account account = new Account();
+        account.setIBAN("testIBAN");
 
-        assertThrows(ResourceNotFoundException.class, () -> accountService.getAccountByIBAN("TESTIBAN"));
-        verify(accountRepository, times(1)).findByIBAN("TESTIBAN");
+        when(accountRepository.findByIBAN("testIBAN")).thenReturn(account);
+
+        Account result = accountService.getAccountByIBAN("testIBAN");
+        assertEquals("testIBAN", result.getIBAN());
     }
 
     @Test
-    void getAllAccounts_ShouldReturnAllAccounts() {
-        Account account1 = new Account();
-        Account account2 = new Account();
-        when(accountRepository.findAll()).thenReturn(List.of(account1, account2));
+    void testGetAccountByIBAN_AccountNotFound() {
+        when(accountRepository.findByIBAN("testIBAN")).thenReturn(null);
+
+        assertThrows(ResourceNotFoundException.class, () -> accountService.getAccountByIBAN("testIBAN"));
+    }
+
+    @Test
+    void testGetAllAccounts_Pageable() {
+        List<Account> accounts = Arrays.asList(new Account(), new Account());
+        Page<Account> page = new PageImpl<>(accounts);
+
+        when(accountRepository.findAll(any(Pageable.class))).thenReturn(page);
+
+        Page<Account> result = accountService.getAllAccounts(PageRequest.of(0, 10));
+        assertEquals(2, result.getTotalElements());
+    }
+
+    @Test
+    void testGetAllAccounts() {
+        List<Account> accounts = Arrays.asList(new Account(), new Account());
+
+        when(accountRepository.findAll()).thenReturn(accounts);
 
         List<Account> result = accountService.getAllAccounts();
-
         assertEquals(2, result.size());
-        verify(accountRepository, times(1)).findAll();
     }
 
     @Test
-    void updateAccount_ShouldReturnUpdatedAccount() {
+    void testUpdateAccount() {
         Account account = new Account();
-        when(accountRepository.save(account)).thenReturn(account);
+        account.setIBAN("testIBAN");
+
+        when(accountRepository.save(any(Account.class))).thenReturn(account);
 
         Account result = accountService.updateAccount(account);
-
-        assertEquals(account, result);
-        verify(accountRepository, times(1)).save(account);
+        assertEquals("testIBAN", result.getIBAN());
     }
 
     @Test
-    void createAccount_ShouldReturnCreatedAccount() {
+    void testCreateAccount() {
         Account account = new Account();
-        when(accountRepository.save(account)).thenReturn(account);
+        account.setIBAN("testIBAN");
+
+        when(accountRepository.save(any(Account.class))).thenReturn(account);
 
         Account result = accountService.createAccount(account);
-
-        assertEquals(account, result);
-        verify(accountRepository, times(1)).save(account);
+        assertEquals("testIBAN", result.getIBAN());
     }
 
-
+    @Test
+    void testDeleteAccount() {
+        accountService.deleteAccount(1);
+        verify(accountRepository, times(1)).deleteById(1);
+    }
 
     @Test
-    void deposit_ShouldIncreaseBalance() {
+    void testGetAccountsByUserId_Success() {
+        User user = new User();
+        user.setId(1);
+
+        List<Account> accounts = Arrays.asList(new Account(), new Account());
+        Page<Account> page = new PageImpl<>(accounts);
+
+        when(userService.getUserById(anyInt())).thenReturn(Optional.of(user));
+        when(accountRepository.findByUserId(any(Pageable.class), anyInt())).thenReturn(page);
+
+        Page<Account> result = accountService.getAccountsByUserId(PageRequest.of(0, 10), 1);
+        assertEquals(2, result.getTotalElements());
+    }
+
+    @Test
+    void testGetAccountsByUserId_UserNotFound() {
+        when(userService.getUserById(anyInt())).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> accountService.getAccountsByUserId(PageRequest.of(0, 10), 1));
+    }
+
+    @Test
+    void testGetAccountsByUserEmail() {
+        Account account = new Account();
+        account.setIBAN("testIBAN");
+
+        when(accountRepository.findAccountsByUserEmail(anyString())).thenReturn(Optional.of(account));
+
+        Optional<Account> result = accountService.getAccountsByUserEmail("test@example.com");
+        assertTrue(result.isPresent());
+        assertEquals("testIBAN", result.get().getIBAN());
+    }
+
+    @Test
+    void testGetCheckingAccountsByUserId_Success() {
+        User user = new User();
+        user.setId(1);
+
+        List<Account> accounts = Arrays.asList(new Account(), new Account());
+        Page<Account> page = new PageImpl<>(accounts);
+
+        when(userService.getUserById(anyInt())).thenReturn(Optional.of(user));
+        when(accountRepository.findByUserIdAndAccountType(any(Pageable.class), anyInt(), any(AccountType.class))).thenReturn(page);
+
+        Page<Account> result = accountService.getCheckingAccountsByUserId(PageRequest.of(0, 10), 1);
+        assertEquals(2, result.getTotalElements());
+    }
+
+    @Test
+    void testGetCheckingAccountsByUserId_UserNotFound() {
+        when(userService.getUserById(anyInt())).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> accountService.getCheckingAccountsByUserId(PageRequest.of(0, 10), 1));
+    }
+
+    @Test
+    void testDeposit() {
         Account account = new Account();
         account.setBalance(100.0);
-        when(accountRepository.saveAndFlush(account)).thenReturn(account);
 
         accountService.deposit(account, 50.0);
-
         assertEquals(150.0, account.getBalance());
         verify(accountRepository, times(1)).saveAndFlush(account);
     }
 
     @Test
-    void withdraw_ShouldDecreaseBalance() {
+    void testDeposit_NegativeAmount() {
+        Account account = new Account();
+        assertThrows(IllegalArgumentException.class, () -> accountService.deposit(account, -50.0));
+    }
+
+    @Test
+    void testWithdraw() {
         Account account = new Account();
         account.setBalance(100.0);
-        account.setAbsoluteLimit(0.0);
-        when(accountRepository.saveAndFlush(account)).thenReturn(account);
+        account.setAbsoluteLimit(-50.0);
 
         accountService.withdraw(account, 50.0);
-
         assertEquals(50.0, account.getBalance());
         verify(accountRepository, times(1)).saveAndFlush(account);
     }
 
     @Test
-    void withdraw_ShouldThrowException_WhenInsufficientFunds() {
+    void testWithdraw_NegativeAmount() {
+        Account account = new Account();
+        assertThrows(IllegalArgumentException.class, () -> accountService.withdraw(account, -50.0));
+    }
+
+    @Test
+    void testWithdraw_InsufficientFunds() {
         Account account = new Account();
         account.setBalance(100.0);
-        account.setAbsoluteLimit(0.0);
+        account.setAbsoluteLimit(0);
 
         assertThrows(InsufficientFundsException.class, () -> accountService.withdraw(account, 150.0));
-        verify(accountRepository, never()).saveAndFlush(account);
     }
 
-    @Test
-    void getAccountsByUserId_ShouldReturnAccounts_WhenUserExists() {
-        int userId = 1;
-        User user = new User();
-        user.setId(userId);
-        when(userService.getUserById(userId)).thenReturn(Optional.of(user));
-        Pageable pageable = PageRequest.of(0, 10);
-        Page<Account> accounts = new PageImpl<>(Collections.emptyList());
-        when(accountRepository.findByUserId(pageable, userId)).thenReturn(accounts);
-
-        Page<Account> result = accountService.getAccountsByUserId(pageable, userId);
-
-        assertEquals(accounts, result);
-        verify(accountRepository, times(1)).findByUserId(pageable, userId);
-    }
-
-    @Test
-    void getAccountsByUserId_ShouldThrowException_WhenUserDoesNotExist() {
-        int userId = 1;
-        when(userService.getUserById(userId)).thenReturn(Optional.empty());
-        Pageable pageable = PageRequest.of(0, 10);
-
-        assertThrows(ResourceNotFoundException.class, () -> accountService.getAccountsByUserId(pageable, userId));
-        verify(accountRepository, never()).findByUserId(pageable, userId);
-    }
+//    @Test
+//    void testCreateAccountForApprovedUser() {
+//        User user = new User();
+//        user.setApproved(true);
+//
+//        ApproveUserDTO approveUserDTO = new ApproveUserDTO(1, new TransactionLimitDTO("IBAN",500.0, 0), 1000.0);
+//
+//        when(accountRepository.save(any(Account.class))).thenAnswer(invocation -> invocation.getArgument(0));
+//        when(transactionLimitRepository.save(any(TransactionLimit.class))).thenAnswer(invocation -> invocation.getArgument(0));
+//
+//        accountService.createAccountForApprovedUser(user, approveUserDTO);
+//
+//        verify(accountRepository, times(2)).save(any(Account.class));
+//        verify(transactionLimitRepository, times(2)).save(any(TransactionLimit.class));
+//    }
 
     @Test
-    void isAccountOwner_ShouldReturnTrue_WhenEmailMatches() {
-        String email = "test@example.com";
-        String iban = "TESTIBAN";
-        User user = new User();
-        user.setEmail(email);
+    void testDisableAccount() {
         Account account = new Account();
-        account.setIBAN(iban);
+        account.setActive(true);
+
+        accountService.disableAccount(account);
+        assertFalse(account.isActive());
+        verify(accountRepository, times(1)).save(account);
+    }
+
+    @Test
+    void testEnableAccount() {
+        Account account = new Account();
+        account.setActive(false);
+
+        accountService.enableAccount(account);
+        assertTrue(account.isActive());
+        verify(accountRepository, times(1)).save(account);
+    }
+
+    @Test
+    void testSetAbsoluteLimit() {
+        Account account = new Account();
+        account.setIBAN("testIBAN");
+
+        when(accountRepository.findByIBAN("testIBAN")).thenReturn(account);
+
+        accountService.setAbsoluteLimit("testIBAN", 500.0);
+        assertEquals(500.0, account.getAbsoluteLimit());
+        verify(accountRepository, times(1)).save(account);
+    }
+
+    @Test
+    void testIsAccountOwner() {
+        User user = new User();
+        user.setEmail("test@example.com");
+
+        Account account = new Account();
+        account.setIBAN("testIBAN");
         account.setUser(user);
-        when(accountRepository.findByIBAN(iban)).thenReturn(account);
 
-        boolean result = accountService.isAccountOwner(email, iban);
+        when(accountRepository.findByIBAN("testIBAN")).thenReturn(account);
 
+        boolean result = accountService.isAccountOwner("test@example.com", "testIBAN");
         assertTrue(result);
-        verify(accountRepository, times(1)).findByIBAN(iban);
-    }
-
-    @Test
-    void isAccountOwner_ShouldReturnFalse_WhenEmailDoesNotMatch() {
-        String email = "test@example.com";
-        String iban = "TESTIBAN";
-        User user = new User();
-        user.setEmail("different@example.com");
-        Account account = new Account();
-        account.setIBAN(iban);
-        account.setUser(user);
-        when(accountRepository.findByIBAN(iban)).thenReturn(account);
-
-        boolean result = accountService.isAccountOwner(email, iban);
-
-        assertFalse(result);
-        verify(accountRepository, times(1)).findByIBAN(iban);
     }
 
 

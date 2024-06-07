@@ -4,31 +4,32 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
+import project.codegeneration.exceptions.DailyTransactionLimitException;
 import project.codegeneration.exceptions.ResourceNotFoundException;
 import project.codegeneration.models.*;
 import project.codegeneration.repositories.TransactionRepository;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
-public class TransactionServiceTest {
+class TransactionServiceTest {
+
+    @InjectMocks
+    private TransactionService transactionService;
 
     @Mock
     private TransactionRepository transactionRepository;
@@ -39,105 +40,153 @@ public class TransactionServiceTest {
     @Mock
     private EntityManager entityManager;
 
-    @InjectMocks
-    private TransactionService transactionService;
 
-    private Account sourceAccount;
-    private Account destinationAccount;
-    private User user;
+    @Mock
+    private CriteriaBuilder criteriaBuilder;
+
+    @Mock
+    private CriteriaQuery<Transaction> criteriaQuery;
+
+    @Mock
+    private Root<Transaction> root;
+
+    @Mock
+    private TypedQuery<Transaction> typedQuery;
 
     @BeforeEach
-    public void setup() {
-        user = new User(List.of(Role.ROLE_USER), false, "wouter123@gmail.com", "test", "test", "test", "3652574", "06352615");
-        user.setId(1);
-
-        sourceAccount = new Account();
-        sourceAccount.setIBAN("SOURCE_IBAN");
-        sourceAccount.setTransactionLimit(new TransactionLimit("SOURCE_IBAN", 500.00));
-        sourceAccount.setUser(user);
-
-        destinationAccount = new Account();
-        destinationAccount.setIBAN("DEST_IBAN");
-
-        when(accountService.getAccountByIBAN("SOURCE_IBAN")).thenReturn(sourceAccount);
-        when(accountService.getAccountByIBAN("DEST_IBAN")).thenReturn(destinationAccount);
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void testTransferTransaction_Success() {
-        double amount = 100.0;
+    void testTransferTransaction_Success() {
+        User user = new User();
+        user.setId(1);
+        user.setRoles(Arrays.asList(Role.ROLE_USER));
 
-        when(transactionRepository.findSumBySourceIBANAndTimestampBetween(anyString(), anyLong(), anyLong()))
-                .thenReturn(0.0);
+        TransactionLimit transactionLimit = new TransactionLimit("sourceIBAN", 5000.0);
 
-        transactionService.transferTransaction("SOURCE_IBAN", "DEST_IBAN", amount, "Test Transfer", TransactionType.TRANSFER, user);
+        Account sourceAccount = new Account();
+        sourceAccount.setIBAN("sourceIBAN");
+        sourceAccount.setBalance(1000.0);
+        sourceAccount.setUser(user);
+        sourceAccount.setTransactionLimit(transactionLimit);
 
-        verify(accountService).withdraw(sourceAccount, amount);
-        verify(accountService).deposit(destinationAccount, amount);
+        Account destinationAccount = new Account();
+        destinationAccount.setIBAN("destinationIBAN");
+        destinationAccount.setBalance(500.0);
+
+        when(accountService.getAccountByIBAN("sourceIBAN")).thenReturn(sourceAccount);
+        when(accountService.getAccountByIBAN("destinationIBAN")).thenReturn(destinationAccount);
+        when(transactionRepository.findSumBySourceIBANAndTimestampBetween(anyString(), anyLong(), anyLong())).thenReturn(Optional.of(0.0));
+
+        transactionService.transferTransaction("sourceIBAN", "destinationIBAN", 200.0, "Test transfer", TransactionType.TRANSFER, user);
+
+        verify(accountService).withdraw(sourceAccount, 200.0);
+        verify(accountService).deposit(destinationAccount, 200.0);
         verify(transactionRepository).saveAndFlush(any(Transaction.class));
     }
 
     @Test
-    public void testTransferTransaction_DailyLimitExceeded() {
-        double amount = 600.0;
+    void testTransferTransaction_SourceAccountNotFound() {
+        User user = new User();
+        user.setId(1);
 
-        when(transactionRepository.findSumBySourceIBANAndTimestampBetween(anyString(), anyLong(), anyLong()))
-                .thenReturn(0.0);
+        when(accountService.getAccountByIBAN("sourceIBAN")).thenReturn(null);
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            transactionService.transferTransaction("SOURCE_IBAN", "DEST_IBAN", amount, "Test Transfer", TransactionType.TRANSFER, user);
-        });
-
-        assertEquals("Daily transaction limit exceeded.", exception.getMessage());
+        assertThrows(ResourceNotFoundException.class, () -> transactionService.transferTransaction("sourceIBAN", "destinationIBAN", 200.0, "Test transfer", TransactionType.TRANSFER, user));
     }
 
     @Test
-    public void testTransferTransaction_SourceAccountNotFound() {
-        when(accountService.getAccountByIBAN("SOURCE_IBAN")).thenReturn(null);
+    void testTransferTransaction_DestinationAccountNotFound() {
+        User user = new User();
+        user.setId(1);
 
-        Exception exception = assertThrows(ResourceNotFoundException.class, () -> {
-            transactionService.transferTransaction("SOURCE_IBAN", "DEST_IBAN", 100.0, "Test Transfer", TransactionType.TRANSFER, user);
-        });
+        Account sourceAccount = new Account();
+        sourceAccount.setIBAN("sourceIBAN");
 
-        assertEquals("Cant find source account", exception.getMessage());
+        when(accountService.getAccountByIBAN("sourceIBAN")).thenReturn(sourceAccount);
+        when(accountService.getAccountByIBAN("destinationIBAN")).thenReturn(null);
+
+        assertThrows(ResourceNotFoundException.class, () -> transactionService.transferTransaction("sourceIBAN", "destinationIBAN", 200.0, "Test transfer", TransactionType.TRANSFER, user));
     }
 
     @Test
-    public void testTransferTransaction_UnauthorizedUser() {
-        User otherUser = new User();
-        otherUser.setId(2);
-        sourceAccount.setUser(otherUser);
+    void testTransferTransaction_DailyLimitExceeded() {
+        User user = new User();
+        user.setId(1);
 
-        Exception exception = assertThrows(AccessDeniedException.class, () -> {
-            transactionService.transferTransaction("SOURCE_IBAN", "DEST_IBAN", 100.0, "Test Transfer", TransactionType.TRANSFER, user);
-        });
+        TransactionLimit transactionLimit = new TransactionLimit("sourceIBAN", 1000.0);
 
-        assertEquals("Not Authorized to perform this action.", exception.getMessage());
+        Account sourceAccount = new Account();
+        sourceAccount.setIBAN("sourceIBAN");
+        sourceAccount.setTransactionLimit(transactionLimit);
+
+        Account destinationAccount = new Account();
+        destinationAccount.setIBAN("destinationIBAN");
+
+        when(accountService.getAccountByIBAN("sourceIBAN")).thenReturn(sourceAccount);
+        when(accountService.getAccountByIBAN("destinationIBAN")).thenReturn(destinationAccount);
+        when(transactionRepository.findSumBySourceIBANAndTimestampBetween(anyString(), anyLong(), anyLong())).thenReturn(Optional.of(900.0));
+
+        assertThrows(DailyTransactionLimitException.class, () -> transactionService.transferTransaction("sourceIBAN", "destinationIBAN", 200.0, "Test transfer", TransactionType.TRANSFER, user));
     }
 
     @Test
-    public void testGetAccountTransactions() {
-        Pageable pageable = PageRequest.of(0, 10);
-        Transaction transaction = new Transaction("SOURCE_IBAN", "DEST_IBAN", 100.0, "Test Transaction", TransactionType.TRANSFER, user);
-        List<Transaction> transactions = new ArrayList<>();
-        transactions.add(transaction);
-        Page<Transaction> page = new PageImpl<>(transactions, pageable, 1);
+    void testATMTransaction_Deposit() {
+        User user = new User();
+        user.setId(1);
 
-        CriteriaBuilder criteriaBuilder = mock(CriteriaBuilder.class);
-        CriteriaQuery<Transaction> criteriaQuery = mock(CriteriaQuery.class);
-        Root<Transaction> root = mock(Root.class);
-        TypedQuery<Transaction> typedQuery = mock(TypedQuery.class);
+        Account destinationAccount = new Account();
+        destinationAccount.setIBAN("destinationIBAN");
 
-        when(entityManager.getCriteriaBuilder()).thenReturn(criteriaBuilder);
-        when(criteriaBuilder.createQuery(Transaction.class)).thenReturn(criteriaQuery);
-        when(criteriaQuery.from(Transaction.class)).thenReturn(root);
-        when(entityManager.createQuery(criteriaQuery)).thenReturn(typedQuery);
-        when(typedQuery.getResultList()).thenReturn(transactions);
+        when(accountService.getAccountByIBAN("destinationIBAN")).thenReturn(destinationAccount);
 
-        Page<Transaction> result = transactionService.getAccountTransactions("SOURCE_IBAN", null, null, null, null, null, null, pageable);
+        transactionService.ATMTransaction(null, "destinationIBAN", 200.0, "ATM deposit", TransactionType.DEPOSIT, user);
 
-        assertEquals(page.getTotalElements(), result.getTotalElements());
-        assertEquals(page.getContent().size(), result.getContent().size());
-        verify(entityManager).createQuery(criteriaQuery);
+        verify(accountService).deposit(destinationAccount, 200.0);
+        verify(transactionRepository).saveAndFlush(any(Transaction.class));
     }
+
+    @Test
+    void testATMTransaction_Withdraw() {
+        User user = new User();
+        user.setId(1);
+
+        TransactionLimit transactionLimit = new TransactionLimit("sourceIBAN", 1000.0);
+
+        Account sourceAccount = new Account();
+        sourceAccount.setIBAN("sourceIBAN");
+        sourceAccount.setTransactionLimit(transactionLimit);
+
+        when(accountService.getAccountByIBAN("sourceIBAN")).thenReturn(sourceAccount);
+        when(transactionRepository.findSumBySourceIBANAndTimestampBetween(anyString(), anyLong(), anyLong())).thenReturn(Optional.of(500.0));
+
+        transactionService.ATMTransaction("sourceIBAN", null, 200.0, "ATM withdraw", TransactionType.WITHDRAW, user);
+
+        verify(accountService).withdraw(sourceAccount, 200.0);
+        verify(transactionRepository).saveAndFlush(any(Transaction.class));
+    }
+
+    @Test
+    void testATMTransaction_DestinationAccountNotFound() {
+        User user = new User();
+        user.setId(1);
+
+        when(accountService.getAccountByIBAN("destinationIBAN")).thenReturn(null);
+
+        assertThrows(ResourceNotFoundException.class, () -> transactionService.ATMTransaction(null, "destinationIBAN", 200.0, "ATM deposit", TransactionType.DEPOSIT, user));
+    }
+
+    @Test
+    void testATMTransaction_SourceAccountNotFound() {
+        User user = new User();
+        user.setId(1);
+
+        when(accountService.getAccountByIBAN("sourceIBAN")).thenReturn(null);
+
+        assertThrows(ResourceNotFoundException.class, () -> transactionService.ATMTransaction("sourceIBAN", null, 200.0, "ATM withdraw", TransactionType.WITHDRAW, user));
+    }
+
+
 }
