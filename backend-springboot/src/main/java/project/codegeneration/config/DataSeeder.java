@@ -32,15 +32,15 @@ public class DataSeeder implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
 
-        System.out.println("DataSeeder is running...");
-        System.out.println("DataSeeder is running...");
-        System.out.println("DataSeeder is running...");
-        userRepository.findAll().forEach(System.out::println);
-
-        User user = new User(List.of(Role.ROLE_ADMIN), true, "hicham@gmail.com", "Test123", "test", "test", "3652584", "06352615");
-        userService.create(user);
-
-        userRepository.findAll().forEach(System.out::println);
+//        System.out.println("DataSeeder is running...");
+//        System.out.println("DataSeeder is running...");
+//        System.out.println("DataSeeder is running...");
+//        userRepository.findAll().forEach(System.out::println);
+//
+//        User user = new User(List.of(Role.ROLE_ADMIN), true, "hicham@gmail.com", "Test123", "test", "test", "3652584", "06352615");
+//        userService.create(user);
+//
+//        userRepository.findAll().forEach(System.out::println);
 
 //                User user = userService.findByEmail("hicham@gmail.com").get();
 //
