@@ -32,20 +32,25 @@ public class DataSeeder implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
 
+        User user = new User(List.of(Role.ROLE_ADMIN), true, "hicham@gmail.com", "Test123", "test", "test", "3652584", "06352615");
+        userService.create(user);
+
+
 //        System.out.println("DataSeeder is running...");
-        System.out.println("DataSeeder is running...");
-
-
-
-        if (userRepository.findByEmail("hicham@gmail.com").isEmpty()) {
-            User user = new User(List.of(Role.ROLE_ADMIN), true, "hicham@gmail.com", "Test123", "test", "test", "3652584", "06352615");
-            userRepository.saveAndFlush(user);
-            System.out.println("User created");
-        }
-        else
-        {
-            System.out.println("User already exists");
-        }
+//        System.out.println("DataSeeder is running...");
+//
+//
+//        System.out.println(userRepository.findByEmail("hicham@gmail.com"));
+//
+//        if (userRepository.findByEmail("hicham@gmail.com").isEmpty()) {
+//            User user = new User(List.of(Role.ROLE_ADMIN), true, "hicham@gmail.com", "Test123", "test", "test", "3652584", "06352615");
+//            userRepository.saveAndFlush(user);
+//            System.out.println("User created");
+//        }
+//        else
+//        {
+//            System.out.println("User already exists");
+//        }
 
 
 
