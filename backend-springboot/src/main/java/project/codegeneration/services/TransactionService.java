@@ -72,7 +72,7 @@ public class TransactionService {
         }
 
         double totalDailyTransactions = calculateTotalDailyTransactions(sourceIBAN);
-        if (totalDailyTransactions + amount > sourceAccount.getTransactionLimit().getDailyLimit() || user.getRoles().contains(Role.ROLE_USER)) {
+        if (!user.getRoles().contains(Role.ROLE_ADMIN) && totalDailyTransactions + amount > sourceAccount.getTransactionLimit().getDailyLimit()) {
             throw new DailyTransactionLimitException();
         }
 
@@ -102,7 +102,7 @@ public class TransactionService {
                 throw new ResourceNotFoundException("Cant find source account");
             }
 
-            if (totalDailyTransactions + amount > sourceAccount.getTransactionLimit().getDailyLimit() || user.getRoles().contains(Role.ROLE_USER)) {
+            if (!user.getRoles().contains(Role.ROLE_ADMIN) && totalDailyTransactions + amount > sourceAccount.getTransactionLimit().getDailyLimit()) {
                 throw new DailyTransactionLimitException();
             }
 
