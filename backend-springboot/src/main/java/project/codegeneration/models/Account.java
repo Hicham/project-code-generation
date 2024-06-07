@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Entity
+@Table(name = "accounts")
 public class Account {
 
     @Id
@@ -29,6 +30,8 @@ public class Account {
     private boolean isActive;
 
     private double absoluteLimit;
+
+
 
 
 }

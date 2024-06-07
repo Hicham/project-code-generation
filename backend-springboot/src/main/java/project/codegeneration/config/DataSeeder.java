@@ -3,10 +3,13 @@ package project.codegeneration.config;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
+import project.codegeneration.models.*;
 import project.codegeneration.repositories.AccountRepository;
 import project.codegeneration.repositories.UserRepository;
 import project.codegeneration.services.AccountService;
 import project.codegeneration.services.UserService;
+
+import java.util.List;
 
 
 @Component
@@ -51,29 +54,35 @@ public class DataSeeder implements ApplicationRunner {
 //        accountRepository.save(account);
 //        accountRepository.save(account2);
 ////
-
-//       User user = new User(List.of(Role.ROLE_ADMIN), false, "wouter123@gmail.com", "test", "test", "test", "3652574", "06352615");
-//        User user2 = new User(List.of(Role.ROLE_USER), false, "hicham21@gmail.com", "test", "test", "test", "3652584", "06352615");
-//        User user3 = new User(List.of(Role.ROLE_USER), false, "hicham22@gmail.com", "test", "test", "test", "3652584", "06352615");
-//        User user4 = new User(List.of(Role.ROLE_USER), false, "hicham23@gmail.com", "test", "test", "test", "3652584", "06352615");
-//        User user5 = new User(List.of(Role.ROLE_USER), false, "hicham24@gmail.com", "test", "test", "test", "3652584", "06352615");
-//                userService.create(user);
+//
+//       User user1 = new User(List.of(Role.ROLE_ADMIN), false, "wouter1234@gmail.com", "Test123", "test", "test", "3652574", "06352615");
+//        User user2 = new User(List.of(Role.ROLE_USER), true, "duha1@gmail.com", "Test123", "test", "test", "3652584", "06352615");
+//        User user3 = new User(List.of(Role.ROLE_USER), false, "hicham25@gmail.com", "Test123", "test", "test", "3652584", "06352615");
+//        User user4 = new User(List.of(Role.ROLE_USER), false, "hicham26@gmail.com", "Test123", "test", "test", "3652584", "06352615");
+//        User user5 = new User(List.of(Role.ROLE_USER), false, "hicham247gmail.com", "Test123", "test", "test", "3652584", "06352615");
+//                userService.create(user1);
 //
 //
 //       userService.create(user2);
 //         userService.create(user3);
 //            userService.create(user4);
 //            userService.create(user5);
+////
+//        TransactionLimit transactionLimit = new TransactionLimit("IBANFAKE1", 1000);
 //
-//        TransactionLimit transactionLimit = new TransactionLimit("IBANFAKE1", 1000, 10000, 100000);
 //
-//        Account account = new Account("IBANFAKE1", user , AccountType.CHECKING, 1000, true, 999999999);
+//        transactionLimit.setAccount(accountService.getAccountByIBAN("IBANFAKE1"));
 //
-//        //Account account = new Account("IBANFAKE2", user , AccountType.CHECKING, 1000, true, 999999999);
-//        //Account account2 = new Account("IBANFAKE3", user ,AccountType.CHECKING, 2000, true, 999999999);
+//        Account account = new Account("IBANFAKE1", transactionLimit, user2 ,AccountType.CHECKING, 1000, true, 999999999);
+//        Account account2 = new Account("IBANFAKE2", transactionLimit, user2 , AccountType.SAVINGS, 2000, true, 999999999);
+//
+//
 //
 //       accountService.createAccount(account);
-        //accountRepository.save(account2);
+//        accountRepository.save(account);
+//
+//        accountService.createAccount(account2);
+//        accountRepository.save(account2);
 
 
 //            Account account = accountService.getAccountByIBAN("IBANFAKE1");
