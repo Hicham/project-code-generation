@@ -44,7 +44,7 @@ public class UserService {
         }
 
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+        return userRepository.saveAndFlush(user);
     }
 
     public String login(String email, String password) {
