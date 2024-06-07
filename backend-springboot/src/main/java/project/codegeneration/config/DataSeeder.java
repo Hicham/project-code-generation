@@ -42,7 +42,7 @@ public class DataSeeder implements ApplicationRunner {
 //            accountRepository.save(account);
 //        }
 
-//        User user = new User(List.of(Role.ROLE_USER), true, "test2@gmail.com", "test", "test", "test", "3652584", "06352615");
+//        User user = new User(List.of(Role.ROLE_ADMIN), true, "admin@gmail.com", "Admin123", "test", "test", "3652584", "06352615");
 //////        User user = new User(List.of(Role.ROLE_USER), false, "hicham2@gmail.com", "test", "test", "test", "3652584", "06352615");
 //        userService.create(user);
 //
