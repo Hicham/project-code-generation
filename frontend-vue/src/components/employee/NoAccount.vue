@@ -93,13 +93,21 @@ export default {
     };
     const approveUser = async () => {
       try {
-        await axiosInstance.post(`/api/accounts/approve`, {
-          userId: selectedUser.value.userId,
-          transactionLimit: {
-            dailyLimit: limits.value.dailyLimit,
-          },
-          absoluteLimit: limits.value.absoluteLimit,
-        });
+        await axiosInstance.post(
+            `/api/accounts/approve`,
+            {
+              userId: selectedUser.value.userId,
+              transactionLimit: {
+                dailyLimit: limits.value.dailyLimit,
+              },
+              absoluteLimit: limits.value.absoluteLimit,
+            },
+            {
+              headers: {
+                Authorization: 'Bearer ' + useStore().token,
+              },
+            }
+        );
         users.value = users.value.filter(user => user.userId !== selectedUser.value.userId);
         showModal.value = false;
         showPopup.value = true;

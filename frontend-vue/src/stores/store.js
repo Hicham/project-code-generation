@@ -30,7 +30,7 @@ export const useStore = defineStore('counter', {
                     .then((res) => {
 
                         console.log(res);
-                        axios.defaults.headers.common['Authorization'] = 'Bearer ' + res.data.token;
+                        axiosInstance.defaults.headers.common['Authorization'] = 'Bearer ' + res.data.token;
                         this.token = res.data.token;
 
                         let decoded = jwtDecode(this.token);
@@ -93,7 +93,7 @@ export const useStore = defineStore('counter', {
             localStorage.removeItem('user');
             localStorage.removeItem('loginType');
 
-            delete axios.defaults.headers.common['Authorization'];
+            delete axiosInstance.defaults.headers.common['Authorization'];
         },
         autoLogin() {
             let token = localStorage.getItem('token');
@@ -104,7 +104,7 @@ export const useStore = defineStore('counter', {
                 this.token = token;
                 this.user = JSON.parse(user);
                 this.loginType = loginType;
-                axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+                axiosInstance.defaults.headers.common['Authorization'] = 'Bearer ' + token;
             } else {
                 // Clear localStorage if any required data is missing
                 this.logout();
