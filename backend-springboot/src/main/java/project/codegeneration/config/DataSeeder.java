@@ -4,6 +4,8 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 import project.codegeneration.models.*;
+import project.codegeneration.models.DTO.ApproveUserDTO;
+import project.codegeneration.models.DTO.TransactionLimitDTO;
 import project.codegeneration.repositories.AccountRepository;
 import project.codegeneration.repositories.UserRepository;
 import project.codegeneration.services.AccountService;
@@ -33,12 +35,12 @@ public class DataSeeder implements ApplicationRunner {
     public void run(ApplicationArguments args) throws Exception {
 
         System.out.println("DataSeeder is running...");
-        userRepository.findAll().forEach(System.out::println);
         User user = new User(List.of(Role.ROLE_ADMIN), true, "hicham@gmail.com", "Test123", "test", "test", "3652584", "06352615");
         userService.create(user);
 
-        System.out.println("after create");
-        userRepository.findAll().forEach(System.out::println);
+        accountService.createAccountForApprovedUser(user, new ApproveUserDTO(1, new TransactionLimitDTO("IBANFAKE1", 1000, 0), 0));
+
+
 
 
 //        System.out.println("DataSeeder is running...");
