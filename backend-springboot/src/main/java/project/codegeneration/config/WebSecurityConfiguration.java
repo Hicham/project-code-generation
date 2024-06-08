@@ -81,8 +81,10 @@ public class WebSecurityConfiguration {
         configuration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:5173",
                 "http://127.0.0.1:5173",
-                "https://hicham.github.io/project-code-generation",
-                "https://hicham.github.io"
+                "https://hicham.github.io/project-code-generation/",
+                "https://hicham.github.io/",
+                "https://hicham.github.io/project-code-generation/*",
+                "https://hicham.github.io/*"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET","POST", "PUT", "DELETE", "HEAD", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
