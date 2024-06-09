@@ -3,6 +3,7 @@ package project.codegeneration.exceptions;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -32,5 +33,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DailyTransactionLimitException.class)
     public ResponseEntity<String> handleDailyTransactionLimitException(DailyTransactionLimitException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<String> handleAccessDeniedException() {
+        return new ResponseEntity<>("You do not have permission to access this resource", HttpStatus.FORBIDDEN);
     }
 }

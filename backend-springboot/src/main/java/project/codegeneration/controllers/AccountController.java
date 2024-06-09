@@ -59,7 +59,7 @@ public class AccountController extends Controller {
         return ResponseEntity.ok(accountDTOPage);
     }
 
-    @PreAuthorize("#userId == principal.id or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("isAuthenticated() and #userId == principal.id or hasRole('ROLE_ADMIN')")
     @GetMapping("/users/{userId}/accounts")
     public ResponseEntity<?> getAccountsByUser(@RequestParam(required = false, defaultValue = "0") Integer pageNumber, @PathVariable Integer userId) {
 
@@ -101,7 +101,7 @@ public class AccountController extends Controller {
         return ResponseEntity.ok(accountDTOPage);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN') or @accountService.isAccountOwner(principal.username, #IBAN)")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or isAuthenticated() and @accountService.isAccountOwner(principal.username, #IBAN)")
     @GetMapping("/accounts/{IBAN}")
     public ResponseEntity<AccountDTO> getAccountByIBAN(@PathVariable String IBAN) {
 
@@ -116,7 +116,7 @@ public class AccountController extends Controller {
     }
 
 
-    @PreAuthorize("hasRole('ROLE_ADMIN') or @accountService.isAccountOwner(principal.username, #IBAN)")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/accounts/disable/{IBAN}")
     public ResponseEntity<String> disableAccount(@PathVariable String IBAN) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -138,7 +138,7 @@ public class AccountController extends Controller {
 
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN') or @accountService.isAccountOwner(principal.username, #IBAN)")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/accounts/enable/{IBAN}")
     public ResponseEntity<String> enableAccount(@PathVariable String IBAN) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -160,7 +160,7 @@ public class AccountController extends Controller {
 
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN') or @accountService.isAccountOwner(principal.username, #iban)")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/accounts/setLimits/{iban}")
     public ResponseEntity<String> setTransactionLimits(
             @PathVariable String iban,

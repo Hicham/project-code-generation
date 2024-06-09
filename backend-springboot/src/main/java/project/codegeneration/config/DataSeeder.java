@@ -41,6 +41,10 @@ public class DataSeeder implements ApplicationRunner {
         accountService.createAccountForApprovedUser(user, new ApproveUserDTO(1, new TransactionLimitDTO("IBANFAKE1", 1000, 0), 0));
 
 
+        User user2 = new User(List.of(Role.ROLE_USER), true, "user@gmail.com", "Test123", "test", "test", "3652584", "06352615");
+        userService.create(user2);
+
+        accountService.createAccountForApprovedUser(user2, new ApproveUserDTO(2, new TransactionLimitDTO("IBANFAKE2", 1000, 0), 0));
 
 
 //        System.out.println("DataSeeder is running...");

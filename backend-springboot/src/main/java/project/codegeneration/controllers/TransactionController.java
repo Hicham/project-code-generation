@@ -48,7 +48,7 @@ public class TransactionController extends Controller {
     }
 
 
-    @PreAuthorize("hasRole('ROLE_ADMIN') or @accountService.isAccountOwner(principal.username, #iban)")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or isAuthenticated() and @accountService.isAccountOwner(principal.username, #iban)")
     @GetMapping("/accounts/{iban}/transactions")
     public ResponseEntity<?> getAccountTransactions(@PathVariable String iban,
                                                     @RequestParam(required = false, defaultValue = "0") Integer pageNumber,
@@ -105,7 +105,7 @@ public class TransactionController extends Controller {
     }
 
 
-    @PreAuthorize("hasRole('ROLE_ADMIN') or @accountService.isAccountOwner(principal.username, #IBAN)")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or isAuthenticated() and @accountService.isAccountOwner(principal.username, #IBAN)")
     @PostMapping("/accounts/{IBAN}/deposit")
     public ResponseEntity<String> deposit(@PathVariable String IBAN, @RequestBody ATMTransactionRequest ATMTransactionRequest
     ) {
@@ -118,7 +118,7 @@ public class TransactionController extends Controller {
 
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN') or @accountService.isAccountOwner(principal.username, #IBAN)")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or isAuthenticated() and @accountService.isAccountOwner(principal.username, #IBAN)")
     @PostMapping("/accounts/{IBAN}/withdraw")
     public ResponseEntity<String> withdraw(@PathVariable String IBAN, @RequestBody ATMTransactionRequest ATMTransactionRequest) {
 
