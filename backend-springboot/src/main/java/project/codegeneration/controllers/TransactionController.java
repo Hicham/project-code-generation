@@ -114,8 +114,6 @@ public class TransactionController extends Controller {
 
         transactionService.ATMTransaction(null, IBAN, ATMTransactionRequest.getAmount(), ATMTransactionRequest.getDescription(), TransactionType.DEPOSIT, user);
         return ResponseEntity.ok("Money deposited successfully.");
-//        return ResponseEntity.ok(Double.toString(ATMTransactionRequest.getAmount()));
-
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN') or isAuthenticated() and @accountService.isAccountOwner(principal.username, #IBAN)")
@@ -123,6 +121,8 @@ public class TransactionController extends Controller {
     public ResponseEntity<String> withdraw(@PathVariable String IBAN, @RequestBody ATMTransactionRequest ATMTransactionRequest) {
 
         User user = getCurrentUser(SecurityContextHolder.getContext().getAuthentication());
+
+
 
         transactionService.ATMTransaction(IBAN, null, ATMTransactionRequest.getAmount(), ATMTransactionRequest.getDescription(), TransactionType.WITHDRAW, user);
         return ResponseEntity.ok("Money deposited successfully.");

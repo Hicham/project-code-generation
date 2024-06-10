@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import project.codegeneration.exceptions.CustomBadRequestException;
 import project.codegeneration.exceptions.InsufficientFundsException;
 import project.codegeneration.exceptions.ResourceNotFoundException;
 import project.codegeneration.models.*;
@@ -194,7 +195,7 @@ class AccountServiceTest {
     @Test
     void testDeposit_NegativeAmount() {
         Account account = new Account();
-        assertThrows(IllegalArgumentException.class, () -> accountService.deposit(account, -50.0));
+        assertThrows(CustomBadRequestException.class, () -> accountService.deposit(account, -50.0));
     }
 
     @Test
@@ -211,7 +212,7 @@ class AccountServiceTest {
     @Test
     void testWithdraw_NegativeAmount() {
         Account account = new Account();
-        assertThrows(IllegalArgumentException.class, () -> accountService.withdraw(account, -50.0));
+        assertThrows(CustomBadRequestException.class, () -> accountService.withdraw(account, -50.0));
     }
 
     @Test

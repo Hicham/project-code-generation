@@ -62,9 +62,9 @@ Feature: TransactionsSteps operations
       "amount": -100.00
     }
     """
-    Then I should receive status code 500
+    Then I should receive status code 400
 
-  Scenario: Deposit money to account with negative amount of other account
+  Scenario: Deposit money to account of other user
     Given user is logged in as "user" with username "user@gmail.com" password "Test123"
     When I access the endpoint "/api/accounts/IBANFAKE1/deposit" with method "POST" and body:
     """
@@ -74,7 +74,7 @@ Feature: TransactionsSteps operations
     """
     Then I should receive status code 403
 
-  Scenario: Deposit money to account with negative amount without account
+  Scenario: Deposit money to account without account
     When I access the endpoint "/api/accounts/IBANFAKE1/deposit" with method "POST" and body:
     """
     {
@@ -101,7 +101,7 @@ Feature: TransactionsSteps operations
     "amount": -100.00
   }
   """
-    Then I should receive status code 500
+    Then I should receive status code 400
 
   Scenario: Withdraw money from account of another user
     Given user is logged in as "user" with username "user@gmail.com" password "Test123"

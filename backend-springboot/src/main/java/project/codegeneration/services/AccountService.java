@@ -3,6 +3,7 @@ package project.codegeneration.services;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import project.codegeneration.exceptions.CustomBadRequestException;
 import project.codegeneration.exceptions.InsufficientFundsException;
 import project.codegeneration.exceptions.ResourceNotFoundException;
 import project.codegeneration.models.Account;
@@ -98,7 +99,7 @@ public class AccountService {
     public void deposit(Account account, double amount) {
 
         if (amount <= 0) {
-            throw new IllegalArgumentException("Deposit amount must be positive");
+            throw new CustomBadRequestException("Deposit amount must be positive");
         }
 
         account.setBalance(account.getBalance() + amount);
@@ -109,7 +110,7 @@ public class AccountService {
     public void withdraw(Account account, double amount) {
 
         if (amount <= 0) {
-            throw new IllegalArgumentException("Withdraw amount must be positive");
+            throw new CustomBadRequestException("Withdraw amount must be positive");
         }
 
         if (account.getBalance() - amount < account.getAbsoluteLimit()) {
