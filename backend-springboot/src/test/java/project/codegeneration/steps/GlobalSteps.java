@@ -1,5 +1,6 @@
 package project.codegeneration.steps;
 
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -67,5 +68,18 @@ public class GlobalSteps {
         assertEquals(HttpStatus.valueOf(code), sharedState.getResponse().getStatusCode());
         String responseBody = sharedState.getResponse().getBody();
         assertNotNull(responseBody);
+    }
+
+    @Given("headers are reset")
+    public void headersAreReset() {
+        sharedState.setHeaders(new HttpHeaders());
+    }
+
+    @When("I access the endpoint {string} with method {string} and body:")
+    public void iAccessTheEndpointWithMethodAndBody(String endpoint, String method, String body) {
+        HttpHeaders headers = new HttpHeaders(sharedState.getHeaders());
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> entity = new HttpEntity<>(body, headers);
+        sharedState.setResponse(restTemplate.exchange(endpoint, HttpMethod.valueOf(method.toUpperCase()), entity, String.class));
     }
 }

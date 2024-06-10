@@ -7,8 +7,10 @@ import project.codegeneration.models.*;
 import project.codegeneration.models.DTO.ApproveUserDTO;
 import project.codegeneration.models.DTO.TransactionLimitDTO;
 import project.codegeneration.repositories.AccountRepository;
+import project.codegeneration.repositories.TransactionLimitRepository;
 import project.codegeneration.repositories.UserRepository;
 import project.codegeneration.services.AccountService;
+import project.codegeneration.services.TransactionService;
 import project.codegeneration.services.UserService;
 
 import java.util.List;
@@ -22,12 +24,16 @@ public class DataSeeder implements ApplicationRunner {
 
     private final UserRepository userRepository;
     private final UserService userService;
+    private final TransactionService transactionService;
+    private final TransactionLimitRepository transactionLimitRepository;
 
-    public DataSeeder(AccountService accountService, AccountRepository accountRepository, UserRepository userRepository, UserService userService) {
+    public DataSeeder(AccountService accountService, AccountRepository accountRepository, UserRepository userRepository, UserService userService, TransactionService transactionService, TransactionLimitRepository transactionLimitRepository) {
         this.accountService = accountService;
         this.accountRepository = accountRepository;
         this.userRepository = userRepository;
         this.userService = userService;
+        this.transactionService = transactionService;
+        this.transactionLimitRepository = transactionLimitRepository;
     }
 
 
@@ -38,14 +44,22 @@ public class DataSeeder implements ApplicationRunner {
         User user = new User(List.of(Role.ROLE_ADMIN), true, "hicham@gmail.com", "Test123", "test", "test", "3652584", "06352615");
         userService.create(user);
 
-        accountService.createAccountForApprovedUser(user, new ApproveUserDTO(1, new TransactionLimitDTO("IBANFAKE1", 1000, 0), 0));
+
+        createAccountWithTransactionLimit(user, "IBANFAKE1", 1000.00, AccountType.CHECKING, 0, 99999999);
+        createAccountWithTransactionLimit(user, "IBANFAKE2", 1000.00, AccountType.SAVINGS, 0, 99999999);
 
 
         User user2 = new User(List.of(Role.ROLE_USER), true, "user@gmail.com", "Test123", "test", "test", "3652584", "06352615");
         userService.create(user2);
 
-        accountService.createAccountForApprovedUser(user2, new ApproveUserDTO(2, new TransactionLimitDTO("IBANFAKE2", 1000, 0), 0));
+        createAccountWithTransactionLimit(user2, "IBANFAKE3", 1000.00, AccountType.CHECKING,  0, 20000);
+        createAccountWithTransactionLimit(user2, "IBANFAKE4", 1000.00, AccountType.SAVINGS, 0, 20000);
 
+        transactionService.ATMTransaction("IBANFAKE3", null, 50.00, "Withdrawal", TransactionType.WITHDRAW, user2);
+
+//        accountService.createAccountForApprovedUser(user2, new ApproveUserDTO(2, new TransactionLimitDTO("IBANFAKE2", 1000, 0), 0));
+
+//        transactionService.ATMTransaction("NL23INHO1813601517", null, 1500.00, "Withdrawal", TransactionType.WITHDRAW, user);
 
 //        System.out.println("DataSeeder is running...");
 //
@@ -125,4 +139,28 @@ public class DataSeeder implements ApplicationRunner {
 //        System.out.println(email);
 
     }
+
+    public void createAccountWithTransactionLimit(User user, String IBAN, Double balance, AccountType accountType, double absoluteLimit, double dailyLimit) {
+        // Create and set up a new account
+        Account account = new Account();
+        account.setIBAN(IBAN);
+        account.setAccountType(accountType);
+        account.setBalance(balance);
+        account.setActive(true);
+        account.setAbsoluteLimit(absoluteLimit);
+        account.setUser(user);
+        accountRepository.save(account);
+
+        // Create and set up a new transaction limit
+        TransactionLimit transactionLimit = new TransactionLimit();
+        transactionLimit.setIBAN(account.getIBAN());
+        transactionLimit.setAccount(account);
+        transactionLimit.setDailyLimit(dailyLimit);
+        transactionLimitRepository.save(transactionLimit);
+
+        // Associate the transaction limit with the account
+        account.setTransactionLimit(transactionLimit);
+        accountRepository.save(account);
+    }
+
 }

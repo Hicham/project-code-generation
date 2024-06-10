@@ -1,6 +1,7 @@
 package project.codegeneration.steps;
 
 import com.jayway.jsonpath.JsonPath;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -11,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import project.codegeneration.CodegenerationApplication;
 import project.codegeneration.steps.SharedState;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -27,6 +30,13 @@ public class TransactionSteps {
 
     @Then("I should receive transactions of iban {string}")
     public void receiveTransactionsOfIBAN(String iban) {
-        // Your implementation here
+        assertEquals(HttpStatus.OK, sharedState.getResponse().getStatusCode());
+        String responseBody = sharedState.getResponse().getBody();
+
+        // Check if the source or destination IBAN matches the provided IBAN
+        boolean ibanExists = JsonPath.parse(responseBody).read("$.content[?(@.sourceIBAN == '" + iban + "' || @.destinationIBAN == '" + iban + "')]", List.class).size() > 0;
+
+        // Assert that the IBAN exists in the transactions
+        assertEquals(true, ibanExists);
     }
 }

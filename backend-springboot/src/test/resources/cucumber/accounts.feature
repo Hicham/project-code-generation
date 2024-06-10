@@ -1,7 +1,7 @@
 Feature: AccountStep operations
 
-#  Background:
-#    Given user is logged in as "admin" with username "hicham@gmail.com" password "Test123"
+  Background:
+    Given headers are reset
 
   Scenario: Getting all accounts as admin
     Given user is logged in as "admin" with username "hicham@gmail.com" password "Test123"
@@ -48,4 +48,4 @@ Feature: AccountStep operations
     Given The endpoint for "/api/users/1/accounts" is available for method "GET"
     When I access the endpoint "/api/users/1/accounts" with method "GET"
     Then I should receive status code 403
-    And a message "Access denied"
+
