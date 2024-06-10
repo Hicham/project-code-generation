@@ -37,8 +37,6 @@ public class TransactionController extends Controller {
     }
 
 
-
-
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/transactions")
     public ResponseEntity<?> getTransactions(@RequestParam(required = false, defaultValue = "0") Integer pageNumber) {

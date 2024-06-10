@@ -18,4 +18,12 @@ public class Controller {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         return userService.getUserByEmail(userDetails.getUsername());
     }
+
+//    public double parseMoney(String amount) {
+//        try {
+//            return Double.parseDouble(amountStr);
+//        } catch (NumberFormatException e) {
+//            throw new InvalidAmountException("Invalid amount format. Please enter a valid number.");
+//        }
+//    }
 }

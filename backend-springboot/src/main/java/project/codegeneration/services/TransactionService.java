@@ -7,6 +7,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import project.codegeneration.exceptions.CustomBadRequestException;
 import project.codegeneration.exceptions.DailyTransactionLimitException;
 import project.codegeneration.exceptions.ResourceNotFoundException;
 import project.codegeneration.models.*;
@@ -146,6 +148,8 @@ public class TransactionService {
     }
 
     public Page<Transaction> getAccountTransactions(String ownIban, String startDate, String endDate, Double amount, String amountCondition, String ibanFilter, String ibanType, Pageable pageable) {
+
+
 
         if(transactionRepository.findBySourceIBAN(ownIban).isEmpty()) {
             throw new ResourceNotFoundException("No transactions found for this IBAN");

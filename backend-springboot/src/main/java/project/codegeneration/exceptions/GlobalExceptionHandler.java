@@ -1,10 +1,18 @@
 package project.codegeneration.exceptions;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.WebRequest;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -39,4 +47,15 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>("You do not have permission to access this resource", HttpStatus.FORBIDDEN);
     }
 
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public final ResponseEntity<Object> handleValidationExceptions(MethodArgumentNotValidException ex, WebRequest request) {
+
+        return new ResponseEntity<>("Bad request. Could be due to missing or invalid fields.", HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public final ResponseEntity<Object> handleInvalidFormatException(HttpMessageNotReadableException ex, WebRequest request) {
+
+        return new ResponseEntity<>("Bad request. Could be due to missing or invalid fields.", HttpStatus.BAD_REQUEST);
+    }
 }
