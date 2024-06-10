@@ -50,6 +50,8 @@ public class GlobalSteps {
             response = restTemplate.exchange(endpoint, HttpMethod.GET, entity, String.class);
         } else if ("POST".equalsIgnoreCase(method)) {
             response = restTemplate.exchange(endpoint, HttpMethod.POST, entity, String.class);
+        } else if("PUT".equalsIgnoreCase(method)) {
+            response = restTemplate.exchange(endpoint, HttpMethod.PUT, entity, String.class);
         }
 
         assertNotEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode(), "Endpoint is not available");

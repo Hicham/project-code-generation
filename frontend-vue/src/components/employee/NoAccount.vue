@@ -30,27 +30,16 @@
         </tbody>
       </table>
     </div>
-    <div v-if="showModal" class="modal fade show" style="display: block;" tabindex="-1" role="dialog">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-body">
-            <p>Set transaction limits for user ID: {{ selectedUser.email }}</p>
-            <div class="form-group">
-              <label for="dailyLimit">Daily Limit</label>
-              <input type="number" class="form-control" id="dailyLimit" v-model="limits.dailyLimit">
-            </div>
-            <div class="form-group">
-              <label for="absoluteLimit">Absolute Limit</label>
-              <input type="number" class="form-control" id="absoluteLimit" v-model="limits.absoluteLimit">
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-primary" @click="approveUser">Approve</button>
-            <button type="button" class="btn btn-secondary" @click="closeModal">Close</button>
-          </div>
-        </div>
+    <Modal :title="'Set transaction limits for user ID: ' + selectedUser.email" :show="showModal" @close="closeModal" @confirm="approveUser" :confirmText="'Approve'">
+      <div class="form-group">
+        <label for="dailyLimit">Daily Limit</label>
+        <input type="number" class="form-control" id="dailyLimit" v-model="limits.dailyLimit">
       </div>
-    </div>
+      <div class="form-group">
+        <label for="absoluteLimit">Absolute Limit</label>
+        <input type="number" class="form-control" id="absoluteLimit" v-model="limits.absoluteLimit">
+      </div>
+    </Modal>
     <div v-if="showPopup" class="modal fade show" style="display: block;" tabindex="-1" role="dialog">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -70,9 +59,11 @@
 import axiosInstance from "../../axios-instance";
 import { ref, onMounted } from "vue";
 import {useStore} from "@/stores/store";
+import Modal from "@/components/employee/Modal.vue";
 
 export default {
   name: "NoAccount",
+  components: {Modal},
   setup() {
     const users = ref([]);
     const showModal = ref(false);
@@ -94,9 +85,8 @@ export default {
     const approveUser = async () => {
       try {
         await axiosInstance.post(
-            `/api/accounts/approve`,
+            `/api/users/${selectedUser.value.userId}/approve`,
             {
-              userId: selectedUser.value.userId,
               transactionLimit: {
                 dailyLimit: limits.value.dailyLimit,
               },
