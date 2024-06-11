@@ -109,7 +109,7 @@ public class AccountController extends Controller {
 
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @PostMapping("/accounts/{IBAN}/disable")
+    @PutMapping("/accounts/{IBAN}/disable")
     public ResponseEntity<String> disableAccount(@PathVariable String IBAN) {
 
             Account account = accountService.getAccountByIBAN(IBAN);
@@ -123,7 +123,7 @@ public class AccountController extends Controller {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @PostMapping("/accounts/{IBAN}/enable")
+    @PutMapping("/accounts/{IBAN}/enable")
     public ResponseEntity<String> enableAccount(@PathVariable String IBAN) {
             Account account = accountService.getAccountByIBAN(IBAN);
             if (account != null) {

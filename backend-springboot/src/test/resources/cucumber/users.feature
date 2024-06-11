@@ -85,13 +85,25 @@ Feature: UserStep operations
     When I access the endpoint "/api/users/3/approve" with method "POST" and body:
     """
     {
-      "userId": 3
+      "userId": 3,
+       "transactionLimit": {
+       "dailyLimit": 0
+        },
+      "absoluteLimit": 69
     }
     """
     Then I should receive status code 200
 
-  Scenario: Regular user trying to approve a user
+  Scenario: User approving a user
     Given user is logged in as "user" with username "user@gmail.com" password "Test123"
-    And The endpoint for "/api/users/3/approve" is available for method "POST"
-    When I access the endpoint "/api/users/3/approve" with method "POST"
+    When I access the endpoint "/api/users/3/approve" with method "POST" and body:
+    """
+    {
+      "userId": 3,
+       "transactionLimit": {
+       "dailyLimit": 0
+        },
+      "absoluteLimit": 69
+    }
+    """
     Then I should receive status code 403

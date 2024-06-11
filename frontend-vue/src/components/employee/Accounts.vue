@@ -118,7 +118,7 @@ export default {
       }
     },
     enableAccount(account) {
-      axiosInstance.post(`/api/accounts/${account.iban}/enable`, null, {
+      axiosInstance.put(`/api/accounts/${account.iban}/enable`, null, {
         headers: { Authorization: 'Bearer ' + useStore().token }
       })
           .then(() => {
@@ -131,7 +131,7 @@ export default {
     },
 
     disableAccount(account) {
-      axiosInstance.post(`/api/accounts/${account.iban}/disable`, null, {
+      axiosInstance.put(`/api/accounts/${account.iban}/disable`, null, {
         headers: { Authorization: 'Bearer ' + useStore().token }
       })
           .then(() => {

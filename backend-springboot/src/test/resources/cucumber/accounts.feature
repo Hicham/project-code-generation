@@ -51,26 +51,26 @@ Feature: AccountStep operations
 
   Scenario: Disabling an account as admin
     Given user is logged in as "admin" with username "hicham@gmail.com" password "Test123"
-    And The endpoint for "/api/accounts/IBANFAKE3/disable" is available for method "POST"
-    When I access the endpoint "/api/accounts/IBANFAKE3/disable" with method "POST"
+    And The endpoint for "/api/accounts/IBANFAKE3/disable" is available for method "PUT"
+    When I access the endpoint "/api/accounts/IBANFAKE3/disable" with method "PUT"
     Then I should receive status code 200
 
   Scenario: Disabling an account as user
     Given user is logged in as "user" with username "user@gmail.com" password "Test123"
-    And The endpoint for "/api/accounts/IBANFAKE3/disable" is available for method "POST"
-    When I access the endpoint "/api/accounts/IBANFAKE3/disable" with method "POST"
+    And The endpoint for "/api/accounts/IBANFAKE3/disable" is available for method "PUT"
+    When I access the endpoint "/api/accounts/IBANFAKE3/disable" with method "PUT"
     Then I should receive status code 403
 
   Scenario: Enabling an account as admin
     Given user is logged in as "admin" with username "hicham@gmail.com" password "Test123"
-    And The endpoint for "/api/accounts/IBANFAKE3/enable" is available for method "POST"
-    When I access the endpoint "/api/accounts/IBANFAKE3/enable" with method "POST"
+    And The endpoint for "/api/accounts/IBANFAKE3/enable" is available for method "PUT"
+    When I access the endpoint "/api/accounts/IBANFAKE3/enable" with method "PUT"
     Then I should receive status code 200
 
   Scenario: Enabling an account as user
     Given user is logged in as "user" with username "user@gmail.com" password "Test123"
-    And The endpoint for "/api/accounts/IBANFAKE3/enable" is available for method "POST"
-    When I access the endpoint "/api/accounts/IBANFAKE3/enable" with method "POST"
+    And The endpoint for "/api/accounts/IBANFAKE3/enable" is available for method "PUT"
+    When I access the endpoint "/api/accounts/IBANFAKE3/enable" with method "PUT"
     Then I should receive status code 403
 
 
