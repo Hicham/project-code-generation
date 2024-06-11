@@ -6,8 +6,8 @@ info:
 servers:
   - description: SwaggerHub API Auto Mocking
     url: https://virtserver.swaggerhub.com/698917_1/Bank/2.0.0
-  - url: 'https://api.idk.nl'
-    description: Bank dev server
+  - url: 'https://project-code-generation.onrender.com'
+    description: Bank application
 paths:
   /login:
     post:
@@ -46,10 +46,11 @@ paths:
                     type: string
                     example: 'Login successful.'
         '401':
-          description: Unauthorized. Incorrect email or password.
+          description: Invalid credentials combination.
         '500':
           description: Internal server error.
-  /users:
+
+  /register:
     post:
       summary: Create a new user account
       description: This endpoint creates a new user account with the provided details.
@@ -120,7 +121,57 @@ paths:
                   $ref: '#/components/schemas/User'
         '500':
           description: Internal server error.
-  
+
+  /users/unapproved:
+    get:
+      summary: Get unapproved users
+      description: Retrieve users that are not approved yet.
+      operationId: getUnapprovedUsers
+      responses:
+        '200':
+          description: User details retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '403':
+          description: You do not have permission to access this resource
+        '500':
+          description: Internal server error.
+
+  /users/{id}/approve:
+    post:
+      tags:
+        - Users
+      summary: Approve a user
+      description: Approves a user and creates an account for the approved user
+      operationId: approveUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the user to be approved
+      requestBody:
+        description: DTO containing approval details
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApproveUserDTO'
+      responses:
+        '200':
+          description: User approved
+          content:
+            text/plain:
+              schema:
+                type: string
+        '400':
+          description: Bad request. Could be due to missing or invalid fields
+        '403':
+          description: You do not have permission to access this resource
+
   /users/{userId}:
     get:
       summary: Get user by ID
@@ -141,6 +192,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+        '400':
+          description: Bad request. Could be due to missing or invalid fields
+        '403':
+          description: You do not have permission to access this resource
         '404':
           description: User not found.
         '500':
@@ -181,6 +236,7 @@ paths:
                 lastname:
                   type: string
                   description: The user's last name.
+                 
                   example: 'new_lastname'
                 bsnNumber:
                   type: string
@@ -207,6 +263,8 @@ paths:
                     example: 'User details updated successfully.'
         '400':
           description: Bad request. Could be due to missing or invalid fields.
+        '403':
+          description: You do not have permission to access this resource
         '404':
           description: User not found.
         '500':
@@ -226,10 +284,13 @@ paths:
       responses:
         '204':
           description: User deactivated successfully.
+        '403':
+          description: You do not have permission to access this resource
         '404':
           description: User not found.
         '500':
           description: Internal server error.
+
   /accounts/{IBAN}/deposit:
     post:
       summary: Deposit money into an account
@@ -261,10 +322,13 @@ paths:
           description: Money deposited successfully.
         '400':
           description: Bad request, such as invalid account ID or amount.
+        '403':
+          description: You do not have permission to access this resource
         '404':
           description: Account not found.
         '500':
           description: Internal server error.
+
   /accounts/{IBAN}/withdraw:
     post:
       summary: Withdraw money from an account
@@ -296,6 +360,8 @@ paths:
           description: Money withdrawn successfully.
         '400':
           description: Bad request, such as invalid account ID or amount.
+        '403':
+          description: You do not have permission to access this resource
         '404':
           description: Account not found.
         '500':
@@ -320,6 +386,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Account'
+        '400':
+          description: Bad request. Could be due to missing or invalid field
+        '403':
+          description: You do not have permission to access this resource
         '404':
           description: Account not found.
         '500':
@@ -368,6 +438,8 @@ paths:
                     example: 'Account details updated successfully.'
         '400':
           description: Bad request. Could be due to missing or invalid fields.
+        '403':
+          description: You do not have permission to access this resource
         '404':
           description: Account not found.
         '500':
@@ -386,11 +458,134 @@ paths:
       responses:
         '204':
           description: Account deleted successfully.
+        '403':
+          description: You do not have permission to access this resource
         '404':
           description: Account not found.
         '500':
           description: Internal server error.
-        
+
+  /accounts/{IBAN}/disable:
+    post:
+      summary: Disable an account
+      description: Disables the account with the given IBAN
+      tags:
+        - Accounts
+      parameters:
+        - name: IBAN
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Account disabled successfully.
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Account disabled successfully.
+        '400':
+          description: Bad request. Could be due to missing or invalid fields
+        '403':
+          description: You do not have permission to access this resource
+        '404':
+          description: Account not found.
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Account not found.
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Internal server error.
+
+  /accounts/{IBAN}/enable:
+    post:
+      summary: Enable an account
+      description: Enables the account with the given IBAN
+      tags:
+        - Accounts
+      parameters:
+        - name: IBAN
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Account enabled successfully.
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Account enabled successfully.
+        '403':
+          description: You do not have permission to access this resource
+        '404':
+          description: Account not found.
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Account not found.
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Internal server error.
+                
+  /accounts/{IBAN}/setLimits:
+    post:
+      summary: Set transaction limits for an account
+      description: Sets the absolute and daily transaction limits for the account with the given IBAN
+      tags:
+        - Accounts
+      parameters:
+        - name: IBAN
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionLimitDTO'
+      responses:
+        '200':
+          description: Transaction limits updated successfully.
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Transaction limits updated successfully.
+        '400':
+          description: Bad request. Could be due to missing or invalid fields
+        '403':
+          description: You do not have permission to access this resource
+        '404':
+          description: Account not found.
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Account not found.
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Internal server error.
+  
   /accounts:
     post:
       summary: Create a new account
@@ -418,6 +613,8 @@ paths:
                 $ref: '#/components/schemas/Account'
         '400':
           description: Bad request. Could be due to missing or invalid fields.
+        '403':
+          description: You do not have permission to access this resource
         '500':
           description: Internal server error.
     get:
@@ -440,10 +637,39 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/UserAccount'
+        '403':
+          description: You do not have permission to access this resource
         '500':
           description: Internal server error.
-      
-          
+
+  /users/{userId}/accounts/checking:
+    get:
+      summary: Get checking accounts from user
+      description: Retrieves checking accounts from user
+      operationId: getCheckingAccounts
+      parameters:
+      - in: path
+        name: userId
+        required: true
+        schema:
+          type: string
+        description: ID of the user
+      responses:
+        '200':
+          description: Successful retrieval of checking accounts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserAccount'
+        '400':
+          description: Bad request. Could be due to missing or invalid fields
+        '403':
+          description: You do not have permission to access this resource
+        '500':
+          description: Internal server error
+
   /accounts/ibans:
     get:
       summary: Find IBANs by customer first and last names
@@ -456,7 +682,6 @@ paths:
           description: The name of the customer to search for.
           schema:
             type: string
-
       responses:
         '200':
           description: IBANs found successfully.
@@ -472,13 +697,15 @@ paths:
                     items:
                       type: string
                       example: "NL91ABNA0417164300"
+        '400':
+          description: Bad request. Could be due to missing or invalid fields
+        '403':
+          description: You do not have permission to access this resource
         '404':
           description: Customer not found.
         '500':
           description: Internal server error.
 
-
-          
   /transactions:
     get:
       summary: Retrieve all transactions
@@ -532,6 +759,10 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Transaction'
+        '400':
+          description: Bad request. Could be due to missing or invalid fields
+        '403':
+          description: You do not have permission to access this resource
         '500':
           description: Internal server error.
     post:
@@ -564,11 +795,89 @@ paths:
         '200':
           description: Money transferred successfully.
         '400':
-          description: Bad request, such as invalid account IDs or amount.
+          description: Bad request. Could be due to missing or invalid fields
+        '403':
+          description: You do not have permission to access this resource
         '404':
           description: Account not found.
         '500':
           description: Internal server error.
+          
+  /accounts/{iban}/transactions:
+    get:
+      summary: Get Account Transactions
+      description: Retrieve transactions for a specified account
+      parameters:
+        - name: iban
+          in: path
+          required: true
+          schema:
+            type: string
+          description: IBAN of the account
+        - name: pageNumber
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+          description: Page number for pagination
+        - name: startDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          description: Start date for filtering transactions
+        - name: endDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          description: End date for filtering transactions
+        - name: amount
+          in: query
+          required: false
+          schema:
+            type: number
+          description: Amount to filter transactions
+        - name: amountCondition
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Condition for amount filtering (e.g., greaterThan, lessThan, equals)
+        - name: ibanFilter
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter transactions by specific IBAN
+        - name: ibanType
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Type of IBAN to filter (e.g., sender, receiver)
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Transaction'
+        '400':
+          description: Bad request. Could be due to missing or invalid fields
+        '403':
+          description: You do not have permission to access this resource
+        '500':
+          description: Internal server error.
+          
 
 components:
   schemas:
@@ -588,6 +897,10 @@ components:
           type: string
         phoneNumber:
           type: string
+        roleName:
+          type: string
+        approved:
+          type: boolean
     Account:
       type: object
       properties:
@@ -601,6 +914,17 @@ components:
         createdAt:
           type: string
           format: date-time
+        transactionLimit:
+          $ref: '#/components/schemas/TransactionLimit'
+        user:
+          $ref: '#/components/schemas/User'
+        accountType:
+          $ref: '#/components/schemas/AccountType'
+        isActive:
+          type: boolean
+        absoluteLimit:
+          type: number
+          format: double
     Transaction:
       type: object
       properties:
@@ -631,3 +955,45 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/Account'
+    ApproveUserDTO:
+      type: object
+      properties:
+        userId:
+          type: integer
+        transactionLimit:
+          type: object
+          properties:
+            daily:
+              type: number
+            monthly:
+              type: number
+        absoluteLimit:
+          type: number
+    AccountType:
+      type: string
+      enum:
+        - SAVINGS
+        - CHECKING
+        - CREDIT
+    TransactionLimit:
+      type: object
+      properties:
+        dailyLimit:
+          type: number
+          format: double
+        absoluteLimit:
+          type: number
+          format: double
+    TransactionLimitDTO:
+      type: object
+      properties:
+        IBAN:
+          type: string
+          description: The International Bank Account Number
+          example: "DE89370400440532013000"
+        dailyLimit:
+          type: number
+          format: double
+        absoluteLimit:
+          type: number
+          format: double
