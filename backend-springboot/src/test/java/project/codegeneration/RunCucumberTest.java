@@ -13,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
         plugin = {"pretty", "html:target/cucumber-report.html"}, // Plugins for reporting
         monochrome = true
 )
-//@CucumberContextConfiguration
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class RunCucumberTest {
 }

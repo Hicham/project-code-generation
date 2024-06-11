@@ -12,7 +12,6 @@ import project.codegeneration.CodegenerationApplication;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(classes = CodegenerationApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@CucumberContextConfiguration
 public class AccountSteps {
 
     @Autowired

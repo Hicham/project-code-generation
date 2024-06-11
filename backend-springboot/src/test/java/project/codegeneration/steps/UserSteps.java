@@ -26,7 +26,6 @@ import java.util.Arrays;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = CodegenerationApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@CucumberContextConfiguration
 public class UserSteps {
     @Autowired
     private TestRestTemplate restTemplate;
