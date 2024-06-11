@@ -5,11 +5,6 @@
         <p class="text-danger">{{ error }}</p>
       </div>
     </div>
-    <div class="row mb-2">
-      <div class="col-md-4">
-        <input type="text" class="form-control" placeholder="Search for user">
-      </div>
-    </div>
     <div class="row">
       <div v-for="transaction in transactions" :key="transaction.id" class="col-12">
         <div class="card mb-2">

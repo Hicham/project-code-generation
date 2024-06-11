@@ -41,7 +41,7 @@ public class TransactionController extends Controller {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/transactions")
-    public ResponseEntity<?> getTransactions(@RequestParam(required = false, defaultValue = "0") Integer pageNumber) {
+    public ResponseEntity<Page<Transaction>> getTransactions(@RequestParam(required = false, defaultValue = "0") Integer pageNumber) {
 
         Pageable pageable = PageRequest.of(pageNumber, 10);
         return ResponseEntity.ok(transactionService.getTransactions(pageable));

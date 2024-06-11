@@ -78,7 +78,7 @@ public class AccountController extends Controller {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/accounts")
-    public ResponseEntity<?> getAccounts(@RequestParam(required = false, defaultValue = "0") Integer pageNumber) {
+    public ResponseEntity<Page<AccountDTO>> getAccounts(@RequestParam(required = false, defaultValue = "0") Integer pageNumber) {
 
         Page<Account> accounts = null;
         Pageable pageable = PageRequest.of(pageNumber, 10);
@@ -103,12 +103,8 @@ public class AccountController extends Controller {
 
         Account account = accountService.getAccountByIBAN(IBAN);
 
-        if (account == null) {
-            return ResponseEntity.notFound().build();
-        } else {
-            AccountDTO accountDTO = new AccountDTO(account.getIBAN(), account.getUser(), account.getAccountType(), account.getBalance(), account.isActive(), account.getAbsoluteLimit(), account.getTransactionLimit());
-            return ResponseEntity.ok(accountDTO);
-        }
+        AccountDTO accountDTO = new AccountDTO(account.getIBAN(), account.getUser(), account.getAccountType(), account.getBalance(), account.isActive(), account.getAbsoluteLimit(), account.getTransactionLimit());
+        return ResponseEntity.ok(accountDTO);
     }
 
 

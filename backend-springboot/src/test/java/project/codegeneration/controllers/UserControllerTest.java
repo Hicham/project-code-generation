@@ -19,6 +19,7 @@ import project.codegeneration.controllers.UserController;
 import project.codegeneration.models.DTO.ApproveUserDTO;
 import project.codegeneration.models.DTO.TransactionLimitDTO;
 import project.codegeneration.models.DTO.UserDTO;
+import project.codegeneration.models.DTO.UserRegisterDTO;
 import project.codegeneration.models.Role;
 import project.codegeneration.models.User;
 import project.codegeneration.services.AccountService;
@@ -69,7 +70,7 @@ public class UserControllerTest {
 
     @Test
     void testRegisterUser() throws Exception {
-        UserDTO userDTO = new UserDTO(1, "USER", false, "test@gmail.com", "Test123", "test", "test", "36251", "063524152");
+        UserRegisterDTO userDTO = new UserRegisterDTO(1, "USER", false, "test@gmail.com", "Test123", "test", "test", "36251", "063524152");
 
         mockMvc.perform(post("/api/register")
                         .contentType(MediaType.APPLICATION_JSON)
