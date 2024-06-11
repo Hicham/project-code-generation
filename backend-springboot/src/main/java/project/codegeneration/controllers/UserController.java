@@ -57,7 +57,7 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @GetMapping("/unapproved-users")
+    @GetMapping("/users/unapproved")
     public List<UserDTO> getNotApprovedUsers() {
         List<User> users = userService.getNotApprovedUsers();
         return users.stream().map(user -> new UserDTO(user.getId(), user.getRoles().toString(), user.isApproved(), user.getEmail(), user.getFirstName(), user.getLastName(), user.getBSNNumber(), user.getPhoneNumber())).toList();

@@ -122,7 +122,7 @@ export default {
 
     onMounted(async () => {
       try {
-        const userResponse = await axiosInstance.get('/api/unapproved-users', {
+        const userResponse = await axiosInstance.get('/api/users/unapproved', {
           headers: {
             Authorization: 'Bearer ' + useStore().token,
           },
