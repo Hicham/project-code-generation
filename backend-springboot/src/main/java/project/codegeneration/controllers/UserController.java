@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import project.codegeneration.models.DTO.ApproveUserDTO;
 import project.codegeneration.models.DTO.UserDTO;
+import project.codegeneration.models.DTO.UserRegisterDTO;
 import project.codegeneration.models.Role;
 import project.codegeneration.models.User;
 import project.codegeneration.services.AccountService;
@@ -44,7 +45,6 @@ public class UserController {
                 user.getRoles().toString(),
                 user.isApproved(),
                 user.getEmail(),
-                user.getPassword(),
                 user.getFirstName(),
                 user.getLastName(),
                 user.getBSNNumber(),
@@ -60,11 +60,11 @@ public class UserController {
     @GetMapping("/unapproved-users")
     public List<UserDTO> getNotApprovedUsers() {
         List<User> users = userService.getNotApprovedUsers();
-        return users.stream().map(user -> new UserDTO(user.getId(), user.getRoles().toString(), user.isApproved(), user.getEmail(), user.getPassword(), user.getFirstName(), user.getLastName(), user.getBSNNumber(), user.getPhoneNumber())).toList();
+        return users.stream().map(user -> new UserDTO(user.getId(), user.getRoles().toString(), user.isApproved(), user.getEmail(), user.getFirstName(), user.getLastName(), user.getBSNNumber(), user.getPhoneNumber())).toList();
     }
 
     @PostMapping("/register")
-    public String registerUser(@RequestBody UserDTO userDTO) {
+    public String registerUser(@RequestBody UserRegisterDTO userDTO) {
         try {
             User user = new User(
                     List.of(Role.ROLE_USER), // Assuming roles should be an empty list
@@ -107,7 +107,6 @@ public class UserController {
                     user.getRoles().toString(),
                     user.isApproved(),
                     user.getEmail(),
-                    user.getPassword(),
                     user.getFirstName(),
                     user.getLastName(),
                     user.getBSNNumber(),
