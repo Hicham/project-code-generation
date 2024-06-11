@@ -6,35 +6,28 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import project.codegeneration.controllers.UserController;
 import project.codegeneration.models.DTO.ApproveUserDTO;
 import project.codegeneration.models.DTO.TransactionLimitDTO;
-import project.codegeneration.models.DTO.UserDTO;
 import project.codegeneration.models.DTO.UserRegisterDTO;
-import project.codegeneration.models.Role;
 import project.codegeneration.models.User;
 import project.codegeneration.services.AccountService;
 import project.codegeneration.services.UserService;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class UserControllerTest {
 
@@ -92,5 +85,26 @@ public class UserControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
 
         verify(userService).findByEmail("test@example.com");
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void testApproveUser() throws Exception {
+        int userId = 1;
+        ApproveUserDTO approveUserDTO = new ApproveUserDTO(userId, new TransactionLimitDTO("IBANFAKE1", 1000, 0), 0);
+
+        User user = new User();
+        user.setId(userId);
+        user.setEmail("test@example.com");
+
+        when(userService.getUserById(userId)).thenReturn(Optional.of(user));
+
+        mockMvc.perform(post("/api/users/{id}/approve", userId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(approveUserDTO)))
+                .andExpect(status().isOk());
+
+        verify(userService).approveUser(userId);
+        verify(accountService).createAccountForApprovedUser(eq(user), eq(approveUserDTO));
     }
 }
