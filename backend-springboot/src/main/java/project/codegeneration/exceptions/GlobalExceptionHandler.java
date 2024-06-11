@@ -10,6 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -56,6 +57,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public final ResponseEntity<Object> handleInvalidFormatException(HttpMessageNotReadableException ex, WebRequest request) {
 
+        return new ResponseEntity<>("Bad request. Could be due to missing or invalid fields.", HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<String> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex) {
+//        String error = "Invalid value: " + ex.getValue() + ". Expected type: " + ex.getRequiredType().getSimpleName();
+//        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>("Bad request. Could be due to missing or invalid fields.", HttpStatus.BAD_REQUEST);
     }
 }

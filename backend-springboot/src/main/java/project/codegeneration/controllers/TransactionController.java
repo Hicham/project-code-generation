@@ -1,5 +1,6 @@
 package project.codegeneration.controllers;
 
+import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +18,7 @@ import project.codegeneration.services.AccountService;
 import project.codegeneration.services.TransactionService;
 import project.codegeneration.services.UserService;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 @RestController
@@ -50,8 +52,8 @@ public class TransactionController extends Controller {
     @GetMapping("/accounts/{iban}/transactions")
     public ResponseEntity<?> getAccountTransactions(@PathVariable String iban,
                                                     @RequestParam(required = false, defaultValue = "0") Integer pageNumber,
-                                                    @RequestParam(required = false) String startDate,
-                                                    @RequestParam(required = false) String endDate,
+                                                    @RequestParam(required = false) LocalDate startDate,
+                                                    @RequestParam(required = false) LocalDate endDate,
                                                     @RequestParam(required = false) Double amount,
                                                     @RequestParam(required = false) String amountCondition,
                                                     @RequestParam(required = false) String ibanFilter,

@@ -21,6 +21,8 @@ import project.codegeneration.services.AccountService;
 import project.codegeneration.services.TransactionService;
 import project.codegeneration.services.UserService;
 
+import java.time.LocalDate;
+
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -71,8 +73,8 @@ public class TransactionControllerTest {
 
         verify(transactionService, times(1)).getAccountTransactions(
                 anyString(),
-                nullable(String.class),
-                nullable(String.class),
+                nullable(LocalDate.class),
+                nullable(LocalDate.class),
                 nullable(Double.class),
                 nullable(String.class),
                 nullable(String.class),

@@ -49,7 +49,7 @@
                        class="account-item"
                        :class="{ selected: account.iban === selectedAccountIBAN }"
                        @click="selectDestinationAccount(account)">
-                    <strong>{{ account.user.firstName }} {{ account.user.lastName }}</strong> - {{ account.iban }}
+                    <strong>{{ account.user.firstName }} {{ account.user.lastName }}</strong> - {{ account.iban }} ({{ account.accountType }})
                   </div>
                 </div>
               </div>
@@ -180,11 +180,22 @@ export default {
             account.user.id === store.user.id && account.accountType === 'CHECKING'
         );
       } else {
-        return allAccounts.value.filter(account =>
+        const userSavingsAccount = allAccounts.value.find(account =>
+            account.user.id === store.user.id && account.accountType === 'SAVINGS'
+        );
+
+        const filtered = allAccounts.value.filter(account =>
             account.iban !== selectedAccount.value?.iban &&
             account.user.firstName.toLowerCase().includes(searchFirstName.value.toLowerCase()) &&
-            account.user.lastName.toLowerCase().includes(searchLastName.value.toLowerCase())
+            account.user.lastName.toLowerCase().includes(searchLastName.value.toLowerCase()) &&
+            account.accountType !== 'SAVINGS'
         );
+
+        if (userSavingsAccount) {
+          filtered.push(userSavingsAccount);
+        }
+
+        return filtered;
       }
     });
 

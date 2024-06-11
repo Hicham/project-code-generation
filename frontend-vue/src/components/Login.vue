@@ -82,7 +82,7 @@ export default {
       this.store.login(this.email, this.password, isAtm)
           .then(() => {
             this.errorMessage = ""; // Reset error message
-            alert("Logged in! Bearer token: " + this.store.token);
+            // alert("Logged in! Bearer token: " + this.store.token);
 
 
             if (isAtm)

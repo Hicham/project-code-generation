@@ -16,8 +16,15 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
 
 //    List<Transaction> findBySourceIBANAndTimestampBetween(String sourceIBAN, Long startDate, Long endDate);
 
-    @Query("SELECT SUM(t.amount) FROM Transaction t WHERE t.sourceIBAN = :sourceIBAN AND t.timestamp BETWEEN :startDate AND :endDate AND t.type = 2")
-    Optional<Double> findSumBySourceIBANAndTimestampBetween(@Param("sourceIBAN") String sourceIBAN, @Param("startDate") Long startDate, @Param("endDate") Long endDate);
+//    @Query("SELECT SUM(t.amount) FROM Transaction t WHERE t.sourceIBAN = :sourceIBAN AND t.timestamp BETWEEN :startDate AND :endDate AND t.type = 2")
+//    Optional<Double> findSumBySourceIBANAndTimestampBetween(@Param("sourceIBAN") String sourceIBAN, @Param("startDate") Long startDate, @Param("endDate") Long endDate);
 
-    Optional<Object> findBySourceIBAN(String ownIban);
+    @Query("SELECT SUM(t.amount) FROM Transaction t JOIN Account a1 ON t.sourceIBAN = a1.IBAN JOIN Account a2 ON t.destinationIBAN = a2.IBAN WHERE a1.user != a2.user AND t.sourceIBAN = :sourceIBAN AND t.timestamp BETWEEN :startDate AND :endDate AND t.type = 2")
+            Optional<Double> findSumBySourceIBANAndTimestampBetweenExcludingOwnTransfers(
+            @Param("sourceIBAN") String sourceIBAN,
+            @Param("startDate") Long startDate,
+            @Param("endDate") Long endDate);
+
+
+    Optional<Transaction> findBySourceIBAN(String ownIban);
 }

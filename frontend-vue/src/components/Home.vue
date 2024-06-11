@@ -68,12 +68,8 @@ export default {
         return;
       }
 
-
       try {
-        const response = await axiosInstance.get(`/api/users/${userEmail.value}`, { headers: {
-            Authorization: 'Bearer ' + useStore().token,
-
-          }});
+        const response = await axiosInstance.get(`/api/users/${userEmail.value}`);
         const user = response.data;
         store.user.firstName = user.firstName;
         store.user.lastName = user.lastName;

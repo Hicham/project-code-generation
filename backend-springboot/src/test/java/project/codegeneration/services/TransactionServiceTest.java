@@ -78,7 +78,7 @@ class TransactionServiceTest {
 
         when(accountService.getAccountByIBAN("sourceIBAN")).thenReturn(sourceAccount);
         when(accountService.getAccountByIBAN("destinationIBAN")).thenReturn(destinationAccount);
-        when(transactionRepository.findSumBySourceIBANAndTimestampBetween(anyString(), anyLong(), anyLong())).thenReturn(Optional.of(0.0));
+        when(transactionRepository.findSumBySourceIBANAndTimestampBetweenExcludingOwnTransfers(anyString(), anyLong(), anyLong())).thenReturn(Optional.of(0.0));
 
         transactionService.transferTransaction("sourceIBAN", "destinationIBAN", 200.0, "Test transfer", TransactionType.TRANSFER, user);
 
@@ -127,7 +127,7 @@ class TransactionServiceTest {
 
         when(accountService.getAccountByIBAN("sourceIBAN")).thenReturn(sourceAccount);
         when(accountService.getAccountByIBAN("destinationIBAN")).thenReturn(destinationAccount);
-        when(transactionRepository.findSumBySourceIBANAndTimestampBetween(anyString(), anyLong(), anyLong())).thenReturn(Optional.of(900.0));
+        when(transactionRepository.findSumBySourceIBANAndTimestampBetweenExcludingOwnTransfers(anyString(), anyLong(), anyLong())).thenReturn(Optional.of(900.0));
 
         assertThrows(DailyTransactionLimitException.class, () -> transactionService.transferTransaction("sourceIBAN", "destinationIBAN", 200.0, "Test transfer", TransactionType.TRANSFER, user));
     }
@@ -160,7 +160,7 @@ class TransactionServiceTest {
         sourceAccount.setTransactionLimit(transactionLimit);
 
         when(accountService.getAccountByIBAN("sourceIBAN")).thenReturn(sourceAccount);
-        when(transactionRepository.findSumBySourceIBANAndTimestampBetween(anyString(), anyLong(), anyLong())).thenReturn(Optional.of(500.0));
+        when(transactionRepository.findSumBySourceIBANAndTimestampBetweenExcludingOwnTransfers(anyString(), anyLong(), anyLong())).thenReturn(Optional.of(500.0));
 
         transactionService.ATMTransaction("sourceIBAN", null, 200.0, "ATM withdraw", TransactionType.WITHDRAW, user);
 

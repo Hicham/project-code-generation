@@ -43,24 +43,8 @@ public class TransactionService {
         this.accountService = accountService;
     }
 
-    public static long convertDateToTimestamp(String dateString) {
-
-        try {
-            LocalDate localDate = LocalDate.parse(dateString);
-
-            Instant instant = localDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
-
-            return instant.toEpochMilli();
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Can't parse date");
-        }
-
-    }
-
     @Transactional
     public void transferTransaction(String sourceIBAN, String destinationIBAN, Double amount, String description, TransactionType type, User user) {
-
-
 
         Account sourceAccount = accountService.getAccountByIBAN(sourceIBAN);
         Account destinationAccount = accountService.getAccountByIBAN(destinationIBAN);
@@ -74,7 +58,7 @@ public class TransactionService {
         }
 
         double totalDailyTransactions = calculateTotalDailyTransactions(sourceIBAN);
-        if (!user.getRoles().contains(Role.ROLE_ADMIN) && totalDailyTransactions + amount > sourceAccount.getTransactionLimit().getDailyLimit()) {
+        if (!user.getRoles().contains(Role.ROLE_ADMIN) && totalDailyTransactions + amount > sourceAccount.getTransactionLimit().getDailyLimit() && destinationAccount.getUser() != user) {
             throw new DailyTransactionLimitException();
         }
 
@@ -132,11 +116,13 @@ public class TransactionService {
         Long startOfDay = today.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
         Long endOfDay = today.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
-        Optional<Double> sum = transactionRepository.findSumBySourceIBANAndTimestampBetween(
+
+        Optional<Double> sum = transactionRepository.findSumBySourceIBANAndTimestampBetweenExcludingOwnTransfers(
                 iban,
                 startOfDay,
                 endOfDay
         );
+
 
        return sum.orElse(0.0);
 
@@ -147,13 +133,8 @@ public class TransactionService {
 
     }
 
-    public Page<Transaction> getAccountTransactions(String ownIban, String startDate, String endDate, Double amount, String amountCondition, String ibanFilter, String ibanType, Pageable pageable) {
+    public Page<Transaction> getAccountTransactions(String ownIban, LocalDate startDate, LocalDate endDate, Double amount, String amountCondition, String ibanFilter, String ibanType, Pageable pageable) {
 
-
-
-        if(transactionRepository.findBySourceIBAN(ownIban).isEmpty()) {
-            throw new ResourceNotFoundException("No transactions found for this IBAN");
-        }
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Transaction> query = cb.createQuery(Transaction.class);
@@ -182,7 +163,7 @@ public class TransactionService {
                     predicates.add(cb.equal(transaction.get("amount"), amount));
                     break;
                 default:
-                    throw new IllegalArgumentException("Invalid amountCondition: " + amountCondition);
+                    throw new CustomBadRequestException("Invalid amountCondition: " + amountCondition);
             }
         }
 
@@ -202,7 +183,7 @@ public class TransactionService {
                     predicates.add(cb.equal(transaction.get("destinationIBAN"), ibanFilter));
                     break;
                 default:
-                    throw new IllegalArgumentException("Invalid ibanType: " + ibanType);
+                    throw new CustomBadRequestException("Invalid ibanType: " + ibanType);
             }
         }
 
@@ -219,4 +200,31 @@ public class TransactionService {
 
         return new PageImpl<>(transactionList, pageable, totalRows);
     }
+
+
+    public static long convertDateToTimestamp(LocalDate date) {
+
+        try {
+            Instant instant = date.atStartOfDay(ZoneId.systemDefault()).toInstant();
+            return instant.toEpochMilli();
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Can't parse date");
+        }
+
+    }
+
+    //    public static long convertDateToTimestamp(String dateString) {
+//
+//        try {
+//            LocalDate localDate = LocalDate.parse(dateString);
+//
+//            Instant instant = localDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
+//
+//            return instant.toEpochMilli();
+//        } catch (Exception e) {
+//            throw new IllegalArgumentException("Can't parse date");
+//        }
+//
+//    }
+
 }
