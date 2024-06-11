@@ -4,14 +4,14 @@ import java.math.BigInteger;
 import java.util.UUID;
 
 public class IBANGenerator {
-    private static final String COUNTRY_CODE = "NL";
-    private static final String BANK_CODE = "INHO";
+    private static final String countryCode = "NL";
+    private static final String bankCode = "INHO";
 
     public static String generateUniqueIBAN() {
         String accountNumber = generateAccountNumber();
-        String partialIBAN = COUNTRY_CODE + "00" + BANK_CODE + accountNumber;
+        String partialIBAN = countryCode + "00" + bankCode + accountNumber;
         String checkDigits = calculateCheckDigits(partialIBAN);
-        return COUNTRY_CODE + checkDigits + BANK_CODE + accountNumber;
+        return countryCode + checkDigits + bankCode + accountNumber;
     }
 
     private static String generateAccountNumber() {

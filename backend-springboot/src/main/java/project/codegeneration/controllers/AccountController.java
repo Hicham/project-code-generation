@@ -6,19 +6,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import project.codegeneration.models.Account;
 import project.codegeneration.models.DTO.AccountDTO;
 import project.codegeneration.models.DTO.TransactionLimitDTO;
-import project.codegeneration.models.User;
 import project.codegeneration.services.AccountService;
 import project.codegeneration.services.TransactionLimitService;
 import project.codegeneration.services.UserService;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -119,11 +115,7 @@ public class AccountController extends Controller {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/accounts/{IBAN}/disable")
     public ResponseEntity<String> disableAccount(@PathVariable String IBAN) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = authentication.getName();
-        Optional<User> currentUser = userService.findByEmail(currentUsername);
 
-        if (currentUser.isPresent()) {
             Account account = accountService.getAccountByIBAN(IBAN);
             if (account != null) {
                 account.setActive(false);
@@ -132,20 +124,11 @@ public class AccountController extends Controller {
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account not found.");
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account not found.");
-        }
-
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/accounts/{IBAN}/enable")
     public ResponseEntity<String> enableAccount(@PathVariable String IBAN) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = authentication.getName();
-        Optional<User> currentUser = userService.findByEmail(currentUsername);
-
-        if (currentUser.isPresent()) {
             Account account = accountService.getAccountByIBAN(IBAN);
             if (account != null) {
                 account.setActive(true);
@@ -154,10 +137,6 @@ public class AccountController extends Controller {
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account not found.");
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account not found.");
-        }
-
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
