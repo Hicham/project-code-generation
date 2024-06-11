@@ -136,6 +136,11 @@ public class TransactionService {
     public Page<Transaction> getAccountTransactions(String ownIban, LocalDate startDate, LocalDate endDate, Double amount, String amountCondition, String ibanFilter, String ibanType, Pageable pageable) {
 
 
+
+        if(accountService.getAccountByIBAN(ownIban) == null) {
+            throw new ResourceNotFoundException("IBAN not found");
+        }
+
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Transaction> query = cb.createQuery(Transaction.class);
         Root<Transaction> transaction = query.from(Transaction.class);
