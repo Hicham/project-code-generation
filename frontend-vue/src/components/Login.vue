@@ -39,7 +39,7 @@
                         <a class="small" href="#">Forgot password</a>
                       </div>
                       <div>
-                        <a class="small" href="/register">Register here</a>
+                        <router-link class="small" router-link to="/register">Register here</router-link>
                       </div>
                     </div>
 
