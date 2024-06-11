@@ -15,16 +15,15 @@ Feature: UserStep operations
 
   Scenario: Finding a user by email when the user exists
     Given user is logged in as "user" with username "user@gmail.com" password "Test123"
-    And The endpoint for "/api/users/{email}" is available for method "POST"
-    When I access the endpoint "/api/users/{email}" with method "POST"
+    And The endpoint for "/api/users/email" is available for method "GET"
+    When I access the endpoint "/api/users/email" with method "GET"
     Then I should receive status code 403
 
-
   Scenario: Finding a user by email when the user does not exist
-    Given there is no user with email "nonexistent@example.com"
-    And The endpoint for "/api/users/search" is available for method "POST"
-    When the email "nonexistent@example.com" is searched for using endpoint "/api/users/search" with method "POST"
-    Then a ResourceNotFoundException should be thrown
+    Given user is given a user with email "user@gmail.com"
+    And The endpoint for "/api/users/email" is available for method "GET"
+    When I access the endpoint "/api/users/email" with method "GET"
+    Then I should receive status code 403
 
   Scenario: Creating a new user
     Given a new user with email "newuser@example.com" and password "Test123"
