@@ -52,6 +52,9 @@ public class DataSeeder implements ApplicationRunner {
         User user2 = new User(List.of(Role.ROLE_USER), true, "user@gmail.com", "Test123", "test", "test", "3652584", "06352615");
         userService.create(user2);
 
+        User user3 = new User(List.of(Role.ROLE_USER), false, "user3@gmail.com", "Test123", "test", "test", "3652584", "06352615");
+        userService.create(user3);
+
         createAccountWithTransactionLimit(user2, "IBANFAKE3", 1000.00, AccountType.CHECKING,  0, 20000);
         createAccountWithTransactionLimit(user2, "IBANFAKE4", 1000.00, AccountType.SAVINGS, 0, 20000);
 
