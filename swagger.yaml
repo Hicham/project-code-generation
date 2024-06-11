@@ -5,6 +5,7 @@ info:
   version: 2.0.0
 servers:
   - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/698917_1/Bank/2.0.0
   - url: 'https://project-code-generation.onrender.com'
     description: Bank application
 paths:
@@ -133,6 +134,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+        '403':
+          description: You do not have permission to access this resource
         '500':
           description: Internal server error.
 
@@ -166,6 +169,8 @@ paths:
                 type: string
         '400':
           description: Bad request. Could be due to missing or invalid fields
+        '403':
+          description: You do not have permission to access this resource
 
   /users/{userId}:
     get:
@@ -189,6 +194,8 @@ paths:
                 $ref: '#/components/schemas/User'
         '400':
           description: Bad request. Could be due to missing or invalid fields
+        '403':
+          description: You do not have permission to access this resource
         '404':
           description: User not found.
         '500':
@@ -256,6 +263,8 @@ paths:
                     example: 'User details updated successfully.'
         '400':
           description: Bad request. Could be due to missing or invalid fields.
+        '403':
+          description: You do not have permission to access this resource
         '404':
           description: User not found.
         '500':
@@ -275,6 +284,8 @@ paths:
       responses:
         '204':
           description: User deactivated successfully.
+        '403':
+          description: You do not have permission to access this resource
         '404':
           description: User not found.
         '500':
@@ -311,6 +322,8 @@ paths:
           description: Money deposited successfully.
         '400':
           description: Bad request, such as invalid account ID or amount.
+        '403':
+          description: You do not have permission to access this resource
         '404':
           description: Account not found.
         '500':
@@ -347,6 +360,8 @@ paths:
           description: Money withdrawn successfully.
         '400':
           description: Bad request, such as invalid account ID or amount.
+        '403':
+          description: You do not have permission to access this resource
         '404':
           description: Account not found.
         '500':
@@ -372,7 +387,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Account'
         '400':
-          description: Bad request. Could be due to missing or invalid fields
+          description: Bad request. Could be due to missing or invalid field
+        '403':
+          description: You do not have permission to access this resource
         '404':
           description: Account not found.
         '500':
@@ -421,6 +438,8 @@ paths:
                     example: 'Account details updated successfully.'
         '400':
           description: Bad request. Could be due to missing or invalid fields.
+        '403':
+          description: You do not have permission to access this resource
         '404':
           description: Account not found.
         '500':
@@ -439,6 +458,8 @@ paths:
       responses:
         '204':
           description: Account deleted successfully.
+        '403':
+          description: You do not have permission to access this resource
         '404':
           description: Account not found.
         '500':
@@ -466,6 +487,8 @@ paths:
                 example: Account disabled successfully.
         '400':
           description: Bad request. Could be due to missing or invalid fields
+        '403':
+          description: You do not have permission to access this resource
         '404':
           description: Account not found.
           content:
@@ -501,6 +524,8 @@ paths:
               schema:
                 type: string
                 example: Account enabled successfully.
+        '403':
+          description: You do not have permission to access this resource
         '404':
           description: Account not found.
           content:
@@ -544,6 +569,8 @@ paths:
                 example: Transaction limits updated successfully.
         '400':
           description: Bad request. Could be due to missing or invalid fields
+        '403':
+          description: You do not have permission to access this resource
         '404':
           description: Account not found.
           content:
@@ -586,6 +613,8 @@ paths:
                 $ref: '#/components/schemas/Account'
         '400':
           description: Bad request. Could be due to missing or invalid fields.
+        '403':
+          description: You do not have permission to access this resource
         '500':
           description: Internal server error.
     get:
@@ -608,6 +637,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/UserAccount'
+        '403':
+          description: You do not have permission to access this resource
         '500':
           description: Internal server error.
 
@@ -634,6 +665,8 @@ paths:
                   $ref: '#/components/schemas/UserAccount'
         '400':
           description: Bad request. Could be due to missing or invalid fields
+        '403':
+          description: You do not have permission to access this resource
         '500':
           description: Internal server error
 
@@ -666,6 +699,8 @@ paths:
                       example: "NL91ABNA0417164300"
         '400':
           description: Bad request. Could be due to missing or invalid fields
+        '403':
+          description: You do not have permission to access this resource
         '404':
           description: Customer not found.
         '500':
@@ -726,6 +761,8 @@ paths:
                   $ref: '#/components/schemas/Transaction'
         '400':
           description: Bad request. Could be due to missing or invalid fields
+        '403':
+          description: You do not have permission to access this resource
         '500':
           description: Internal server error.
     post:
@@ -759,6 +796,8 @@ paths:
           description: Money transferred successfully.
         '400':
           description: Bad request. Could be due to missing or invalid fields
+        '403':
+          description: You do not have permission to access this resource
         '404':
           description: Account not found.
         '500':
@@ -834,6 +873,8 @@ paths:
                       $ref: '#/components/schemas/Transaction'
         '400':
           description: Bad request. Could be due to missing or invalid fields
+        '403':
+          description: You do not have permission to access this resource
         '500':
           description: Internal server error.
           
