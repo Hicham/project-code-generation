@@ -30,7 +30,7 @@
         </tbody>
       </table>
     </div>
-    <Modal :title="'Set transaction limits for user ID: ' + selectedUser.email" :show="showModal" @close="closeModal" @confirm="approveUser" :confirmText="'Approve'">
+    <Modal v-if="showModal" :title="'Set transaction limits for user ID: ' + selectedUser.email" :show="showModal" @close="closeModal" @confirm="approveUser" :confirmText="'Approve'">
       <div class="form-group">
         <label for="dailyLimit">Daily Limit</label>
         <input type="number" class="form-control" id="dailyLimit" v-model="limits.dailyLimit">
@@ -103,6 +103,13 @@ export default {
         showPopup.value = true;
       } catch (error) {
         console.error(error);
+      }
+    };
+
+    const validateNumber = (event) => {
+      const value = event.target.value;
+      if (!/^\d*$/.test(value)) {
+        event.target.value = value.replace(/[^\d]/g, '');
       }
     };
 
