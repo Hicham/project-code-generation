@@ -134,7 +134,7 @@ class AccountServiceTest {
         List<Account> accounts = Arrays.asList(new Account(), new Account());
         Page<Account> page = new PageImpl<>(accounts);
 
-        when(userService.getUserById(anyInt())).thenReturn(Optional.of(user));
+        when(userService.getUserById(1)).thenReturn(Optional.of(user));
         when(accountRepository.findByUserId(any(Pageable.class), anyInt())).thenReturn(page);
 
         Page<Account> result = accountService.getAccountsByUserId(PageRequest.of(0, 10), 1);
@@ -168,7 +168,7 @@ class AccountServiceTest {
         List<Account> accounts = Arrays.asList(new Account(), new Account());
         Page<Account> page = new PageImpl<>(accounts);
 
-        when(userService.getUserById(anyInt())).thenReturn(Optional.of(user));
+        when(userService.getUserById(1)).thenReturn(Optional.of(user));
         when(accountRepository.findByUserIdAndAccountType(any(Pageable.class), anyInt(), any(AccountType.class))).thenReturn(page);
 
         Page<Account> result = accountService.getCheckingAccountsByUserId(PageRequest.of(0, 10), 1);

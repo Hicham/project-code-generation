@@ -87,7 +87,8 @@ public class AccountService {
 
     public Page<Account> getCheckingAccountsByUserId(Pageable pageable, Integer userId) {
 
-        if (!userService.getUserById(userId).isPresent())
+
+        if (userService.getUserById(userId).isEmpty())
         {
             throw new ResourceNotFoundException("User not found");
         }

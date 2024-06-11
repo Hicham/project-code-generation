@@ -61,26 +61,11 @@ public class WebSecurityConfiguration {
         return new BCryptPasswordEncoder(12);
     }
 
-//    @Bean
-//    public CorsConfigurationSource corsConfigurationSource() {
-//        CorsConfiguration configuration = new CorsConfiguration();
-////        configuration.addAllowedOrigin("http://localhost:5173");
-//        configuration.addAllowedOrigin("https://hicham.github.io/project-code-generation");
-//        configuration.addAllowedMethod("*");
-//        configuration.addAllowedHeader("*");
-//        configuration.setAllowCredentials(true);
-//
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        source.registerCorsConfiguration("/**", configuration);
-//        return source;
-//    }
-
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:5173",
-                "http://127.0.0.1:5173",
                 "https://hicham.github.io/project-code-generation/",
                 "https://hicham.github.io/"
         ));

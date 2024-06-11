@@ -134,25 +134,30 @@ public class TransactionService {
     }
 
     public Page<Transaction> getAccountTransactions(String ownIban, LocalDate startDate, LocalDate endDate, Double amount, String amountCondition, String ibanFilter, String ibanType, Pageable pageable) {
-
-
-
-        if(accountService.getAccountByIBAN(ownIban) == null) {
+        if (accountService.getAccountByIBAN(ownIban) == null) {
             throw new ResourceNotFoundException("IBAN not found");
         }
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Transaction> query = cb.createQuery(Transaction.class);
         Root<Transaction> transaction = query.from(Transaction.class);
+
+        List<Predicate> predicates = createPredicates(cb, transaction, ownIban, startDate, endDate, amount, amountCondition, ibanFilter, ibanType);
+
+        query.where(predicates.toArray(new Predicate[0]));
+
+        CriteriaQuery<Transaction> select = query.select(transaction);
+
+        return executePagedQuery(select, pageable);
+    }
+
+    private List<Predicate> createPredicates(CriteriaBuilder cb, Root<Transaction> transaction, String ownIban, LocalDate startDate, LocalDate endDate, Double amount, String amountCondition, String ibanFilter, String ibanType) {
         List<Predicate> predicates = new ArrayList<>();
 
-
         if (startDate != null) {
-
             predicates.add(cb.greaterThanOrEqualTo(transaction.get("timestamp"), convertDateToTimestamp(startDate)));
         }
         if (endDate != null) {
-
             predicates.add(cb.lessThanOrEqualTo(transaction.get("timestamp"), convertDateToTimestamp(endDate)));
         }
 
@@ -178,7 +183,6 @@ public class TransactionService {
         );
         predicates.add(ownIbanPredicate);
 
-
         if (ibanFilter != null && ibanType != null) {
             switch (ibanType) {
                 case "source":
@@ -192,10 +196,11 @@ public class TransactionService {
             }
         }
 
-        query.where(predicates.toArray(new Predicate[0]));
+        return predicates;
+    }
 
-        CriteriaQuery<Transaction> select = query.select(transaction);
-        TypedQuery<Transaction> typedQuery = entityManager.createQuery(select);
+    private Page<Transaction> executePagedQuery(CriteriaQuery<Transaction> query, Pageable pageable) {
+        TypedQuery<Transaction> typedQuery = entityManager.createQuery(query);
 
         int totalRows = typedQuery.getResultList().size();
         typedQuery.setFirstResult((int) pageable.getOffset());
@@ -205,6 +210,7 @@ public class TransactionService {
 
         return new PageImpl<>(transactionList, pageable, totalRows);
     }
+
 
 
     public static long convertDateToTimestamp(LocalDate date) {
