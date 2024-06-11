@@ -48,10 +48,10 @@ public class UserService {
     }
 
     public String login(String email, String password) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("User not found"));
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid credentials combination"));
 
         if (!bCryptPasswordEncoder.matches(password, user.getPassword())) {
-            throw new IllegalArgumentException("Invalid password");
+            throw new IllegalArgumentException("Invalid credentials combination");
         }
 
         return jwtProvider.createToken(user);

@@ -6,12 +6,6 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-md-4">
-        <input type="text" class="form-control" placeholder="Search for user">
-      </div>
-
-    </div>
-    <div class="row">
       <div class="col-md-12">
         <table class="table table-striped table-hover">
           <thead class="thead-dark">
