@@ -37,6 +37,7 @@ public class UserService {
         return user;
     }
 
+    // duha-toets
     public User create(User user) {
 
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {

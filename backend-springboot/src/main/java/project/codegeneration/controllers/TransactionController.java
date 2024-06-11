@@ -65,6 +65,7 @@ public class TransactionController extends Controller {
     }
 
 
+    // duha-toets
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     @PostMapping("/transactions")
     public ResponseEntity<?> createTransaction(@RequestBody TransactionRequestDTO transactionRequest) {

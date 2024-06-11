@@ -26,6 +26,7 @@ import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -113,7 +114,7 @@ public class AccountControllerTest {
         when(userService.findByEmail(anyString())).thenReturn(Optional.of(new User()));
         when(accountService.getAccountByIBAN(anyString())).thenReturn(new Account());
 
-        mockMvc.perform(post("/api/accounts/IBAN123/disable")
+        mockMvc.perform(put("/api/accounts/IBAN123/disable")
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Account disabled successfully."));
@@ -125,7 +126,7 @@ public class AccountControllerTest {
         when(userService.findByEmail(anyString())).thenReturn(Optional.of(new User()));
         when(accountService.getAccountByIBAN(anyString())).thenReturn(new Account());
 
-        mockMvc.perform(post("/api/accounts/IBAN123/enable")
+        mockMvc.perform(put("/api/accounts/IBAN123/enable")
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Account enabled successfully."));

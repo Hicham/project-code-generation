@@ -62,7 +62,7 @@ public class UserControllerTest {
         user.setId(1);
         when(userService.getNotApprovedUsers()).thenReturn(Collections.singletonList(user));
 
-        mockMvc.perform(get("/api/unapproved-users"))
+        mockMvc.perform(get("/api/users/unapproved"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
         verify(userService).getNotApprovedUsers();

@@ -3,6 +3,7 @@ import axios from '../axios-auth';
 import axiosInstance from '../axios-instance';
 import jwtDecode from "jwt-decode";
 
+// duha-toets
 export const useStore = defineStore('counter', {
     state: () => ({
         token: '',

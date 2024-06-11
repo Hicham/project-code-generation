@@ -71,11 +71,12 @@
   </div>
 </template>
 
+
 <script>
+// duha-toets
 import axiosInstance from '@/axios-instance';
 import { useStore } from '@/stores/store';
 import { ref, onMounted, computed } from 'vue';
-import axios from "axios";
 
 export default {
   name: "TransferFunds",
