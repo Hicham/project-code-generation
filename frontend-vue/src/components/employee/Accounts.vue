@@ -45,16 +45,8 @@
         </ul>
       </nav>
     </div>
-    <div v-if="showLimitModal" class="modal fade show" style="display: block;" tabindex="-1" role="dialog">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Set Transaction Limits</h5>
-            <button type="button" class="close" @click="closeLimitModal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
+
+          <Modal :title="'Set Transaction Limits'" :show="showLimitModal" @close="closeLimitModal" @confirm="setLimits" :confirmText="'Save Limits'">
             <form @submit.prevent="setLimits">
               <div class="form-group">
                 <label for="dailyLimit">Daily Limit</label>
@@ -64,21 +56,20 @@
                 <label for="absoluteLimit">Absolute Limit</label>
                 <input type="number" v-model="limits.absoluteLimit" class="form-control" id="absoluteLimit" required>
               </div>
-              <button type="submit" class="btn btn-primary">Save Limits</button>
             </form>
-          </div>
+          </Modal>
         </div>
-      </div>
-    </div>
-  </div>
+      
 </template>
 
 <script>
 import axiosInstance from '@/axios-instance';
 import {useStore} from "@/stores/store";
+import Modal from "@/components/employee/Modal.vue";
 
 export default {
   name: "accounts",
+  components: {Modal},
   data() {
     return {
       accounts: [],
@@ -127,7 +118,7 @@ export default {
       }
     },
     enableAccount(account) {
-      axiosInstance.post(`/api/accounts/enable/${account.iban}`, null, {
+      axiosInstance.post(`/api/accounts/${account.iban}/enable`, null, {
         headers: { Authorization: 'Bearer ' + useStore().token }
       })
           .then(() => {
@@ -140,7 +131,7 @@ export default {
     },
 
     disableAccount(account) {
-      axiosInstance.post(`/api/accounts/disable/${account.iban}`, null, {
+      axiosInstance.post(`/api/accounts/${account.iban}/disable`, null, {
         headers: { Authorization: 'Bearer ' + useStore().token }
       })
           .then(() => {
@@ -167,7 +158,7 @@ export default {
       };
     },
     setLimits() {
-      axiosInstance.post(`/api/accounts/setLimits/${this.selectedAccount.iban}`, this.limits, {
+      axiosInstance.post(`/api/accounts/${this.selectedAccount.iban}/setLimits`, this.limits, {
         headers: { Authorization: 'Bearer ' + useStore().token }
       })
           .then(() => {

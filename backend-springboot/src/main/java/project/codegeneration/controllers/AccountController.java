@@ -117,7 +117,7 @@ public class AccountController extends Controller {
 
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @PostMapping("/accounts/disable/{IBAN}")
+    @PostMapping("/accounts/{IBAN}/disable")
     public ResponseEntity<String> disableAccount(@PathVariable String IBAN) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUsername = authentication.getName();
@@ -139,7 +139,7 @@ public class AccountController extends Controller {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @PostMapping("/accounts/enable/{IBAN}")
+    @PostMapping("/accounts/{IBAN}/enable")
     public ResponseEntity<String> enableAccount(@PathVariable String IBAN) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUsername = authentication.getName();
@@ -161,13 +161,13 @@ public class AccountController extends Controller {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @PostMapping("/accounts/setLimits/{iban}")
+    @PostMapping("/accounts/{IBAN}/setLimits")
     public ResponseEntity<String> setTransactionLimits(
-            @PathVariable String iban,
+            @PathVariable String IBAN,
             @RequestBody TransactionLimitDTO transactionLimitDTO) {
-        accountService.setAbsoluteLimit(iban, transactionLimitDTO.getAbsoluteLimit());
+        accountService.setAbsoluteLimit(IBAN, transactionLimitDTO.getAbsoluteLimit());
         transactionLimitService.setTransactionLimit(
-                iban,
+                IBAN,
                 transactionLimitDTO.getDailyLimit()
         );
         return ResponseEntity.ok("Transaction limits updated successfully");
@@ -189,6 +189,4 @@ public class AccountController extends Controller {
         )).collect(Collectors.toList());
         return ResponseEntity.ok(accountDTOs);
     }
-
-
 }

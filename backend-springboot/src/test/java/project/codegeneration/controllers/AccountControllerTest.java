@@ -2,19 +2,18 @@ package project.codegeneration.controllers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 import project.codegeneration.models.Account;
 import project.codegeneration.models.DTO.TransactionLimitDTO;
 import project.codegeneration.models.User;
@@ -25,21 +24,13 @@ import project.codegeneration.services.UserService;
 
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
-import org.springframework.security.web.FilterChainProxy;
-import org.springframework.security.web.csrf.CsrfToken;
-import org.springframework.security.web.csrf.CsrfTokenRepository;
-import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 
 //@ExtendWith(MockitoExtension.class)
 @WebMvcTest(AccountController.class)
@@ -122,7 +113,7 @@ public class AccountControllerTest {
         when(userService.findByEmail(anyString())).thenReturn(Optional.of(new User()));
         when(accountService.getAccountByIBAN(anyString())).thenReturn(new Account());
 
-        mockMvc.perform(post("/api/accounts/disable/IBAN123")
+        mockMvc.perform(post("/api/accounts/IBAN123/disable")
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Account disabled successfully."));
@@ -134,7 +125,7 @@ public class AccountControllerTest {
         when(userService.findByEmail(anyString())).thenReturn(Optional.of(new User()));
         when(accountService.getAccountByIBAN(anyString())).thenReturn(new Account());
 
-        mockMvc.perform(post("/api/accounts/enable/IBAN123")
+        mockMvc.perform(post("/api/accounts/IBAN123/enable")
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Account enabled successfully."));
@@ -146,7 +137,7 @@ public class AccountControllerTest {
         TransactionLimitDTO transactionLimitDTO = new TransactionLimitDTO("IBAN", 500, 0);
         String json = "{\"absoluteLimit\":1000,\"dailyLimit\":500}";
 
-        mockMvc.perform(post("/api/accounts/setLimits/IBAN123")
+        mockMvc.perform(post("/api/accounts/IBAN123/setLimits")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
                         .with(csrf()))

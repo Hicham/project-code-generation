@@ -85,11 +85,12 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @PostMapping("/accounts/approve")
-    public ResponseEntity<String> approveUser(@RequestBody ApproveUserDTO request) {
+    @PostMapping("/users/{id}/approve")
+    public ResponseEntity<String> approveUser(@RequestBody ApproveUserDTO request, @PathVariable String id) {
         try {
-            userService.approveUser(request.getUserId());
-            accountService.createAccountForApprovedUser(userService.getUserById(request.getUserId()).get(), request);
+            long userId = Long.parseLong(id);
+            userService.approveUser(userId);
+            accountService.createAccountForApprovedUser(userService.getUserById(userId).orElseThrow(), request);
             return ResponseEntity.ok("User approved");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -116,9 +117,5 @@ public class UserController {
         } else {
             throw new IllegalArgumentException("User not found");
         }
-
-
     }
-
-
 }

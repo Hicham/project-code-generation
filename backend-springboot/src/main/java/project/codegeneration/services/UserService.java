@@ -61,15 +61,15 @@ public class UserService {
         return userRepository.findByIsApprovedAndRolesContains(false, Role.ROLE_USER);
     }
 
-    public void approveUser(int userId) {
-        User user = userRepository.findById((long) userId).orElseThrow();
+    public void approveUser(long userId) {
+        User user = userRepository.findById(userId).orElseThrow();
         user.setApproved(true);
         userRepository.save(user);
         userRepository.flush();
     }
 
-    public Optional<User> getUserById(int userId) {
-        return userRepository.findById((long) userId);
+    public Optional<User> getUserById(long userId) {
+        return userRepository.findById(userId);
     }
 
     public User getUserByEmail(String email) {
