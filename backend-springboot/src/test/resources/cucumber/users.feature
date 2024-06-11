@@ -46,7 +46,7 @@ Feature: UserStep operations
 
   Scenario: Retrieving a list of not approved users
     Given there are users who are not approved
-    And The endpoint for "/api/not-approved-users" is available for method "GET"
+    And The endpoint for "/api/users/unapproved" is available for method "GET"
     When retrieving the list of not approved users using endpoint "/api/not-approved-users" with method "GET"
     Then a list of not approved users should be returned
 
