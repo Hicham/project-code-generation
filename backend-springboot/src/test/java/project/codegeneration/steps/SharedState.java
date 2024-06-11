@@ -24,5 +24,4 @@ public class SharedState {
     public void setHeaders(HttpHeaders headers) {
         this.headers = headers;
     }
-    
 }
